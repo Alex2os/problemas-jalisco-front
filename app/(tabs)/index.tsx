@@ -1,22 +1,20 @@
-import { Image } from 'expo-image';
+import {Image} from 'expo-image';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 
-import { ThemedText } from '@/components/themed-text';
+import {ThemedText} from '@/components/themed-text';
 
-import { ThemedView } from '@/components/themed-view';
+import {ThemedView} from '@/components/themed-view';
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import {useThemeColor} from '@/hooks/use-theme-color';
 
-import { LinearGradient } from 'expo-linear-gradient';
+import {LinearGradient} from 'expo-linear-gradient';
 
-import { useRouter } from 'expo-router';
+import {useRouter} from 'expo-router';
 
-import React from "react";
+import {Pressable, useWindowDimensions, View} from 'react-native';
 
-import { Pressable, useWindowDimensions, View } from 'react-native';
-
-import { estilosInicio } from "@/styles/estilosInicio";
+import {estilosInicio} from "@/styles/estilosInicio";
 
 // Pantalla principal de bienvenida (Inicio).
 export default function HomeScreen() {

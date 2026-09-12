@@ -1,13 +1,14 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import {ThemedText} from '@/components/themed-text';
+import {ThemedView} from '@/components/themed-view';
+import {useThemeColor} from '@/hooks/use-theme-color';
 
 import Feather from '@expo/vector-icons/Feather';
 import * as SecureStore from "expo-secure-store";
 
-import React, { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import {
   Animated,
+  Pressable,
   StyleSheet,
   TextInput,
   useColorScheme,
@@ -15,18 +16,17 @@ import {
   View
 } from 'react-native';
 
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
 
-import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
 import BotonAgregarReporte from "@/components/BotonAgregarReporte";
 import BotonCancelarReporte from "@/components/BotonCancelarReporte";
+import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
 import SelectorReporte from "@/components/SelectorReporte";
-import BotonActualizarReportes from "@/components/BotonActualizarReportes";
 
-import { crearReporte } from "@/services/crearReporte";
-import { obtenerTodosLosReportes } from "@/services/obtenerTodosLosReportes";
+import {crearReporte} from "@/services/crearReporte";
+import {obtenerTodosLosReportes} from "@/services/obtenerTodosLosReportes";
 
-import { estilosMapa } from "@/styles/estilosMapa";
+import {estilosMapa} from "@/styles/estilosMapa";
 
 // Pantalla principal del mapa interactivo donde se visualizan y agregan reportes en el estado de Jalisco.
 export default function PantallaMapa() {
@@ -272,7 +272,25 @@ export default function PantallaMapa() {
         ))}
       </MapView>
 
-      <BotonActualizarReportes obtenerReportes={obtenerReportes} />
+      <Pressable
+            style={{
+                position: "absolute",
+                height: "5%",
+                width: "70%",
+                alignItems: "center",
+                justifyContent: "center",
+                top: 60,
+                backgroundColor: "#FFF",
+            }}
+            onPress={obtenerReportes}>
+            <ThemedText style={{
+                fontSize: 17,
+                fontWeight: "bold",
+                color: "black",
+            }}>
+                Actualizar
+            </ThemedText>
+        </Pressable>
 
       {popupCuentaNecesariaActivo &&
         <PopupCuentaNecesaria

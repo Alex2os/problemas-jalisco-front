@@ -1,21 +1,20 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useRouter } from 'expo-router';
+import {ThemedText} from '@/components/themed-text';
+import {ThemedView} from '@/components/themed-view';
+import {useThemeColor} from '@/hooks/use-theme-color';
+import {useRouter} from 'expo-router';
 import * as SecureStore from "expo-secure-store";
-import { useRef, useState } from "react";
-import { Animated, Pressable, Text, TextInput, View } from 'react-native';
+import {useRef, useState} from "react";
+import {Animated, Pressable, Text, TextInput, View} from 'react-native';
 
-import { Image } from 'expo-image';
+import {Image} from 'expo-image';
 
-import { LinearGradient } from 'expo-linear-gradient';
-import React from "react";
+import {LinearGradient} from 'expo-linear-gradient';
 
-import { estilosInicio } from "@/styles/estilosInicio";
+import {estilosInicio} from "@/styles/estilosInicio";
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 
-import { iniciarSesionUsuario } from "@/services/iniciarSesionUsuario";
+import {iniciarSesionUsuario} from "@/services/iniciarSesionUsuario";
 
 // Pantalla para iniciar sesión con correo electrónico y contraseña.
 export default function Login() {

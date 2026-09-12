@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 
 // No realizar llamadas a hooks desde este archivo. Los hooks solo deben ejecutarse dentro de componentes React y no en archivos externos.
 
