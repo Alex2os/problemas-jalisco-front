@@ -10,6 +10,7 @@ import {
   Animated,
   Pressable,
   StyleSheet,
+  Text,
   TextInput,
   useColorScheme,
   useWindowDimensions,
@@ -40,8 +41,8 @@ export default function PantallaMapa() {
   const [popupReporteActivo, setPopupReporteActivo] = useState(false);
   const [popupCuentaNecesariaActivo, setPopupCuentaNecesariaActivo] = useState(false);
 
-  const { height: alto } = useWindowDimensions();
-  const { width: ancho } = useWindowDimensions();
+  const {height: alto} = useWindowDimensions();
+  const {width: ancho} = useWindowDimensions();
 
   const esquemaColor = useColorScheme();
   const colorFondo = useThemeColor({}, 'background');
@@ -57,7 +58,7 @@ export default function PantallaMapa() {
   };
 
   useEffect(() => {
-    if (popupReporteActivo) {
+    if(popupReporteActivo) {
       Animated.timing(animacionDesvanecer, {
         toValue: 1,
         duration: 100,
@@ -78,7 +79,7 @@ export default function PantallaMapa() {
   }, []);
 
   const manejarPresionMapa = (evento: any) => {
-    const { latitude: latitud, longitude: longitud } = evento.nativeEvent.coordinate;
+    const {latitude: latitud, longitude: longitud} = evento.nativeEvent.coordinate;
 
     setNuevoMarcador([
       {
@@ -92,7 +93,7 @@ export default function PantallaMapa() {
 
   // Función para asignar un color distinto al marcador del mapa según la categoría del reporte.
   function definirColorMarcador(tituloMarcador: string) {
-    switch (tituloMarcador) {
+    switch(tituloMarcador) {
       case "accidente":
         return "#ff6969";
 
@@ -121,7 +122,7 @@ export default function PantallaMapa() {
 
   // Función para determinar el ícono de Feather Icons asignado a cada tipo de problema.
   function definirIconoMarcador(tituloMarcador: string) {
-    switch (tituloMarcador) {
+    switch(tituloMarcador) {
       case "accidente":
         return "alert-triangle";
 
@@ -152,12 +153,12 @@ export default function PantallaMapa() {
   function verificarCoordenadasNuevoMarcador() {
     const marcadorActual = nuevoMarcador[0];
 
-    if (
+    if(
       marcadorActual.latitude < limitesJalisco.south ||
       marcadorActual.latitude > limitesJalisco.north
     ) return false;
 
-    if (
+    if(
       marcadorActual.longitude < limitesJalisco.west ||
       marcadorActual.longitude > limitesJalisco.east
     ) return false;
@@ -169,7 +170,7 @@ export default function PantallaMapa() {
   async function agregarMarcadorAlMapa() {
     const tokenAutenticacion = await SecureStore.getItemAsync("auth_token");
 
-    if (tokenAutenticacion) { }
+    if(tokenAutenticacion) {}
     else {
       setPopupCuentaNecesariaActivo(true);
       setPopupReporteActivo(false);
@@ -177,7 +178,7 @@ export default function PantallaMapa() {
       return;
     }
 
-    if (!verificarCoordenadasNuevoMarcador()) {
+    if(!verificarCoordenadasNuevoMarcador()) {
       setPopupReporteActivo(false);
 
       return;
@@ -196,7 +197,7 @@ export default function PantallaMapa() {
 
       console.log("Reporte creado.", datos);
     }
-    catch (error) {
+    catch(error) {
       console.log("Error al crear el reporte.", error);
     }
 
@@ -222,7 +223,7 @@ export default function PantallaMapa() {
 
       console.log("Reportes obtenidos.");
     }
-    catch (error) {
+    catch(error) {
       console.log("Error al obtener los reportes.", error);
     }
   }
@@ -273,24 +274,11 @@ export default function PantallaMapa() {
       </MapView>
 
       <Pressable
-            style={{
-                position: "absolute",
-                height: "5%",
-                width: "70%",
-                alignItems: "center",
-                justifyContent: "center",
-                top: 60,
-                backgroundColor: "#FFF",
-            }}
-            onPress={obtenerReportes}>
-            <ThemedText style={{
-                fontSize: 17,
-                fontWeight: "bold",
-                color: "black",
-            }}>
-                Actualizar
-            </ThemedText>
-        </Pressable>
+        className="absolute top-[60px] h-[5%] w-[70%] items-center justify-center bg-white"
+        onPress={obtenerReportes}>
+        <Text className="text-xl font-bold">hello
+        </Text>
+      </Pressable>
 
       {popupCuentaNecesariaActivo &&
         <PopupCuentaNecesaria
@@ -305,8 +293,8 @@ export default function PantallaMapa() {
             opacity: animacionDesvanecer,
             pointerEvents: popupReporteActivo ? "auto" : "none",
             transform: [
-              { translateY: -(alto / 2) / 1.9 },
-              { translateX: -(ancho / 2) / 1.25 },
+              {translateY: -(alto / 2) / 1.9},
+              {translateX: -(ancho / 2) / 1.25},
             ],
             height: alto / 1.9,
             width: ancho / 1.25,
@@ -324,7 +312,7 @@ export default function PantallaMapa() {
         >
           <ThemedText
             type="subtitle"
-            style={{ textAlign: "center" }}
+            style={{textAlign: "center"}}
           >
             ¿Qué problema quieres reportar?
           </ThemedText>
