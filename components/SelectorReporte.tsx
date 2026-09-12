@@ -1,9 +1,7 @@
-import { ThemedView } from '@/components/themed-view';
-import { Picker } from '@react-native-picker/picker';
+import {ThemedView} from '@/components/themed-view';
+import {Picker} from '@react-native-picker/picker';
 import React from "react";
-import { useColorScheme } from 'react-native';
-
-import { estilosMapa } from "@/styles/estilosMapa";
+import {useColorScheme} from 'react-native';
 
 // Componente selector de categoría de reporte.
 // Recibe como props el valor seleccionado (problemaSeleccionado) y la función modificadora de estado (setProblemaSeleccionado).
@@ -28,8 +26,7 @@ export default function SelectorReporte(propiedades: any) {
             }}>
                 <Picker
                     selectedValue={problemaSeleccionado}
-                    onValueChange={(valorItem: any) => setProblemaSeleccionado(valorItem)}
-                    style={estilosMapa.selectorReporte}>
+                    onValueChange={(valorItem: any) => setProblemaSeleccionado(valorItem)}>
                     <Picker.Item label="Accidente" value="accidente" />
                     <Picker.Item label="Basura" value="basura" />
                     <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />

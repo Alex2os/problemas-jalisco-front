@@ -13,36 +13,32 @@ import {
   Text,
   TextInput,
   useColorScheme,
-  useWindowDimensions,
   View
 } from 'react-native';
 
 import MapView, {Marker} from 'react-native-maps';
 
-import BotonAgregarReporte from "@/components/BotonAgregarReporte";
-import BotonCancelarReporte from "@/components/BotonCancelarReporte";
 import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
 import SelectorReporte from "@/components/SelectorReporte";
 
+import CancelReportButton from "@/components/CancelReportButton";
 import {crearReporte} from "@/services/crearReporte";
 import {obtenerTodosLosReportes} from "@/services/obtenerTodosLosReportes";
 
-import {estilosMapa} from "@/styles/estilosMapa";
+import {mapStyles} from "@/styles/mapStyles";
 
 // Pantalla principal del mapa interactivo donde se visualizan y agregan reportes en el estado de Jalisco.
 export default function PantallaMapa() {
 
-  const [marcadores, setMarcadores] = useState<any[]>([]);
-  const [nuevoMarcador, setNuevoMarcador] = useState<any[]>([]);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [newMarker, setNewMarker] = useState<any[]>([]);
 
   const [problemaSeleccionado, setProblemaSeleccionado] = useState("accidente");
   const [textoReporte, setTextoReporte] = useState("");
 
-  const [popupReporteActivo, setPopupReporteActivo] = useState(false);
-  const [popupCuentaNecesariaActivo, setPopupCuentaNecesariaActivo] = useState(false);
+  const [reportProblemModal, setReportProblemModal] = useState(false);
 
-  const {height: alto} = useWindowDimensions();
-  const {width: ancho} = useWindowDimensions();
+  const [popupCuentaNecesariaActivo, setPopupCuentaNecesariaActivo] = useState(false);
 
   const esquemaColor = useColorScheme();
   const colorFondo = useThemeColor({}, 'background');
@@ -58,100 +54,50 @@ export default function PantallaMapa() {
   };
 
   useEffect(() => {
-    if(popupReporteActivo) {
-      Animated.timing(animacionDesvanecer, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }).start();
-    }
-    else {
-      Animated.timing(animacionDesvanecer, {
-        toValue: 0,
-        duration: 100,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [popupReporteActivo]);
-
-  useEffect(() => {
     obtenerReportes();
   }, []);
 
   const manejarPresionMapa = (evento: any) => {
     const {latitude: latitud, longitude: longitud} = evento.nativeEvent.coordinate;
 
-    setNuevoMarcador([
+    setNewMarker([
       {
         latitude: latitud,
         longitude: longitud,
       }
     ]);
 
-    setPopupReporteActivo(true);
+    setReportProblemModal(true);
   };
 
-  // Función para asignar un color distinto al marcador del mapa según la categoría del reporte.
-  function definirColorMarcador(tituloMarcador: string) {
-    switch(tituloMarcador) {
-      case "accidente":
-        return "#ff6969";
+  // dictionary/array to get colors of markers.
+  const MarkerColors = {
+    "accidente": "#ff6969",
+    "basura": "#b9ff69",
+    "bloqueo": "#69c8ff",
+    "corte-de-sercicios": "#f5ff69",
+    "transporte-publico": "#ffa069",
+    "robo-asalto": "#aa69ff",
+    "otros": "#f369ff",
+  } as const;
 
-      case "basura":
-        return "#b9ff69";
+  // we have to add const at the end so there's no problems with typescript. seems like typescript has a LOT of strict rules and it slows development-
+  // but seems to "promise" fewer bugs
 
-      case "bloqueo":
-        return "#69c8ff";
-
-      case "corte-de-servicios":
-        return "#f5ff69";
-
-      case "transporte-publico":
-        return "#ffa069";
-
-      case "robo-asalto":
-        return "#aa69ff";
-
-      case "otros":
-        return "#f369ff";
-
-      default:
-        return "#6d6d6d";
-    }
-  }
-
-  // Función para determinar el ícono de Feather Icons asignado a cada tipo de problema.
-  function definirIconoMarcador(tituloMarcador: string) {
-    switch(tituloMarcador) {
-      case "accidente":
-        return "alert-triangle";
-
-      case "basura":
-        return "trash";
-
-      case "bloqueo":
-        return "lock";
-
-      case "corte-de-servicios":
-        return "frown";
-
-      case "transporte-publico":
-        return "truck";
-
-      case "robo-asalto":
-        return "eye-off";
-
-      case "otros":
-        return "code";
-
-      default:
-        return "moon";
-    }
-  }
+  // dictionary/array to get the icon of a marker
+  const MarkerIcons = {
+    "accidente": "alert-triangle",
+    "basura": "trash",
+    "bloqueo": "lock",
+    "corte-de-sercicios": "frown",
+    "transporte-publico": "truck",
+    "robo-asalto": "eye-off",
+    "otros": "code",
+  } as const;
 
   // Verifica si las coordenadas seleccionadas en el mapa pertenecen al rango de Jalisco.
   function verificarCoordenadasNuevoMarcador() {
-    const marcadorActual = nuevoMarcador[0];
+    const marcadorActual = newMarker[0];
 
     if(
       marcadorActual.latitude < limitesJalisco.south ||
@@ -173,13 +119,13 @@ export default function PantallaMapa() {
     if(tokenAutenticacion) {}
     else {
       setPopupCuentaNecesariaActivo(true);
-      setPopupReporteActivo(false);
+      setReportProblemModal(false);
 
       return;
     }
 
     if(!verificarCoordenadasNuevoMarcador()) {
-      setPopupReporteActivo(false);
+      setReportProblemModal(false);
 
       return;
     }
@@ -191,8 +137,8 @@ export default function PantallaMapa() {
       const datos = await crearReporte(
         tipoReporte,
         descripcionReporte,
-        nuevoMarcador[0].latitude,
-        nuevoMarcador[0].longitude
+        newMarker[0].latitude,
+        newMarker[0].longitude
       );
 
       console.log("Reporte creado.", datos);
@@ -203,14 +149,14 @@ export default function PantallaMapa() {
 
     obtenerReportes();
 
-    setPopupReporteActivo(false);
+    setReportProblemModal(false);
     setTextoReporte("");
 
     console.log(
       "Marcador añadido al mapa.\nLongitud: "
-      + nuevoMarcador[0].longitude
+      + newMarker[0].longitude
       + "\nLatitud: "
-      + nuevoMarcador[0].latitude
+      + newMarker[0].latitude
     );
   }
 
@@ -219,7 +165,7 @@ export default function PantallaMapa() {
     try {
       const datos = await obtenerTodosLosReportes();
 
-      setMarcadores(datos);
+      setMarkers(datos);
 
       console.log("Reportes obtenidos.");
     }
@@ -245,39 +191,28 @@ export default function PantallaMapa() {
         }}
         onPress={manejarPresionMapa}
       >
-        {marcadores.map((marcador: any, indice: number) => (
+
+        {markers.map((marker: any, indice: number) => (
           <Marker
             key={indice}
             coordinate={{
-              latitude: marcador.markerLatitude,
-              longitude: marcador.markerLongitude,
+              latitude: marker.markerLatitude,
+              longitude: marker.markerLongitude,
             }}
-            title={marcador.reportType}
-            description={marcador.description}
+            title={marker.reportType}
+            description={marker.description}
           >
-            <View
-              style={[
-                estilosMapa.envoltorioMarcador,
-                {
-                  backgroundColor: definirColorMarcador(marcador.reportType)
-                }
-              ]}
-            >
-              <Feather
-                name={definirIconoMarcador(marcador.reportType)}
-                size={18}
-                color="black"
-              />
+            {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reporType, as if not this gives errors.*/}
+            {/* we can do this by simply doing as keyof typeof markercolors, typeof for the type/shape of markercolors and keyof for the name of properties inside there. */}
+            <View style={{backgroundColor: MarkerColors[marker.reportType as keyof typeof MarkerColors]}}>
+              <Feather name={MarkerIcons[marker.reportType as keyof typeof MarkerIcons]} size={18} color="black" />
             </View>
           </Marker>
         ))}
       </MapView>
 
-      <Pressable
-        className="absolute top-[60px] h-[5%] w-[70%] items-center justify-center bg-white"
-        onPress={obtenerReportes}>
-        <Text className="text-xl font-bold">hello
-        </Text>
+      <Pressable style={mapStyles.update_reports_button} onPress={obtenerReportes}>
+        <Text className="text-xl font-bold">Actualizar </Text>
       </Pressable>
 
       {popupCuentaNecesariaActivo &&
@@ -286,24 +221,11 @@ export default function PantallaMapa() {
         />
       }
 
-      <Animated.View
-        style={[
-          estilosMapa.vistaAnimadaPopupReporte,
-          {
-            opacity: animacionDesvanecer,
-            pointerEvents: popupReporteActivo ? "auto" : "none",
-            transform: [
-              {translateY: -(alto / 2) / 1.9},
-              {translateX: -(ancho / 2) / 1.25},
-            ],
-            height: alto / 1.9,
-            width: ancho / 1.25,
-          }
-        ]}
-      >
+      {/* REPORT PROBLEM MODAL */}
+      {reportProblemModal && (
         <ThemedView
           style={[
-            estilosMapa.flexReportarProblema,
+            mapStyles.report_problem_flex,
             {
               backgroundColor: colorFondo,
               borderColor: esquemaColor == 'dark' ? 'white' : 'black',
@@ -311,8 +233,8 @@ export default function PantallaMapa() {
           ]}
         >
           <ThemedText
-            type="subtitle"
             style={{textAlign: "center"}}
+            type="subtitle"
           >
             ¿Qué problema quieres reportar?
           </ThemedText>
@@ -322,34 +244,26 @@ export default function PantallaMapa() {
             setProblemaSeleccionado={setProblemaSeleccionado}
           />
 
-          <ThemedView
-            style={{
-              width: "100%",
-              height: "auto",
-              padding: 2,
-              backgroundColor: esquemaColor == 'dark' ? 'white' : 'black',
-            }}
-          >
-            <TextInput
-              style={estilosMapa.entradaTextoReporte}
-              placeholder="Describe el problema..."
-              autoCapitalize="none"
-              onChangeText={setTextoReporte}
-              value={textoReporte}
-            >
-            </TextInput>
-          </ThemedView>
+          {/* with multiline we can make it so this input works like a textarea.*/}
+          <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px]"
+            placeholder="Describe el problema..."
+            autoCapitalize="none"
+            multiline={true}
+            onChangeText={setTextoReporte}
+            value={textoReporte}>
+          </TextInput>
 
-          <BotonAgregarReporte
-            agregarMarcadorAlMapa={agregarMarcadorAlMapa}
-          />
+          <Pressable className="flex text-black items-center justify-center bg-[#407cff] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
+            <Text className="text-[17px] text-white">Añadir</Text>
+          </Pressable>
 
-          <BotonCancelarReporte
-            setPopupReporteVisible={setPopupReporteActivo}
+          <CancelReportButton
+            setPopupReporteVisible={setReportProblemModal}
             setTextoEntradaReporte={setTextoReporte}
           />
         </ThemedView>
-      </Animated.View>
+      )}
+
     </View>
   );
 }
