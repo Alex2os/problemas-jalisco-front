@@ -1,30 +1,17 @@
-import {ThemedText} from '@/components/themed-text';
-import {ThemedView} from '@/components/themed-view';
-import {useThemeColor} from '@/hooks/use-theme-color';
-
-import Feather from '@expo/vector-icons/Feather';
-import * as SecureStore from "expo-secure-store";
-
-import {useEffect, useRef, useState} from "react";
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  View
-} from 'react-native';
-
+import {useEffect, useState} from "react";
+import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 
-import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
-import SelectorReporte from "@/components/SelectorReporte";
+import Feather from '@expo/vector-icons/Feather';
+import {Picker} from '@react-native-picker/picker';
+import * as SecureStore from "expo-secure-store";
 
-import CancelReportButton from "@/components/CancelReportButton";
+import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
+
 import {crearReporte} from "@/services/crearReporte";
 import {obtenerTodosLosReportes} from "@/services/obtenerTodosLosReportes";
 
+import {globalStyles} from "@/styles/globalStyles";
 import {mapStyles} from "@/styles/mapStyles";
 
 // Pantalla principal del mapa interactivo donde se visualizan y agregan reportes en el estado de Jalisco.
@@ -33,17 +20,12 @@ export default function PantallaMapa() {
   const [markers, setMarkers] = useState<any[]>([]);
   const [newMarker, setNewMarker] = useState<any[]>([]);
 
-  const [problemaSeleccionado, setProblemaSeleccionado] = useState("accidente");
+  const [problemSelected, setProblemSelected] = useState("accidente");
   const [textoReporte, setTextoReporte] = useState("");
 
   const [reportProblemModal, setReportProblemModal] = useState(false);
 
   const [popupCuentaNecesariaActivo, setPopupCuentaNecesariaActivo] = useState(false);
-
-  const esquemaColor = useColorScheme();
-  const colorFondo = useThemeColor({}, 'background');
-
-  const animacionDesvanecer = useRef(new Animated.Value(1)).current;
 
   // Coordenadas límite para restringir la creación de reportes al estado de Jalisco.
   const limitesJalisco = {
@@ -130,7 +112,7 @@ export default function PantallaMapa() {
       return;
     }
 
-    let tipoReporte = problemaSeleccionado;
+    let tipoReporte = problemSelected;
     const descripcionReporte = textoReporte;
 
     try {
@@ -174,12 +156,12 @@ export default function PantallaMapa() {
     }
   }
 
+  // FRONT END
   return (
-    <View
-      style={{
-        flex: 1,
-        position: "relative",
-      }}
+    <View style={{
+      flex: 1,
+      position: "relative"
+    }}
     >
       <MapView
         style={StyleSheet.absoluteFill}
@@ -212,7 +194,7 @@ export default function PantallaMapa() {
       </MapView>
 
       <Pressable style={mapStyles.update_reports_button} onPress={obtenerReportes}>
-        <Text className="text-xl font-bold">Actualizar </Text>
+        <Text style={globalStyles.default_text}>Actualizar </Text>
       </Pressable>
 
       {popupCuentaNecesariaActivo &&
@@ -223,29 +205,26 @@ export default function PantallaMapa() {
 
       {/* REPORT PROBLEM MODAL */}
       {reportProblemModal && (
-        <ThemedView
-          style={[
-            mapStyles.report_problem_flex,
-            {
-              backgroundColor: colorFondo,
-              borderColor: esquemaColor == 'dark' ? 'white' : 'black',
-            }
-          ]}
-        >
-          <ThemedText
-            style={{textAlign: "center"}}
-            type="subtitle"
-          >
-            ¿Qué problema quieres reportar?
-          </ThemedText>
+        <View style={mapStyles.report_problem_flex}>
 
-          <SelectorReporte
-            problemaSeleccionado={problemaSeleccionado}
-            setProblemaSeleccionado={setProblemaSeleccionado}
-          />
+          <Text style={globalStyles.text_subtitle}>¿Qué problema quieres reportar?</Text>
 
-          {/* with multiline we can make it so this input works like a textarea.*/}
-          <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px]"
+          <View className="flex bg-white h-[55px] w-full text-black border-solid border-[2px] border-[#d7d7d7] rounded-[10px]">
+            <Picker
+              selectedValue={problemSelected}
+              onValueChange={(item_value: any) => setProblemSelected(item_value)}>
+              <Picker.Item label="Accidente" value="accidente" />
+              <Picker.Item label="Basura" value="basura" />
+              <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />
+              <Picker.Item label="Corte de electricidad/agua" value="corte-de-servicios" />
+              <Picker.Item label="Problema en transporte público" value="transporte-publico" />
+              <Picker.Item label="Robo/asalto" value="robo-asalto" />
+              <Picker.Item label="Otro" value="otros" />
+            </Picker>
+          </View>
+
+          {/* with multiline we can make it so this input works like a textarea. */}
+          <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
             placeholder="Describe el problema..."
             autoCapitalize="none"
             multiline={true}
@@ -253,17 +232,14 @@ export default function PantallaMapa() {
             value={textoReporte}>
           </TextInput>
 
-          <Pressable className="flex text-black items-center justify-center bg-[#407cff] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
-            <Text className="text-[17px] text-white">Añadir</Text>
+          <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
+            <Text style={globalStyles.default_text_white}>Añadir</Text>
           </Pressable>
-
-          <CancelReportButton
-            setPopupReporteVisible={setReportProblemModal}
-            setTextoEntradaReporte={setTextoReporte}
-          />
-        </ThemedView>
+        </View>
       )}
 
     </View>
+
+
   );
 }

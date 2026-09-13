@@ -1,93 +1,28 @@
-import {Image} from 'expo-image';
-
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-
-import {ThemedText} from '@/components/themed-text';
-
-import {ThemedView} from '@/components/themed-view';
-
-import {useThemeColor} from '@/hooks/use-theme-color';
-
-import {LinearGradient} from 'expo-linear-gradient';
-
 import {useRouter} from 'expo-router';
+import {Pressable, Text, View} from 'react-native';
 
-import {Pressable, useWindowDimensions, View} from 'react-native';
+import {globalStyles} from "@/styles/globalStyles";
 
-import {estilosInicio} from "@/styles/estilosInicio";
-
-// Pantalla principal de bienvenida (Inicio).
+// main screen
 export default function HomeScreen() {
 
-  const enrutador = useRouter();
-
-  const { height: alto } = useWindowDimensions();
-
-  const colorFondo = useThemeColor({}, 'background');
+  const router = useRouter();
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: colorFondo, dark: colorFondo }}
-      headerImage={
-        <View style={estilosInicio.envoltorioImagenEncabezado}>
-          <LinearGradient
-            colors={['#ff00cc', '#3333ff']}
-            start={{ x: 1, y: 0 }}
-            end={{ x: 0, y: 0 }}
-            style={{
-              width: "100%",
-              height: "200%",
-              position: "absolute",
-              top: 0,
-            }}
-          />
+    // first view is only for the layout. (body)
+    <View style = {globalStyles.page_body}> 
 
-          <Image
-            source={require('@/assets/images/jalisco-outline.png')}
-            style={estilosInicio.imagenEncabezado}
-          />
+      <View className = "flex flex-col items-center justify-center rounded-[20px] w-[100%] h-[50%] p-[20px] gap-5 border-solid border-[2px] border-[#d7d7d7]">
+
+        <View className="flex flex-col h-[100px] gap-3 items-center justify-center">
+          <Text className = "text-[35px] font-bold"> ProblemasJalisco </Text>
+          <Text className = "text-[20px] text-center">Aplicación para reporte de problemas</Text>
         </View>
-      }
-    >
 
-      <ThemedView style={estilosInicio.contenedorTitulo}>
-        <ThemedText type="title">
-          ProblemasJalisco
-        </ThemedText>
-
-        <ThemedText type="subtitle">
-          Aplicación para reporte de problemas
-        </ThemedText>
-      </ThemedView>
-
-      <ThemedView
-        style={[
-          estilosInicio.contenedorBoton,
-          {
-            height: alto / 3
-          }
-        ]}
-      >
-        <LinearGradient
-          colors={['#ff00cc', '#3333ff']}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 0 }}
-          style={{
-            padding: 3,
-            borderRadius: 10,
-          }}
-        >
-          <Pressable
-            onPress={() => enrutador.push('/map')}
-            style={estilosInicio.botonInicio}
-          >
-            <ThemedText style={estilosInicio.textoBotonInicio}>
-              Abrir mapa de Jalisco
-            </ThemedText>
-          </Pressable>
-        </LinearGradient>
-      </ThemedView>
-
-    </ParallaxScrollView>
+        <Pressable onPress={() => router.push('/map')} className="flex w-full h-[50px] items-center justify-center rounded-[10px] border-solid border-[2px] border-[#d7d7d7]">
+          <Text style = {globalStyles.default_text}>Abrir mapa de Jalisco</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }

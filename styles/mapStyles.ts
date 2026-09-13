@@ -16,10 +16,13 @@ export const mapStyles = StyleSheet.create({
 
         backgroundColor: "white",
 
+        borderColor: "#d7d7d7",
+        borderWidth: 2,
+        borderRadius: 10,
+
         transform: [
             {translateX: "-50%"},
         ],
-
     },
     marker_wrapper: {
         padding: 7,
@@ -33,6 +36,11 @@ export const mapStyles = StyleSheet.create({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+
+        backgroundColor: "white",
+        borderRadius: 10,
+        borderColor: "#d7d7d7",
+        borderWidth: 2,
 
         gap: 20,
         height: "55%",

@@ -1,27 +1,26 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
+import {ThemedText} from '@/components/default_components/themed-text';
+import {ThemedView} from '@/components/default_components/themed-view';
+import {useRouter} from 'expo-router';
 import * as SecureStore from "expo-secure-store";
-import { Pressable, Text } from 'react-native';
+import {Pressable, Text} from 'react-native';
 
-import { Image } from 'expo-image';
+import {Image} from 'expo-image';
 
-import { TextInput, View } from "react-native";
+import {TextInput, View} from "react-native";
 
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useRef, useState } from "react";
-import { Animated } from 'react-native';
+import {useThemeColor} from '@/hooks/use-theme-color';
+import {useRef, useState} from "react";
+import {Animated} from 'react-native';
 
-import { LinearGradient } from 'expo-linear-gradient';
+import {LinearGradient} from 'expo-linear-gradient';
 
-import { estilosInicio } from "@/styles/estilosInicio";
+import {estilosInicio} from "@/styles/indexStyles";
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import ParallaxScrollView from '@/components/default_components/parallax-scroll-view';
 
-import React from "react";
 
-import { iniciarSesionUsuario } from "@/services/iniciarSesionUsuario";
-import { registrarUsuario } from "@/services/registrarUsuario";
+import {iniciarSesionUsuario} from "@/services/iniciarSesionUsuario";
+import {registrarUsuario} from "@/services/registrarUsuario";
 
 // Pantalla para el registro de nuevos usuarios en la plataforma.
 export default function Register() {

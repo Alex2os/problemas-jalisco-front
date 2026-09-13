@@ -1,5 +1,5 @@
-import {ThemedText} from '@/components/themed-text';
-import {ThemedView} from '@/components/themed-view';
+import {ThemedText} from '@/components/default_components/themed-text';
+import {ThemedView} from '@/components/default_components/themed-view';
 import {useThemeColor} from '@/hooks/use-theme-color';
 import {useRouter} from 'expo-router';
 import * as SecureStore from "expo-secure-store";
@@ -10,9 +10,9 @@ import {Image} from 'expo-image';
 
 import {LinearGradient} from 'expo-linear-gradient';
 
-import {estilosInicio} from "@/styles/estilosInicio";
+import {estilosInicio} from "@/styles/indexStyles";
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import ParallaxScrollView from '@/components/default_components/parallax-scroll-view';
 
 import {iniciarSesionUsuario} from "@/services/iniciarSesionUsuario";
 
