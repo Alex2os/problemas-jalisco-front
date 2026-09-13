@@ -16,4 +16,20 @@ export const indexStyles = StyleSheet.create({
     width: "100%",
     height: 50,
   },
+  main_page_button: {
+    display: "flex",
+    width: "100%",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+
+    borderRadius: 10,
+    borderColor: "#d7d7d7",
+    borderWidth: 2,
+
+  },
+
+  about_collapsible: {
+    
+  }
 });

@@ -94,7 +94,7 @@ export default function PantallaMapa() {
     else return true;
   }
 
-  // Envía el reporte a la API backend y refresca los marcadores si el usuario está autenticado.
+
   async function agregarMarcadorAlMapa() {
     const tokenAutenticacion = await SecureStore.getItemAsync("auth_token");
 
@@ -207,34 +207,48 @@ export default function PantallaMapa() {
       {reportProblemModal && (
         <View style={mapStyles.report_problem_flex}>
 
-          <Text style={globalStyles.text_subtitle}>¿Qué problema quieres reportar?</Text>
+          <Text style={globalStyles.text_subtitle}>Reportar problema</Text>
 
-          <View className="flex bg-white h-[55px] w-full text-black border-solid border-[2px] border-[#d7d7d7] rounded-[10px]">
-            <Picker
-              selectedValue={problemSelected}
-              onValueChange={(item_value: any) => setProblemSelected(item_value)}>
-              <Picker.Item label="Accidente" value="accidente" />
-              <Picker.Item label="Basura" value="basura" />
-              <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />
-              <Picker.Item label="Corte de electricidad/agua" value="corte-de-servicios" />
-              <Picker.Item label="Problema en transporte público" value="transporte-publico" />
-              <Picker.Item label="Robo/asalto" value="robo-asalto" />
-              <Picker.Item label="Otro" value="otros" />
-            </Picker>
+          {/* problem */}
+          <View className="w-full gap-1">
+            <Text style={globalStyles.default_text}>Problema</Text>
+            <View className="flex bg-white h-[55px] w-full text-black border-solid border-[2px] border-[#d7d7d7] rounded-[10px]">
+              <Picker
+                selectedValue={problemSelected}
+                onValueChange={(item_value: any) => setProblemSelected(item_value)}>
+                <Picker.Item label="Accidente" value="accidente" />
+                <Picker.Item label="Basura" value="basura" />
+                <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />
+                <Picker.Item label="Corte de electricidad/agua" value="corte-de-servicios" />
+                <Picker.Item label="Problema en transporte público" value="transporte-publico" />
+                <Picker.Item label="Robo/asalto" value="robo-asalto" />
+                <Picker.Item label="Otro" value="otros" />
+              </Picker>
+            </View>
           </View>
 
-          {/* with multiline we can make it so this input works like a textarea. */}
-          <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
-            placeholder="Describe el problema..."
-            autoCapitalize="none"
-            multiline={true}
-            onChangeText={setTextoReporte}
-            value={textoReporte}>
-          </TextInput>
+          {/* description*/}
+          <View className="w-full gap-1">
+            <Text style={globalStyles.default_text}>Descripción</Text>
+            {/* with multiline we can make it so this input works like a textarea. */}
+            <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
+              placeholder="Describe el problema..."
+              autoCapitalize="none"
+              multiline={true}
+              onChangeText={setTextoReporte}
+              value={textoReporte}>
+            </TextInput>
+          </View>
 
-          <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
-            <Text style={globalStyles.default_text_white}>Añadir</Text>
-          </Pressable>
+          <View className="w-full gap-3">
+            <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
+              <Text style={globalStyles.default_text_white}>Añadir</Text>
+            </Pressable>
+
+            <Pressable onPress={() => setReportProblemModal(false)} className="flex text-black items-center justify-center bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7] w-full h-[50px]">
+              <Text style={globalStyles.default_text}>Cancelar</Text>
+            </Pressable>
+          </View>
         </View>
       )}
 
