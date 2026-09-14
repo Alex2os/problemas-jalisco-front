@@ -1,211 +1,72 @@
-import {ThemedText} from '@/components/default_components/themed-text';
-import {ThemedView} from '@/components/default_components/themed-view';
-import {useThemeColor} from '@/hooks/use-theme-color';
 import {useRouter} from 'expo-router';
 import * as SecureStore from "expo-secure-store";
-import {useRef, useState} from "react";
-import {Animated, Pressable, Text, TextInput, View} from 'react-native';
+import {useState} from "react";
+import {Pressable, Text, TextInput, View} from 'react-native';
 
-import {Image} from 'expo-image';
+import {UserLogIn} from "@/services/UserLogIn";
+import {globalStyles} from "@/styles/globalStyles";
+import {indexStyles} from "@/styles/indexStyles";
 
-import {LinearGradient} from 'expo-linear-gradient';
-
-import {estilosInicio} from "@/styles/indexStyles";
-
-import ParallaxScrollView from '@/components/default_components/parallax-scroll-view';
-
-import {iniciarSesionUsuario} from "@/services/iniciarSesionUsuario";
-
-// Pantalla para iniciar sesión con correo electrónico y contraseña.
 export default function Login() {
 
-    const enrutador = useRouter();
+    const router = useRouter();
 
-    const [contrasena, setContrasena] = useState("");
-    const [correo, setCorreo] = useState("");
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
 
-    const colorFondo = useThemeColor({}, 'background');
-
-    const desvanecerBotonLogin = useRef(new Animated.Value(1)).current;
-
-    const botonLoginPresionado = () => {
-        Animated.timing(desvanecerBotonLogin, {
-            toValue: 0.8,
-            duration: 0,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const botonLoginSoltado = () => {
-        Animated.timing(desvanecerBotonLogin, {
-            toValue: 1,
-            duration: 0,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const desvanecerBotonRegistro = useRef(new Animated.Value(1)).current;
-
-    const botonRegistroPresionado = () => {
-        Animated.timing(desvanecerBotonRegistro, {
-            toValue: 0.8,
-            duration: 0,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const botonRegistroSoltado = () => {
-        Animated.timing(desvanecerBotonRegistro, {
-            toValue: 1,
-            duration: 0,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    // Función encargada de validar las credenciales con la API y guardar el token JWT devuelto en SecureStore.
-    const manejarInicioSesion = async () => {
+    const ManageUserLogIn = async () => {
         try {
-            const datos = await iniciarSesionUsuario(correo, contrasena);
+            const data = await UserLogIn(email, password);
 
-            await SecureStore.setItemAsync("auth_token", datos.token);
+            await SecureStore.setItemAsync("auth_token", data.token);
 
-            console.log("Inicio de sesión completado.", datos);
-            enrutador.replace("/(tabs)/account");
-        } catch (error) {
+            console.log("Inicio de sesión completado.", data);
+            router.replace("/(tabs)/account");
+        } catch(error) {
             console.log(error);
         }
     };
 
     return (
-        <>
-            <ParallaxScrollView
-                headerBackgroundColor={{ light: colorFondo, dark: colorFondo }}
-                headerImage={
+        <View className="w-full h-full flex flex-col justify-center items-center p-[20px] gap-5">
 
-                    <View style={estilosInicio.envoltorioImagenEncabezado} >
+            <Text style = {globalStyles.text_subtitle}>Ingresar</Text>
 
-                        <LinearGradient
-                            colors={['#88006d', '#1a1a88']}
-                            start={{ x: 1, y: 0 }}
-                            end={{ x: 0, y: 0 }}
-                            style={{
-                                width: "100%",
-                                height: "200%",
-                                position: "absolute",
-                                top: 0,
-                            }}
-                        />
+            <View className = "flex gap-3 flex-col items-center justify-start w-full">
 
-                        <Image
-                            source={require('@/assets/images/login-image.webp')}
-                            style={estilosInicio.imagenEncabezado}
-                        />
+                <TextInput style = {indexStyles.account_textinput}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={email}
+                    onChangeText={setEmail}
+                />
 
-                    </View>
-                }>
+                <TextInput style = {indexStyles.account_textinput}
+                    placeholder="Contraseña"
+                    placeholderTextColor="#777"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
 
-                <ThemedView style={estilosInicio.contenedorTitulo}>
-                    <ThemedText type="title">Ingresar</ThemedText>
-                </ThemedView>
+                <Pressable onPress={ManageUserLogIn} className = "flex items-center justify-center w-full h-[50px] border-solid bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3]">
+                    <Text style = {globalStyles.default_text_white}>Ingresar</Text>
+                </Pressable>
+                
+                 <Pressable onPress = {() => router.push("/(tabs)/account")} style = {indexStyles.default_button}>
+                    <Text style = {globalStyles.default_text}>Cancelar</Text>
+                </Pressable>
 
-                <ThemedView style={estilosInicio.contenidoComponente}>
+                <Text style = {globalStyles.default_text}>Ingresa con tu correo electrónico y contraseña.</Text>
 
-                    <TextInput style={estilosInicio.entradaTexto}
-                        placeholder="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={correo}
-                        onChangeText={setCorreo}
-                    />
+                <Text style = {globalStyles.default_text}>¿No tienes una cuenta?</Text>
 
-                    <TextInput
-                        style={estilosInicio.entradaTexto}
-                        placeholder="Contraseña"
-                        placeholderTextColor="#777"
-                        secureTextEntry
-                        value={contrasena}
-                        onChangeText={setContrasena}
-                    />
+                <Pressable onPress={() => router.push("/register")} style = {indexStyles.default_button}>
+                    <Text style = {globalStyles.default_text}>Crea una cuenta</Text>
+                </Pressable>
 
-                    <Animated.View style={{
-                        opacity: desvanecerBotonLogin,
-                        width: "50%",
-                        height: 50,
-                    }}>
-                        <LinearGradient
-                            colors={['#105ac9', '#3d8bff']}
-                            start={{ x: 1, y: 0 }}
-                            end={{ x: 0, y: 0 }}
-                            style={{
-                                padding: 3,
-                                height: 40,
-                                width: "100%",
-                            }}>
-                            <Pressable style={{
-                                width: "100%",
-                                height: "100%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                                onPressIn={botonLoginPresionado}
-                                onPressOut={botonLoginSoltado}
-                                onPress={manejarInicioSesion}>
-                                <Text style={{
-                                    color: "white",
-                                    fontSize: 17,
-                                }}>
-                                    Ingresar
-                                </Text>
-                            </Pressable>
-                        </LinearGradient>
-                    </Animated.View>
-
-                    <ThemedText style={{
-                        fontSize: 17,
-                    }}>Ingresa con tu correo electrónico y contraseña.</ThemedText>
-
-                    <ThemedText style={{
-                        fontSize: 17,
-                    }}>¿No tienes una cuenta?</ThemedText>
-
-                    <Animated.View style={{
-                        opacity: desvanecerBotonRegistro,
-                        width: "50%",
-                        height: 50,
-                    }}>
-                        <LinearGradient
-                            colors={['#3ca023', '#2cff48']}
-                            start={{ x: 1, y: 0 }}
-                            end={{ x: 0, y: 0 }}
-                            style={{
-                                padding: 3,
-                                height: 40,
-                                width: "100%",
-                            }}>
-                            <Pressable
-                                onPressIn={botonRegistroPresionado}
-                                onPressOut={botonRegistroSoltado}
-                                onPress={() => enrutador.push("/register")}
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}>
-                                <Text style={{
-                                    color: "white",
-                                    fontSize: 17,
-                                }}>
-                                    Crea una cuenta
-                                </Text>
-                            </Pressable>
-                        </LinearGradient>
-                    </Animated.View>
-                </ThemedView>
-
-            </ParallaxScrollView>
-
-
-        </>
+            </View>
+        </View>
     );
 }

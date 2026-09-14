@@ -4,18 +4,6 @@
 import {StyleSheet} from 'react-native';
 
 export const indexStyles = StyleSheet.create({
-  account_button: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 10,
-    borderColor: "#d7d7d7",
-    borderWidth: 2,
-
-    width: "100%",
-    height: 50,
-  },
   main_page_button: {
     display: "flex",
     width: "100%",
@@ -28,8 +16,45 @@ export const indexStyles = StyleSheet.create({
     borderWidth: 2,
 
   },
-
   about_collapsible: {
-    
+
+  },
+  account_textinput: {
+    width: "100%",
+    height: 50,
+
+    backgroundColor: "white",
+
+    borderRadius: 10,
+    borderColor: "#d7d7d7",
+    borderWidth: 2,
+    padding: 10,
+    fontSize: 17,
+  },
+  default_button: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 50,
+    backgroundColor: "white",
+
+    borderRadius: 10,
+    borderColor: "#d7d7d7",
+    borderWidth: 2,
+
+  },
+  default_button_blue: {
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 50,
+    backgroundColor: "#407cff",
+
+    borderRadius: 10,
+    borderColor: "#315fc3",
+    borderWidth: 2,
   }
 });

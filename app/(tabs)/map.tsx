@@ -6,10 +6,8 @@ import Feather from '@expo/vector-icons/Feather';
 import {Picker} from '@react-native-picker/picker';
 import * as SecureStore from "expo-secure-store";
 
-import PopupCuentaNecesaria from "@/components/PopupCuentaNecesaria";
-
-import {crearReporte} from "@/services/crearReporte";
-import {obtenerTodosLosReportes} from "@/services/obtenerTodosLosReportes";
+import {CreateReport} from "@/services/CreateReport";
+import {GetAllReports} from "@/services/GetAllReports";
 
 import {globalStyles} from "@/styles/globalStyles";
 import {mapStyles} from "@/styles/mapStyles";
@@ -21,35 +19,16 @@ export default function PantallaMapa() {
   const [newMarker, setNewMarker] = useState<any[]>([]);
 
   const [problemSelected, setProblemSelected] = useState("accidente");
-  const [textoReporte, setTextoReporte] = useState("");
+  const [reportDescription, setReportDescription] = useState("");
 
   const [reportProblemModal, setReportProblemModal] = useState(false);
 
-  const [popupCuentaNecesariaActivo, setPopupCuentaNecesariaActivo] = useState(false);
-
   // Coordenadas límite para restringir la creación de reportes al estado de Jalisco.
-  const limitesJalisco = {
+  const JaliscoLimits = {
     north: 22.75,
     south: 18.92,
     east: -101.50,
     west: -105.68,
-  };
-
-  useEffect(() => {
-    obtenerReportes();
-  }, []);
-
-  const manejarPresionMapa = (evento: any) => {
-    const {latitude: latitud, longitude: longitud} = evento.nativeEvent.coordinate;
-
-    setNewMarker([
-      {
-        latitude: latitud,
-        longitude: longitud,
-      }
-    ]);
-
-    setReportProblemModal(true);
   };
 
   // dictionary/array to get colors of markers.
@@ -77,62 +56,76 @@ export default function PantallaMapa() {
     "otros": "code",
   } as const;
 
-  // Verifica si las coordenadas seleccionadas en el mapa pertenecen al rango de Jalisco.
-  function verificarCoordenadasNuevoMarcador() {
+  useEffect(() => {
+    LoadAllReports();
+  }, []);
+
+  const OnMapPressed = (event: any) => {
+    const {latitude: latitude, longitude: longitude} = event.nativeEvent.coordinate;
+
+    setNewMarker([
+      {
+        latitude: latitude,
+        longitude: longitude,
+      }
+    ]);
+
+    setReportProblemModal(true);
+  };
+
+  // check coordinates for the new marker (they have to be inside jalisco bounds)
+  function CheckNewMarkerCoordinates() {
     const marcadorActual = newMarker[0];
 
     if(
-      marcadorActual.latitude < limitesJalisco.south ||
-      marcadorActual.latitude > limitesJalisco.north
+      marcadorActual.latitude < JaliscoLimits.south ||
+      marcadorActual.latitude > JaliscoLimits.north
     ) return false;
 
     if(
-      marcadorActual.longitude < limitesJalisco.west ||
-      marcadorActual.longitude > limitesJalisco.east
+      marcadorActual.longitude < JaliscoLimits.west ||
+      marcadorActual.longitude > JaliscoLimits.east
     ) return false;
 
     else return true;
   }
 
+  async function AddMarkerToMap() {
+    const autentication_token = await SecureStore.getItemAsync("auth_token");
 
-  async function agregarMarcadorAlMapa() {
-    const tokenAutenticacion = await SecureStore.getItemAsync("auth_token");
-
-    if(tokenAutenticacion) {}
+    if(autentication_token) {}
     else {
-      setPopupCuentaNecesariaActivo(true);
+      setReportProblemModal(false);
+      return;
+    }
+
+    if(!CheckNewMarkerCoordinates()) {
       setReportProblemModal(false);
 
       return;
     }
 
-    if(!verificarCoordenadasNuevoMarcador()) {
-      setReportProblemModal(false);
-
-      return;
-    }
-
-    let tipoReporte = problemSelected;
-    const descripcionReporte = textoReporte;
+    let report_type = problemSelected;
+    const report_description = reportDescription;
 
     try {
-      const datos = await crearReporte(
-        tipoReporte,
-        descripcionReporte,
+      const data = await CreateReport(
+        report_type,
+        report_description,
         newMarker[0].latitude,
         newMarker[0].longitude
       );
 
-      console.log("Reporte creado.", datos);
+      console.log("Reporte creado.", data);
     }
     catch(error) {
       console.log("Error al crear el reporte.", error);
     }
 
-    obtenerReportes();
+    LoadAllReports();
 
     setReportProblemModal(false);
-    setTextoReporte("");
+    setReportDescription("");
 
     console.log(
       "Marcador añadido al mapa.\nLongitud: "
@@ -142,10 +135,9 @@ export default function PantallaMapa() {
     );
   }
 
-  // Obtiene los reportes desde la API y actualiza el estado de marcadores.
-  async function obtenerReportes() {
+  async function LoadAllReports() {
     try {
-      const datos = await obtenerTodosLosReportes();
+      const datos = await GetAllReports();
 
       setMarkers(datos);
 
@@ -171,7 +163,7 @@ export default function PantallaMapa() {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-        onPress={manejarPresionMapa}
+        onPress={OnMapPressed}
       >
 
         {markers.map((marker: any, indice: number) => (
@@ -193,15 +185,9 @@ export default function PantallaMapa() {
         ))}
       </MapView>
 
-      <Pressable style={mapStyles.update_reports_button} onPress={obtenerReportes}>
+      <Pressable style={mapStyles.update_reports_button} onPress={LoadAllReports}>
         <Text style={globalStyles.default_text}>Actualizar </Text>
       </Pressable>
-
-      {popupCuentaNecesariaActivo &&
-        <PopupCuentaNecesaria
-          setPopupCuentaNecesariaActivo={setPopupCuentaNecesariaActivo}
-        />
-      }
 
       {/* REPORT PROBLEM MODAL */}
       {reportProblemModal && (
@@ -235,13 +221,13 @@ export default function PantallaMapa() {
               placeholder="Describe el problema..."
               autoCapitalize="none"
               multiline={true}
-              onChangeText={setTextoReporte}
-              value={textoReporte}>
+              onChangeText={setReportDescription}
+              value={reportDescription}>
             </TextInput>
           </View>
 
           <View className="w-full gap-3">
-            <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => agregarMarcadorAlMapa()}>
+            <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => AddMarkerToMap()}>
               <Text style={globalStyles.default_text_white}>Añadir</Text>
             </Pressable>
 

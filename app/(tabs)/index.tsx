@@ -21,12 +21,12 @@ export default function HomeScreen() {
       {/* wallpaper */}
       <MainWallpaper />
 
-      <Text className="text-[30px] text-white absolute top-20" style={{fontFamily: "ArchivoBlack"}}> PROBLEMASJALISCO </Text>
+      <Text className="text-[30px] text-white absolute top-20" style={{fontFamily: "ArchivoBlack"}}> PROBLEMASJALISCO</Text>
 
       <View className="bg-white flex flex-col items-center justify-center rounded-[20px] w-[100%] h-[30%] p-[20px] gap-5  border-solid border-[2px] border-[#d7d7d7]">
 
         <Pressable onPress={() => router.push('/map')} style={indexStyles.main_page_button}>
-          <Text style={globalStyles.default_text}>Abrir mapa de Jalisco</Text>
+          <Text style={globalStyles.default_text}>Abrir mapa</Text>
         </Pressable>
 
         <Pressable onPress={() => router.push('/account')} style={indexStyles.main_page_button}>

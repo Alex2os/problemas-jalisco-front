@@ -1,23 +1,16 @@
 import Feather from '@expo/vector-icons/Feather';
 import {Tabs} from 'expo-router';
 
-import {useColorScheme} from '@/hooks/use-color-scheme';
-
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-// Configuración de la barra de navegación por pestañas (Tabs Layout).
 export default function TabLayout() {
-  const esquemaColor = useColorScheme();
-
-  // Cada Tabs.Screen define una ruta de navegación inferior. El nombre (name) coincide con la vista dentro del directorio (tabs).
   return (
 
-    // Se utiliza LinearGradient dentro de tabBarBackground para simular un borde superior personalizado en las pestañas.
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "black",
-        tabBarInactiveTintColor: "black",
+        tabBarInactiveTintColor: "#999",
         headerShown: false,
       }}>
       <Tabs.Screen
