@@ -10,6 +10,7 @@ import {CreateReport} from "@/services/CreateReport";
 import {GetAllReports} from "@/services/GetAllReports";
 
 import {globalStyles} from "@/styles/globalStyles";
+import {indexStyles} from "@/styles/indexStyles";
 import {mapStyles} from "@/styles/mapStyles";
 
 // Pantalla principal del mapa interactivo donde se visualizan y agregan reportes en el estado de Jalisco.
@@ -227,11 +228,11 @@ export default function PantallaMapa() {
           </View>
 
           <View className="w-full gap-3">
-            <Pressable className="flex text-black items-center justify-center bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3] w-full h-[50px]" onPress={() => AddMarkerToMap()}>
+            <Pressable style = {indexStyles.default_button_blue} onPress={() => AddMarkerToMap()}>
               <Text style={globalStyles.default_text_white}>Añadir</Text>
             </Pressable>
 
-            <Pressable onPress={() => setReportProblemModal(false)} className="flex text-black items-center justify-center bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7] w-full h-[50px]">
+            <Pressable onPress={() => setReportProblemModal(false)} style = {indexStyles.default_button}>
               <Text style={globalStyles.default_text}>Cancelar</Text>
             </Pressable>
           </View>

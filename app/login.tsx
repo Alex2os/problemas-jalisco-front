@@ -30,40 +30,46 @@ export default function Login() {
     return (
         <View className="w-full h-full flex flex-col justify-center items-center p-[20px] gap-5">
 
-            <Text style = {globalStyles.text_subtitle}>Ingresar</Text>
+            <Text style={globalStyles.text_subtitle}>Ingresar</Text>
 
-            <View className = "flex gap-3 flex-col items-center justify-start w-full">
+            <View className="flex gap-3 flex-col items-center justify-start w-full">
 
-                <TextInput style = {indexStyles.account_textinput}
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    value={email}
-                    onChangeText={setEmail}
-                />
+                <View style={indexStyles.account_textinput_container}>
+                    <Text style={globalStyles.default_text}>Correo electrónico</Text>
+                    <TextInput style={indexStyles.account_textinput}
+                        placeholder="Email"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                </View>
 
-                <TextInput style = {indexStyles.account_textinput}
-                    placeholder="Contraseña"
-                    placeholderTextColor="#777"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                />
+                <View style={indexStyles.account_textinput_container}>
+                    <Text style={globalStyles.default_text}>Contraseña</Text>
+                    <TextInput style={indexStyles.account_textinput}
+                        placeholder="Contraseña"
+                        placeholderTextColor="#777"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+                </View>
 
-                <Pressable onPress={ManageUserLogIn} className = "flex items-center justify-center w-full h-[50px] border-solid bg-[#407cff] rounded-[10px] border-solid border-[2px] border-[#315fc3]">
-                    <Text style = {globalStyles.default_text_white}>Ingresar</Text>
+                <Pressable onPress={ManageUserLogIn} style = {indexStyles.default_button_blue}>
+                    <Text style={globalStyles.default_text_white}>Ingresar</Text>
                 </Pressable>
-                
-                 <Pressable onPress = {() => router.push("/(tabs)/account")} style = {indexStyles.default_button}>
-                    <Text style = {globalStyles.default_text}>Cancelar</Text>
+
+                <Pressable onPress={() => router.push("/(tabs)/account")} style={indexStyles.default_button}>
+                    <Text style={globalStyles.default_text}>Cancelar</Text>
                 </Pressable>
 
-                <Text style = {globalStyles.default_text}>Ingresa con tu correo electrónico y contraseña.</Text>
+                <Text style={globalStyles.default_text}>Ingresa con tu correo electrónico y contraseña.</Text>
 
-                <Text style = {globalStyles.default_text}>¿No tienes una cuenta?</Text>
+                <Text style={globalStyles.default_text}>¿No tienes una cuenta?</Text>
 
-                <Pressable onPress={() => router.push("/register")} style = {indexStyles.default_button}>
-                    <Text style = {globalStyles.default_text}>Crea una cuenta</Text>
+                <Pressable onPress={() => router.push("/register")} style={indexStyles.default_button}>
+                    <Text style={globalStyles.default_text}>Crea una cuenta</Text>
                 </Pressable>
 
             </View>

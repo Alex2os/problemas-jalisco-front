@@ -21,7 +21,7 @@ export function MainWallpaper() {
             {/* after specifying the blurtargetview, we can now do blurview, in which we specify the tint, method and intensity, besides the blurtarget we
             previously declared. also we style it so it covers the whole screen.
             like this we have the blur working on our image, and we could apply the same to other things if we wanted.*/}
-            <BlurView blurTarget={blurTarget} blurMethod="dimezisBlurView" intensity={15} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView blurTarget={blurTarget} blurMethod="dimezisBlurView" intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
         </>
     );
 }

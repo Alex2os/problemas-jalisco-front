@@ -56,5 +56,14 @@ export const indexStyles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#315fc3",
     borderWidth: 2,
-  }
+  },
+  account_textinput_container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: 1,
+    width: "100%",
+
+  },
 });
