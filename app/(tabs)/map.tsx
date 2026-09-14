@@ -24,7 +24,7 @@ export default function PantallaMapa() {
 
   const [reportProblemModal, setReportProblemModal] = useState(false);
 
-  // Coordenadas límite para restringir la creación de reportes al estado de Jalisco.
+  // jalisco bounds used to check if the user marker has a valid position
   const JaliscoLimits = {
     north: 22.75,
     south: 18.92,
@@ -138,9 +138,9 @@ export default function PantallaMapa() {
 
   async function LoadAllReports() {
     try {
-      const datos = await GetAllReports();
+      const data = await GetAllReports();
 
-      setMarkers(datos);
+      setMarkers(data);
 
       console.log("Reportes obtenidos.");
     }
@@ -149,13 +149,8 @@ export default function PantallaMapa() {
     }
   }
 
-  // FRONT END
   return (
-    <View style={{
-      flex: 1,
-      position: "relative"
-    }}
-    >
+    <View style={{flex: 1, position: "relative"}}>
       <MapView
         style={StyleSheet.absoluteFill}
         initialRegion={{
@@ -177,7 +172,7 @@ export default function PantallaMapa() {
             title={marker.reportType}
             description={marker.description}
           >
-            {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reporType, as if not this gives errors.*/}
+            {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reportType, as if not this gives errors.*/}
             {/* we can do this by simply doing as keyof typeof markercolors, typeof for the type/shape of markercolors and keyof for the name of properties inside there. */}
             <View style={{backgroundColor: MarkerColors[marker.reportType as keyof typeof MarkerColors]}}>
               <Feather name={MarkerIcons[marker.reportType as keyof typeof MarkerIcons]} size={18} color="black" />
