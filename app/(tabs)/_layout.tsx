@@ -1,8 +1,6 @@
-import Feather from '@expo/vector-icons/Feather';
 import {Tabs} from 'expo-router';
 
 import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function TabLayout() {
   return (
@@ -16,22 +14,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Inicio',
-          tabBarIcon: ({color}) => <FontAwesome6 name="house-chimney" size={22} color={color} />,
+          title: 'Mapa',
+          tabBarIcon: ({color}) => <AntDesign name="environment" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="map"
+        name="reports"
         options={{
-          title: 'Mapa',
-          tabBarIcon: ({color}) => <Feather name="map" size={22} color={color} />,
+          title: 'Reportes',
+          tabBarIcon: ({color}) => <AntDesign name="notification" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
           title: 'Cuenta',
-          tabBarIcon: ({color}) => <Feather name="settings" size={24} color={color} />,
+          tabBarIcon: ({color}) => <AntDesign name="setting" size={24} color={color} />,
         }}
       />
       <Tabs.Screen

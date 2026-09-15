@@ -34,6 +34,7 @@
     "nativewind": "^4.2.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-icons": "^5.7.0",
     "react-native": "0.86.3",
     "react-native-collapsible": "^1.6.2",
     "react-native-gesture-handler": "~2.32.0",

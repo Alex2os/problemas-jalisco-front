@@ -45,7 +45,6 @@ export const indexStyles = StyleSheet.create({
 
   },
   default_button_blue: {
-
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -66,4 +65,12 @@ export const indexStyles = StyleSheet.create({
     width: "100%",
 
   },
+  report_table_header: {
+    textAlign: "center",
+    width: "33%",
+  },
+  report_table_cell: {
+    textAlign: "center",
+    width: "33%",
+  }
 });
