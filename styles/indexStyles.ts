@@ -65,12 +65,48 @@ export const indexStyles = StyleSheet.create({
     width: "100%",
 
   },
-  report_table_header: {
-    textAlign: "center",
-    width: "33%",
+  report_table_collapsible: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 5,
+    width: "100%",
+    padding: 10,
   },
-  report_table_cell: {
-    textAlign: "center",
-    width: "33%",
-  }
+  report_collapsible_header: {
+    textAlignVertical: "center",
+    textAlign: "left",
+    width: "45%",
+    padding: 10,
+    fontSize: 17,
+  },
+  report_table_collapsible_title: {
+    width: "85%",
+    textAlign: "left",
+    textAlignVertical: "center",
+    fontSize: 17,
+  },
+  report_table_collapsible_content: {
+    textAlign: "left",
+    textAlignVertical: "center",
+    width: "50%",
+    fontSize: 17,
+  },
+  report_table_collapsible_content_wrapper: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+  },
+  report_collapsible_icon: {
+    position: "absolute",
+    textAlign: "right",
+    textAlignVertical: "center",
+    height: "100%",
+    right: 10,
+  },
+  report_table_header: {
+    textAlign: "left",
+    textAlignVertical: "center",
+    width: "45%",
+    height: 30,
+  },
 });
