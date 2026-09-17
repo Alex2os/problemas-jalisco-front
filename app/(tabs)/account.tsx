@@ -45,7 +45,7 @@ export default function Account() {
           <Text style={globalStyles.text_subtitle}>Cuenta</Text>
 
           {!userConnected &&
-            <View className="flex w-full gap-2">
+            <View className="flex flex-col w-full gap-2">
               <Pressable style={indexStyles.default_button} onPress={() => router.push("/login")}>
                 <Text style={globalStyles.default_text}>Iniciar sesión</Text>
               </Pressable>
@@ -57,7 +57,7 @@ export default function Account() {
           }
 
           {userConnected &&
-            <View>
+            <View className = "w-full">
               <Pressable style={indexStyles.default_button} onPress={() => LogOut()}>
                 <Text style={globalStyles.default_text}>Cerrar sesión</Text>
               </Pressable>

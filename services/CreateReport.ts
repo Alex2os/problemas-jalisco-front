@@ -1,8 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
-const API_URL = "http://10.0.2.2:5195";
+const API_URL = "http://10.0.2.2:5140";
 
-export async function CreateReport(report_type: string, description: string, latitude: number, longitude: number) {
+export async function CreateReport(type: string, description: string, latitude: number, longitude: number) {
 
     const autentication_token = await SecureStore.getItemAsync("auth_token");
 
@@ -13,7 +13,7 @@ export async function CreateReport(report_type: string, description: string, lat
             "Authorization": `Bearer ${autentication_token}`,
         },
         body: JSON.stringify({
-            reportType: report_type,
+            type: type,
             description: description,
             latitude: latitude,
             longitude: longitude,

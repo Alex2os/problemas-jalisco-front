@@ -3,27 +3,6 @@ import {StyleSheet} from 'react-native';
 // No realizar llamadas a hooks desde este archivo. Los hooks solo deben ejecutarse dentro de componentes React y no en archivos externos.
 
 export const mapStyles = StyleSheet.create({
-    update_reports_button: {
-        position: "absolute",
-        bottom: 20,
-        left: "50%",
-
-        height: 50,
-        width: "60%",
-
-        justifyContent: "center",
-        alignItems: "center",
-
-        backgroundColor: "white",
-
-        borderColor: "#d7d7d7",
-        borderWidth: 2,
-        borderRadius: 10,
-
-        transform: [
-            {translateX: "-50%"},
-        ],
-    },
     marker_wrapper: {
         padding: 7,
         borderRadius: 20,
@@ -55,6 +34,29 @@ export const mapStyles = StyleSheet.create({
 
         transform: [
             {translateY: "-50%"},
+            {translateX: "-50%"},
+        ],
+    },
+    update_reports_button: {
+        position: "absolute",
+        bottom: 20,
+        left: "50%",
+
+        height: 50,
+        width: "60%",
+
+        zIndex: 10,
+
+        justifyContent: "center",
+        alignItems: "center",
+
+        backgroundColor: "white",
+
+        borderColor: "#d7d7d7",
+        borderWidth: 2,
+        borderRadius: 10,
+
+        transform: [
             {translateX: "-50%"},
         ],
     },

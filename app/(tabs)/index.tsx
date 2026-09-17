@@ -95,8 +95,7 @@ export default function Index() {
   async function AddMarkerToMap() {
     const autentication_token = await SecureStore.getItemAsync("auth_token");
 
-    if(autentication_token) {}
-    else {
+    if(!autentication_token) {
       setReportProblemModal(false);
       return;
     }
@@ -152,6 +151,12 @@ export default function Index() {
 
   return (
     <SafeAreaView className="flex-1" edges={["top"]}>
+
+      {/* button to update the reports*/}
+      <Pressable style={mapStyles.update_reports_button} onPress={LoadAllReports}>
+        <Text style={globalStyles.default_text}>Actualizar</Text>
+      </Pressable>
+
       <View style={{flex: 1, position: "relative"}}>
         <MapView
           style={StyleSheet.absoluteFill}
@@ -168,24 +173,20 @@ export default function Index() {
             <Marker
               key={key}
               coordinate={{
-                latitude: marker.marker_latitude,
-                longitude: marker.marker_longitude,
+                latitude: marker.latitude,
+                longitude: marker.longitude,
               }}
-              title={marker.report_type}
+              title={marker.type}
               description={marker.description}
             >
               {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reportType, as if not this gives errors.*/}
               {/* we can do this by simply doing as keyof typeof markercolors, typeof for the type/shape of markercolors and keyof for the name of properties inside there. */}
-              <View style={{ backgroundColor: MarkerColors[marker.report_type as keyof typeof MarkerColors], padding: 5, borderRadius: 20}}>
-                <Feather name={MarkerIcons[marker.report_type as keyof typeof MarkerIcons]} size={18} color="black" />
+              <View style={{backgroundColor: MarkerColors[marker.type as keyof typeof MarkerColors], padding: 5, borderRadius: 20}}>
+                <Feather name={MarkerIcons[marker.type as keyof typeof MarkerIcons]} size={18} color="black" />
               </View>
             </Marker>
           ))}
         </MapView>
-
-        <Pressable style={mapStyles.update_reports_button} onPress={LoadAllReports}>
-          <Text style={globalStyles.default_text}>Actualizar</Text>
-        </Pressable>
 
         {/* REPORT PROBLEM MODAL */}
         {reportProblemModal && (
