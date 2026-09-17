@@ -15,7 +15,6 @@ export default function Reports() {
 
     const [reports, setReports] = useState<any[]>([])
 
-
     async function LoadAllReports() {
         try {
             const data = await GetAllReports();
@@ -33,7 +32,7 @@ export default function Reports() {
         LoadAllReports();
     }, []);
 
-    const [tableReportShown, setTableReportShown] = useState<number>(-1);
+    const [reportCollapsibleOpen, setReportCollapsibleOpen] = useState<number>(-1);
 
     return (
         // in this case we use SafeAreaView so there's no problem with the layout (as it started from the top notch of the phone, which is not what we want),
@@ -59,7 +58,7 @@ export default function Reports() {
                         </TextInput>
 
                         {/* button to update reports. this should be made a global variable so both map and reports pages use the same variable.*/}
-                        <Pressable style = {indexStyles.default_button_blue} onPress={LoadAllReports}>
+                        <Pressable style={indexStyles.default_button_blue} onPress={LoadAllReports}>
                             <Text style={globalStyles.default_text_white}>Actualizar</Text>
                         </Pressable>
 
@@ -73,9 +72,9 @@ export default function Reports() {
                             {reports.map((report) => (
                                 <View className="flex flex-col w-full" key={report.id}>
 
-                                    <Pressable className="flex flex-col w-full bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7]" onPress={() => tableReportShown == report.id ? setTableReportShown(-1) : setTableReportShown(report.id)}>
+                                    <Pressable className="flex flex-col w-full bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7]" onPress={() => reportCollapsibleOpen == report.id ? setReportCollapsibleOpen(-1) : setReportCollapsibleOpen(report.id)}>
 
-                                        {tableReportShown != report.id && (
+                                        {reportCollapsibleOpen != report.id && (
                                             <View className="flex flex-row w-full h-[60px]">
                                                 <Text style={indexStyles.report_collapsible_header}>{report.type}</Text>
 
@@ -87,7 +86,7 @@ export default function Reports() {
                                             </View>
                                         )}
 
-                                        {tableReportShown == report.id && (
+                                        {reportCollapsibleOpen == report.id && (
 
                                             <View style={indexStyles.report_table_collapsible}>
 
