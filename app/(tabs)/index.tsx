@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
+import {SafeAreaView} from "react-native-safe-area-context";
 
 import Feather from '@expo/vector-icons/Feather';
 import {Picker} from '@react-native-picker/picker';
@@ -150,91 +151,93 @@ export default function Index() {
   }
 
   return (
-    <View style={{flex: 1, position: "relative"}}>
-      <MapView
-        style={StyleSheet.absoluteFill}
-        initialRegion={{
-          latitude: 20.6597,
-          longitude: -103.3496,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
-        onPress={OnMapPressed}
-      >
+    <SafeAreaView className="flex-1" edges={["top"]}>
+      <View style={{flex: 1, position: "relative"}}>
+        <MapView
+          style={StyleSheet.absoluteFill}
+          initialRegion={{
+            latitude: 20.6597,
+            longitude: -103.3496,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }}
+          onPress={OnMapPressed}
+        >
 
-        {markers.map((marker: any, indice: number) => (
-          <Marker
-            key={indice}
-            coordinate={{
-              latitude: marker.markerLatitude,
-              longitude: marker.markerLongitude,
-            }}
-            title={marker.reportType}
-            description={marker.description}
-          >
-            {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reportType, as if not this gives errors.*/}
-            {/* we can do this by simply doing as keyof typeof markercolors, typeof for the type/shape of markercolors and keyof for the name of properties inside there. */}
-            <View style={{backgroundColor: MarkerColors[marker.reportType as keyof typeof MarkerColors]}}>
-              <Feather name={MarkerIcons[marker.reportType as keyof typeof MarkerIcons]} size={18} color="black" />
+          {markers.map((marker: any, key: number) => (
+            <Marker
+              key={key}
+              coordinate={{
+                latitude: marker.marker_latitude,
+                longitude: marker.marker_longitude,
+              }}
+              title={marker.report_type}
+              description={marker.description}
+            >
+              {/* for typescript issues (ts is bullshit) we have to specify the type of the marker.reportType, as if not this gives errors.*/}
+              {/* we can do this by simply doing as keyof typeof markercolors, typeof for the type/shape of markercolors and keyof for the name of properties inside there. */}
+              <View style={{ backgroundColor: MarkerColors[marker.report_type as keyof typeof MarkerColors], padding: 5, borderRadius: 20}}>
+                <Feather name={MarkerIcons[marker.report_type as keyof typeof MarkerIcons]} size={18} color="black" />
+              </View>
+            </Marker>
+          ))}
+        </MapView>
+
+        <Pressable style={mapStyles.update_reports_button} onPress={LoadAllReports}>
+          <Text style={globalStyles.default_text}>Actualizar</Text>
+        </Pressable>
+
+        {/* REPORT PROBLEM MODAL */}
+        {reportProblemModal && (
+          <View style={mapStyles.report_problem_flex}>
+
+            <Text style={globalStyles.text_subtitle}>Reportar problema</Text>
+
+            {/* problem */}
+            <View className="w-full gap-1">
+              <Text style={globalStyles.default_text}>Problema</Text>
+              <View className="flex bg-white h-[55px] w-full text-black border-solid border-[2px] border-[#d7d7d7] rounded-[10px]">
+                <Picker
+                  selectedValue={problemSelected}
+                  onValueChange={(item_value: any) => setProblemSelected(item_value)}>
+                  <Picker.Item label="Accidente" value="accidente" />
+                  <Picker.Item label="Basura" value="basura" />
+                  <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />
+                  <Picker.Item label="Corte de electricidad/agua" value="corte-de-servicios" />
+                  <Picker.Item label="Problema en transporte público" value="transporte-publico" />
+                  <Picker.Item label="Robo/asalto" value="robo-asalto" />
+                  <Picker.Item label="Otro" value="otros" />
+                </Picker>
+              </View>
             </View>
-          </Marker>
-        ))}
-      </MapView>
 
-      <Pressable style={mapStyles.update_reports_button} onPress={LoadAllReports}>
-        <Text style={globalStyles.default_text}>Actualizar </Text>
-      </Pressable>
+            {/* description*/}
+            <View className="w-full gap-1">
+              <Text style={globalStyles.default_text}>Descripción</Text>
+              {/* with multiline we can make it so this input works like a textarea. */}
+              <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
+                placeholder="Describe el problema..."
+                autoCapitalize="none"
+                multiline={true}
+                onChangeText={setReportDescription}
+                value={reportDescription}>
+              </TextInput>
+            </View>
 
-      {/* REPORT PROBLEM MODAL */}
-      {reportProblemModal && (
-        <View style={mapStyles.report_problem_flex}>
+            <View className="w-full gap-3">
+              <Pressable style={indexStyles.default_button_blue} onPress={() => AddMarkerToMap()}>
+                <Text style={globalStyles.default_text_white}>Añadir</Text>
+              </Pressable>
 
-          <Text style={globalStyles.text_subtitle}>Reportar problema</Text>
-
-          {/* problem */}
-          <View className="w-full gap-1">
-            <Text style={globalStyles.default_text}>Problema</Text>
-            <View className="flex bg-white h-[55px] w-full text-black border-solid border-[2px] border-[#d7d7d7] rounded-[10px]">
-              <Picker
-                selectedValue={problemSelected}
-                onValueChange={(item_value: any) => setProblemSelected(item_value)}>
-                <Picker.Item label="Accidente" value="accidente" />
-                <Picker.Item label="Basura" value="basura" />
-                <Picker.Item label="Bloqueo en una calle/avenida" value="bloqueo" />
-                <Picker.Item label="Corte de electricidad/agua" value="corte-de-servicios" />
-                <Picker.Item label="Problema en transporte público" value="transporte-publico" />
-                <Picker.Item label="Robo/asalto" value="robo-asalto" />
-                <Picker.Item label="Otro" value="otros" />
-              </Picker>
+              <Pressable onPress={() => setReportProblemModal(false)} style={indexStyles.default_button}>
+                <Text style={globalStyles.default_text}>Cancelar</Text>
+              </Pressable>
             </View>
           </View>
+        )}
 
-          {/* description*/}
-          <View className="w-full gap-1">
-            <Text style={globalStyles.default_text}>Descripción</Text>
-            {/* with multiline we can make it so this input works like a textarea. */}
-            <TextInput className="bg-white w-full h-[100px] text-black p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
-              placeholder="Describe el problema..."
-              autoCapitalize="none"
-              multiline={true}
-              onChangeText={setReportDescription}
-              value={reportDescription}>
-            </TextInput>
-          </View>
-
-          <View className="w-full gap-3">
-            <Pressable style = {indexStyles.default_button_blue} onPress={() => AddMarkerToMap()}>
-              <Text style={globalStyles.default_text_white}>Añadir</Text>
-            </Pressable>
-
-            <Pressable onPress={() => setReportProblemModal(false)} style = {indexStyles.default_button}>
-              <Text style={globalStyles.default_text}>Cancelar</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-
-    </View>
+      </View>
+    </SafeAreaView>
 
 
   );

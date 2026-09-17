@@ -1,7 +1,8 @@
 import {useFocusEffect, useRouter} from 'expo-router';
 import * as SecureStore from "expo-secure-store";
 import {useCallback, useState} from "react";
-import {Pressable, Text, View} from 'react-native';
+import {Pressable, ScrollView, Text, View} from 'react-native';
+import {SafeAreaView} from "react-native-safe-area-context";
 
 import {globalStyles} from "@/styles/globalStyles";
 import {indexStyles} from "@/styles/indexStyles";
@@ -37,29 +38,33 @@ export default function Account() {
 
 
   return (
-    <View className="w-full h-full flex flex-col justify-center items-center p-[20px] gap-5">
+    <SafeAreaView className="flex-1" edges={["top"]}>
+      <ScrollView className="w-full h-full">
+        <View className="w-full h-full flex flex-col justify-center items-center p-[20px] gap-5">
 
-      <Text style={globalStyles.text_subtitle}>Cuenta</Text>
+          <Text style={globalStyles.text_subtitle}>Cuenta</Text>
 
-      {!userConnected &&
-        <View className = "flex w-full gap-2">
-          <Pressable style={indexStyles.default_button} onPress={() => router.push("/login")}>
-            <Text style={globalStyles.default_text}>Iniciar sesión</Text>
-          </Pressable>
+          {!userConnected &&
+            <View className="flex w-full gap-2">
+              <Pressable style={indexStyles.default_button} onPress={() => router.push("/login")}>
+                <Text style={globalStyles.default_text}>Iniciar sesión</Text>
+              </Pressable>
 
-          <Pressable style={indexStyles.default_button} onPress={() => router.push("/register")}>
-            <Text style={globalStyles.default_text}>Crear cuenta</Text>
-          </Pressable>
+              <Pressable style={indexStyles.default_button} onPress={() => router.push("/register")}>
+                <Text style={globalStyles.default_text}>Crear cuenta</Text>
+              </Pressable>
+            </View>
+          }
+
+          {userConnected &&
+            <View>
+              <Pressable style={indexStyles.default_button} onPress={() => LogOut()}>
+                <Text style={globalStyles.default_text}>Cerrar sesión</Text>
+              </Pressable>
+            </View>
+          }
         </View>
-      }
-
-      {userConnected &&
-        <View>
-          <Pressable style={indexStyles.default_button} onPress={() => LogOut()}>
-            <Text style={globalStyles.default_text}>Cerrar sesión</Text>
-          </Pressable>
-        </View>
-      }
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

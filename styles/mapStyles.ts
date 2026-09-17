@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 export const mapStyles = StyleSheet.create({
     update_reports_button: {
         position: "absolute",
-        top: 60,
+        bottom: 20,
         left: "50%",
 
         height: 50,
@@ -37,13 +37,15 @@ export const mapStyles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
 
+        position: "absolute",
+
         backgroundColor: "white",
         borderRadius: 10,
         borderColor: "#d7d7d7",
         borderWidth: 2,
 
         gap: 20,
-        height: "55%",
+        height: "60%",
         width: "80%",
 
         padding: 20,
