@@ -1,5 +1,6 @@
+import {GetReportById} from "@/services/GetReportById";
 import {useLocalSearchParams} from "expo-router";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 
@@ -12,13 +13,39 @@ export default function ReportDetails() {
   const {report_id} = useLocalSearchParams();
 
   // temporary variable for testing. later this will be the report obtained through the report_id
-  const [report, setReport] = useState({
-    type: report_id,
-    ubication: "123",
-    created_at: "asd",
-    description: "22",
-    username: "yo",
-  });
+  const [report, setReport] = useState<any>();
+
+  async function LoadReportById(id: number) {
+    try {
+      const data = await GetReportById(id);
+
+      setReport(data);
+
+      console.log(`Reporte obtenido con id: ${id}.`);
+
+    }
+    catch(error) {
+      console.log("Error al obtener el reporte.", error);
+    }
+  }
+
+  useEffect(() => {
+    LoadReportById(+report_id);
+  }, []);
+
+  // if the report does not load yet, we just show a loading screen.
+  if(!report) {
+    return (
+      <SafeAreaView className="flex-1" edges={["top"]}>
+        <ScrollView className="w-full h-full">
+
+          <View className="flex items-left justify-center w-full h-full p-[20px]">
+            <Text style={globalStyles.default_text}>Cargando...</Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView className="flex-1" edges={["top"]}>
@@ -29,15 +56,15 @@ export default function ReportDetails() {
           <Text style={globalStyles.text_subtitle}>Detalles del reporte</Text>
 
           <View style={indexStyles.report_details_info_container}>
-            <Text style = {indexStyles.report_details_text}>Tipo:</Text>
-            <Text style = {indexStyles.report_details_text}>{report.type}</Text>
+            <Text style={indexStyles.report_details_text}>Tipo:</Text>
+            <Text style={indexStyles.report_details_text}>{report.type}</Text>
           </View>
 
           {/* in the case of the date, we can turn the date given from the backend to a date object, then turning it to a locale string-
               so it appears in spanish, then specifying what things we want inside the string. in this case we specify weekday, hour, minute, etc.*/}
           <View style={indexStyles.report_details_info_container}>
-            <Text style = {indexStyles.report_details_text}>Fecha:</Text>
-            <Text style = {indexStyles.report_details_text}>{new Date(report.created_at).toLocaleDateString("es-MX",
+            <Text style={indexStyles.report_details_text}>Fecha:</Text>
+            <Text style={indexStyles.report_details_text}>{new Date(report.created_at).toLocaleDateString("es-MX",
               {
                 weekday: "long",
                 year: "numeric",
@@ -50,18 +77,18 @@ export default function ReportDetails() {
           </View>
 
           <View style={indexStyles.report_details_info_container}>
-            <Text style = {indexStyles.report_details_text}>Ubicación:</Text>
-            <Text style = {indexStyles.report_details_text}>{report.ubication}</Text>
+            <Text style={indexStyles.report_details_text}>Ubicación:</Text>
+            <Text style={indexStyles.report_details_text}>{report.ubication}</Text>
           </View>
 
           <View style={indexStyles.report_details_info_container}>
-            <Text style = {indexStyles.report_details_text}>Descripción:</Text>
-            <Text style = {indexStyles.report_details_text}>{report.description}</Text>
+            <Text style={indexStyles.report_details_text}>Descripción:</Text>
+            <Text style={indexStyles.report_details_text}>{report.description}</Text>
           </View>
 
           <View style={indexStyles.report_details_info_container}>
-            <Text style = {indexStyles.report_details_text}>Hecho por:</Text>
-            <Text style = {indexStyles.report_details_text}>{report.username}</Text>
+            <Text style={indexStyles.report_details_text}>Hecho por:</Text>
+            <Text style={indexStyles.report_details_text}>{report.username}</Text>
           </View>
         </View>
 
