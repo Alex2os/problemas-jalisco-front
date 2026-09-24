@@ -2,7 +2,7 @@ const API_URL = "http://10.0.2.2:5140";
 
 export async function GetAllReports() {
 
-    const response = await fetch(`${API_URL}/api/reports/getallreports`, {
+    const response = await fetch(`${API_URL}/reports`, {
         method: "GET",
     });
 

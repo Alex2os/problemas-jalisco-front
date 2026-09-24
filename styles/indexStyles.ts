@@ -87,7 +87,7 @@ export const indexStyles = StyleSheet.create({
   },
   report_table_collapsible_content: {
     textAlign: "left",
-    textAlignVertical: "center",
+    textAlignVertical: "top",
     width: "50%",
     fontSize: 17,
   },

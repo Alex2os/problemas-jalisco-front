@@ -7,19 +7,20 @@ import {indexStyles} from "@/styles/indexStyles";
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 import {GetAllReports} from "@/services/GetAllReports";
+import {GetFilteredReports} from "@/services/GetFilteredReports";
 
 
 export default function Reports() {
 
-    // example variable for testing.
-
-    const [reports, setReports] = useState<any[]>([])
+    const [reports, setReports] = useState<any[]>([]);
+    const [reportCollapsibleOpen, setReportCollapsibleOpen] = useState<number>(-1);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     async function LoadAllReports() {
         try {
             const data = await GetAllReports();
 
-            setReports(data)
+            setReports(data);
 
             console.log("Reportes obtenidos.");
         }
@@ -28,11 +29,26 @@ export default function Reports() {
         }
     }
 
+    async function LoadFilteredReports(query: string) {
+        try {
+            if(query == ""){
+                return ;
+            }
+
+            const data = await GetFilteredReports(searchQuery);
+
+            setReports(data);
+
+            console.log("Reportes filtrados obtenidos.");
+        }
+        catch(error) {
+            console.log("Error al obtener los reportes filtrados.", error);
+        }
+    }
+
     useEffect(() => {
         LoadAllReports();
     }, []);
-
-    const [reportCollapsibleOpen, setReportCollapsibleOpen] = useState<number>(-1);
 
     return (
         // in this case we use SafeAreaView so there's no problem with the layout (as it started from the top notch of the phone, which is not what we want),
@@ -53,8 +69,16 @@ export default function Reports() {
                     <View className="w-full gap-5">
 
                         {/* search bar */}
+                        {/* in this case we do the extra onsubmitediting and returnkeytype so we dont need a button to search.
+                        whenever the user presses the start or enter key, onSubmitEditing fires the function that is inside of there.
+                        the returnkeytype is just to make the keyboard button to enter more like a search action, if supported. */}
                         <TextInput className="bg-white w-[100%] h-[50px] p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
-                            placeholder="Busca un reporte...">
+                            placeholder="Busca por ubicación..."
+                            value = {searchQuery}
+                            onChangeText = {setSearchQuery}
+                            onSubmitEditing = {() => LoadFilteredReports(searchQuery)}
+                            returnKeyType = "search"
+                            >
                         </TextInput>
 
                         {/* button to update reports. this should be made a global variable so both map and reports pages use the same variable.*/}
@@ -68,6 +92,7 @@ export default function Reports() {
                                 <Text style={[globalStyles.default_text, indexStyles.report_table_header]}>Problema</Text>
                                 <Text style={[globalStyles.default_text, indexStyles.report_table_header]}>Ubicación</Text>
                             </View>
+
 
                             {reports.map((report) => (
                                 <View className="flex flex-col w-full" key={report.id}>
@@ -100,9 +125,20 @@ export default function Reports() {
                                                     <Text style={indexStyles.report_table_collapsible_content}>{report.type}</Text>
                                                 </View>
 
+                                                {/* in the case of the date, we can turn the date given from the backend to a date object, then turning it to a locale string-
+                                                so it appears in spanish, then specifying what things we want inside the string. in this case we specify weekday, hour, minute, etc.*/}
                                                 <View style={indexStyles.report_table_collapsible_content_wrapper}>
                                                     <Text style={indexStyles.report_table_collapsible_content}>Fecha:</Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{report.created_at}</Text>
+                                                    <Text style={indexStyles.report_table_collapsible_content}>{new Date(report.created_at).toLocaleDateString("es-MX",
+                                                        {
+                                                            weekday: "long",
+                                                            year: "numeric",
+                                                            month: "long",
+                                                            day: "numeric",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        }
+                                                    )}</Text>
                                                 </View>
 
                                                 <View style={indexStyles.report_table_collapsible_content_wrapper}>
