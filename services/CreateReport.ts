@@ -6,7 +6,7 @@ export async function CreateReport(type: string, description: string, latitude: 
 
     const autentication_token = await SecureStore.getItemAsync("auth_token");
 
-    const response = await fetch(`${API_URL}/api/reports/createreport`, {
+    const response = await fetch(`${API_URL}/reports/create`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 const API_URL = "http://10.0.2.2:5140";
 
 export async function UserLogIn(email: string, password: string) {
-  const reponse = await fetch(`${API_URL}/api/auth/login`, {
+  const reponse = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

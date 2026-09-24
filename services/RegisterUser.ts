@@ -1,7 +1,7 @@
 const API_URL = "http://10.0.2.2:5140";
 
 export async function RegisterUser(username: string, email: string, password: string) {
-  const response = await fetch(`${API_URL}/api/auth/register`, {
+  const response = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
