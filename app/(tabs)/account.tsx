@@ -46,11 +46,11 @@ export default function Account() {
 
           {!userConnected &&
             <View className="flex flex-col w-full gap-2">
-              <Pressable style={indexStyles.default_button} onPress={() => router.push("/login")}>
+              <Pressable style={indexStyles.default_button} onPress={() => router.push("/auth/login")}>
                 <Text style={globalStyles.default_text}>Iniciar sesión</Text>
               </Pressable>
 
-              <Pressable style={indexStyles.default_button} onPress={() => router.push("/register")}>
+              <Pressable style={indexStyles.default_button} onPress={() => router.push("/auth/register")}>
                 <Text style={globalStyles.default_text}>Crear cuenta</Text>
               </Pressable>
             </View>

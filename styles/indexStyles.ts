@@ -16,9 +16,6 @@ export const indexStyles = StyleSheet.create({
     borderWidth: 2,
 
   },
-  about_collapsible: {
-
-  },
   account_textinput: {
     width: "100%",
     height: 50,
@@ -79,23 +76,6 @@ export const indexStyles = StyleSheet.create({
     padding: 10,
     fontSize: 17,
   },
-  report_table_collapsible_title: {
-    width: "85%",
-    textAlign: "left",
-    textAlignVertical: "center",
-    fontSize: 17,
-  },
-  report_table_collapsible_content: {
-    textAlign: "left",
-    textAlignVertical: "top",
-    width: "50%",
-    fontSize: 17,
-  },
-  report_table_collapsible_content_wrapper: {
-    display: "flex",
-    flexDirection: "row",
-    width: "100%",
-  },
   report_collapsible_icon: {
     position: "absolute",
     textAlign: "right",
@@ -109,4 +89,14 @@ export const indexStyles = StyleSheet.create({
     width: "45%",
     height: 30,
   },
+  report_details_info_container: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    height: "auto",
+  },
+  report_details_text: {
+    fontSize: 17,
+    width: "50%",
+  }
 });

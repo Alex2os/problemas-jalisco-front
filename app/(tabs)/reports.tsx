@@ -1,3 +1,4 @@
+import {router} from "expo-router";
 import {useEffect, useState} from "react";
 import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -31,8 +32,8 @@ export default function Reports() {
 
     async function LoadFilteredReports(query: string) {
         try {
-            if(query == ""){
-                return ;
+            if(query == "") {
+                return;
             }
 
             const data = await GetFilteredReports(searchQuery);
@@ -74,11 +75,11 @@ export default function Reports() {
                         the returnkeytype is just to make the keyboard button to enter more like a search action, if supported. */}
                         <TextInput className="bg-white w-[100%] h-[50px] p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
                             placeholder="Busca por ubicación..."
-                            value = {searchQuery}
-                            onChangeText = {setSearchQuery}
-                            onSubmitEditing = {() => LoadFilteredReports(searchQuery)}
-                            returnKeyType = "search"
-                            >
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            onSubmitEditing={() => LoadFilteredReports(searchQuery)}
+                            returnKeyType="search"
+                        >
                         </TextInput>
 
                         {/* button to update reports. this should be made a global variable so both map and reports pages use the same variable.*/}
@@ -97,70 +98,19 @@ export default function Reports() {
                             {reports.map((report) => (
                                 <View className="flex flex-col w-full" key={report.id}>
 
-                                    <Pressable className="flex flex-col w-full bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7]" onPress={() => reportCollapsibleOpen == report.id ? setReportCollapsibleOpen(-1) : setReportCollapsibleOpen(report.id)}>
+                                    <Pressable className="flex flex-col w-full bg-white rounded-[10px] border-solid border-[2px] border-[#d7d7d7]" onPress={() => router.push(`/reports/${report.id}`)}>
 
-                                        {reportCollapsibleOpen != report.id && (
-                                            <View className="flex flex-row w-full h-[60px]">
-                                                <Text style={indexStyles.report_collapsible_header}>{report.type}</Text>
+                                        <View className="flex flex-row w-full h-[60px]">
+                                            <Text style={indexStyles.report_collapsible_header}>{report.type}</Text>
 
-                                                <View className="h-full w-[3px] bg-[#d7d7d7]"></View>
+                                            <View className="h-full w-[3px] bg-[#d7d7d7]"></View>
 
-                                                <Text style={indexStyles.report_collapsible_header}>{report.ubication}</Text>
+                                            <Text style={indexStyles.report_collapsible_header}>{report.ubication}</Text>
 
-                                                <AntDesign style={indexStyles.report_collapsible_icon} name="caret-down" size={24} color="black" />
-                                            </View>
-                                        )}
+                                            <AntDesign style={indexStyles.report_collapsible_icon} name="caret-right" size={24} color="black" />
+                                        </View>
 
-                                        {reportCollapsibleOpen == report.id && (
-
-                                            <View style={indexStyles.report_table_collapsible}>
-
-                                                <View className="flex flex-row w-full">
-                                                    <Text style={indexStyles.report_table_collapsible_title}>Información</Text>
-                                                    <AntDesign style={indexStyles.report_collapsible_icon} name="caret-up" size={24} color="black" />
-                                                </View>
-
-                                                <View style={indexStyles.report_table_collapsible_content_wrapper}>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>Tipo: </Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{report.type}</Text>
-                                                </View>
-
-                                                {/* in the case of the date, we can turn the date given from the backend to a date object, then turning it to a locale string-
-                                                so it appears in spanish, then specifying what things we want inside the string. in this case we specify weekday, hour, minute, etc.*/}
-                                                <View style={indexStyles.report_table_collapsible_content_wrapper}>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>Fecha:</Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{new Date(report.created_at).toLocaleDateString("es-MX",
-                                                        {
-                                                            weekday: "long",
-                                                            year: "numeric",
-                                                            month: "long",
-                                                            day: "numeric",
-                                                            hour: "2-digit",
-                                                            minute: "2-digit",
-                                                        }
-                                                    )}</Text>
-                                                </View>
-
-                                                <View style={indexStyles.report_table_collapsible_content_wrapper}>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>Ubicación:</Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{report.ubication}</Text>
-                                                </View>
-
-                                                <View style={indexStyles.report_table_collapsible_content_wrapper}>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>Descripción:</Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{report.description}</Text>
-                                                </View>
-
-                                                <View style={indexStyles.report_table_collapsible_content_wrapper}>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>Hecho por:</Text>
-                                                    <Text style={indexStyles.report_table_collapsible_content}>{report.username}</Text>
-                                                </View>
-                                            </View>
-                                        )}
                                     </Pressable>
-
-
-
 
                                 </View>
                             ))}

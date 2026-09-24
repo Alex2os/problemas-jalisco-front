@@ -70,7 +70,7 @@ export default function Login() {
 
                         <Text style={globalStyles.default_text}>¿No tienes una cuenta?</Text>
 
-                        <Pressable onPress={() => router.push("/register")} style={indexStyles.default_button}>
+                        <Pressable onPress={() => router.push("/auth/register")} style={indexStyles.default_button}>
                             <Text style={globalStyles.default_text}>Crea una cuenta</Text>
                         </Pressable>
 
