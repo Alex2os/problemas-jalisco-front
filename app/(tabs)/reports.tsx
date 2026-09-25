@@ -73,13 +73,12 @@ export default function Reports() {
                         {/* in this case we do the extra onsubmitediting and returnkeytype so we dont need a button to search.
                         whenever the user presses the start or enter key, onSubmitEditing fires the function that is inside of there.
                         the returnkeytype is just to make the keyboard button to enter more like a search action, if supported. */}
-                        <TextInput className="bg-white w-[100%] h-[50px] p-[10px] text-[15px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
+                        <TextInput className="bg-white w-[100%] h-[50px] p-[10px] text-[17px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
                             placeholder="Busca por ubicación..."
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                             onSubmitEditing={() => LoadFilteredReports(searchQuery)}
-                            returnKeyType="search"
-                        >
+                            returnKeyType="search">
                         </TextInput>
 
                         {/* button to update reports. this should be made a global variable so both map and reports pages use the same variable.*/}
@@ -103,7 +102,7 @@ export default function Reports() {
                                         <View className="flex flex-row w-full h-[60px]">
                                             <Text style={indexStyles.report_collapsible_header}>{report.type}</Text>
 
-                                            <View className="h-full w-[3px] bg-[#d7d7d7]"></View>
+                                            <View className="h-full w-[2px] bg-[#d7d7d7]"></View>
 
                                             <Text style={indexStyles.report_collapsible_header}>{report.ubication}</Text>
 
