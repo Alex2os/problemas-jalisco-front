@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 
+import {CreateComment} from "@/services/CreateNewComment";
 import {GetCommentsByReportId} from "@/services/GetCommentsByReportId";
 
 import {globalStyles} from "@/styles/globalStyles";
@@ -20,6 +21,8 @@ export default function ReportDetails() {
   const [likes, setLikes] = useState<number>();
   const [comments, setComments] = useState<any[]>([]);
 
+  const [userComment, setUserComment] = useState<string>("");
+
   const [loadingPage, setLoadingPage] = useState<boolean>(true);
 
   async function LoadReportById(id: number) {
@@ -33,6 +36,23 @@ export default function ReportDetails() {
     }
     catch(error) {
       console.log("Error al obtener el reporte.", error);
+    }
+  }
+
+  async function CreateNewComment(report_id: number) {
+
+    try {
+
+      if(userComment == "") return;
+
+      const data = await CreateComment(userComment, report_id);
+
+      console.log(`Comentario creado con éxito.`);
+      console.log(data);
+
+    }
+    catch(error) {
+      console.log("Error al obtener los comentarios.", error);
     }
   }
 
@@ -145,7 +165,10 @@ export default function ReportDetails() {
           {/* input to make a comment */}
           <TextInput className="bg-white w-[100%] h-[50px] p-[10px] text-[17px] rounded-[10px] border-solid border-[2px] border-[#d7d7d7]"
             placeholder="Escribe un comentario..."
-            returnKeyType="search">
+            returnKeyType="search"
+            value = {userComment}
+            onChangeText = {setUserComment}
+            onSubmitEditing = {() => CreateNewComment(+report_id)}>
           </TextInput>
 
           {/* comment section */}
