@@ -1,0 +1,33 @@
+export const palette = {
+  light: {
+    background: "#FAF9F6",
+    surface: "#FFFFFF",
+    raised: "#F0EEE9",
+    text: "#242923",
+    muted: "#62685F",
+    border: "#DDDFD7",
+    accent: "#A33F28",
+    accentSoft: "#F8EAE3",
+    onAccent: "#FFFFFF",
+    danger: "#AB2F3D",
+    dangerSoft: "#FAE9EB",
+    success: "#306246",
+    successSoft: "#E8F1EA",
+  },
+  dark: {
+    background: "#171C19",
+    surface: "#1F2621",
+    raised: "#2B332D",
+    text: "#EDF0E9",
+    muted: "#A9B3A7",
+    border: "#3A443C",
+    accent: "#F0AC91",
+    accentSoft: "#3C2B24",
+    onAccent: "#302019",
+    danger: "#FFADB6",
+    dangerSoft: "#40262C",
+    success: "#9FD3AD",
+    successSoft: "#23392C",
+  },
+};
+export type AppColors = typeof palette.light;

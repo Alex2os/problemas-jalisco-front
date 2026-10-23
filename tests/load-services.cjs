@@ -1,0 +1,33 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const ts = require('typescript');
+
+// Only native platform/secure-storage bindings are substituted. API services themselves are loaded unchanged.
+function createServiceClient({storage = new Map(), api} = {}) {
+  const modules = new Map();
+  const root = path.resolve(__dirname, '..');
+  const secureStore = {
+    getItemAsync: async key => storage.get(key) || null,
+    setItemAsync: async (key, value) => {storage.set(key, value);},
+    deleteItemAsync: async key => {storage.delete(key);},
+  };
+  function load(filename) {
+    const full = path.resolve(root, filename.endsWith('.ts') ? filename : filename + '.ts');
+    if (api && full === path.join(root, 'services/api.ts')) return api;
+    if (modules.has(full)) return modules.get(full).exports;
+    const module = {exports: {}};
+    modules.set(full, module);
+    const code = ts.transpileModule(fs.readFileSync(full, 'utf8'), {
+      compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
+    }).outputText;
+    new Function('require', 'module', 'exports', code)(request => {
+      if (request === 'expo-secure-store') return secureStore;
+      if (request === 'react-native') return {Platform: {OS: 'android'}};
+      if (request.startsWith('.')) return load(path.resolve(path.dirname(full), request));
+      return require(request);
+    }, module, module.exports);
+    return module.exports;
+  }
+  return {load, storage};
+}
+module.exports = {createServiceClient};
