@@ -107,3 +107,19 @@ test('API client rejects an in-flight personalized response after an account cha
     await assert.rejects(pending, error => error.status === 409);
   } finally {global.fetch = originalFetch;}
 });
+
+test('logged-out users cannot post comments and no unauthenticated request is sent', async () => {
+  const originalFetch = global.fetch;
+  let calls = 0;
+  global.fetch = async () => { calls++; throw new Error('Unexpected request'); };
+  try {
+    const c = createServiceClient();
+    await assert.rejects(
+      c.load('services/CreateNewComment').CreateComment('Test comment', 12),
+      error => error.status === 401 && /Inicia sesión/.test(error.message),
+    );
+    assert.equal(calls, 0);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

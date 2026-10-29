@@ -1,6 +1,7 @@
 import { ReportInteractions } from "@/components/app/report-interactions";
 import { ReportPhotos } from "@/components/app/report-photos";
 import { reportDate } from "@/components/app/report-row";
+import { ReportEditButton } from "@/src/components/ReportEditButton";
 import { ReportStatusPanel } from "@/components/app/report-status";
 import {
     AppText,
@@ -355,6 +356,7 @@ function ReportContent({
                   {live.description || "Sin descripción adicional."}
                 </AppText>
                 <ReportStatusPanel report={live} />
+                <ReportEditButton report={live} />
                 <ReportPhotos report={live} />
                 <ReportInteractions
                   report={live}

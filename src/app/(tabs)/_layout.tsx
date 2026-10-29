@@ -1,5 +1,6 @@
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
 import { useWindowDimensions } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
@@ -10,6 +11,7 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const reducedMotion = useReducedMotion();
   const { colors } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
@@ -19,6 +21,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
+          borderTopWidth: 1,
           paddingTop: 8,
           height:
             64 +
@@ -26,62 +29,86 @@ export default function TabLayout() {
             Math.ceil(14 * (Math.max(1, fontScale) - 1)),
           paddingBottom: Math.max(insets.bottom, 8),
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "500" },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "700",
+          letterSpacing: -0.1,
+          marginTop: 2,
+        },
         tabBarLabelPosition: "below-icon",
         tabBarHideOnKeyboard: true,
         animation: reducedMotion ? "none" : "fade",
       }}
+      screenListeners={{
+        tabPress: () => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+      }}
     >
+      <Tabs.Screen name="index" options={{ href: null }} />
+
       <Tabs.Screen
-        name="index"
+        name="mapa"
         options={{
           title: "Mapa",
-          tabBarIcon: ({ focused }) => (
-            <Feather
-              name="map"
-              size={20}
-              color={focused ? colors.accent : colors.muted}
+          tabBarLabel: "Mapa",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "map" : "map-outline"}
+              size={24}
+              color={color as string}
             />
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="mis-reportes"
+        options={{
+          title: "Reportes",
+          tabBarLabel: "Reportes",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "document-text" : "document-text-outline"}
+              size={24}
+              color={color as string}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="perfil"
+        options={{
+          title: "Perfil",
+          tabBarLabel: "Perfil",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={24}
+              color={color as string}
+            />
+          ),
+        }}
+      />
+
+      {/* Hidden legacy tab screens */}
       <Tabs.Screen
         name="reports"
         options={{
-          title: "Reportes",
-          tabBarIcon: ({ focused }) => (
-            <Feather
-              name="layers"
-              size={20}
-              color={focused ? colors.accent : colors.muted}
-            />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
-          title: "Cuenta",
-          tabBarIcon: ({ focused }) => (
-            <Feather
-              name="user"
-              size={20}
-              color={focused ? colors.accent : colors.muted}
-            />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
         name="about"
         options={{
-          title: "Acerca de",
-          tabBarIcon: ({ focused }) => (
-            <Feather
-              name="info"
-              size={20}
-              color={focused ? colors.accent : colors.muted}
-            />
-          ),
+          href: null,
         }}
       />
     </Tabs>

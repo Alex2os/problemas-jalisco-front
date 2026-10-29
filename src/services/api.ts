@@ -1,14 +1,10 @@
 import * as SecureStore from "expo-secure-store";
-import { sessionVersion } from "./session";
-import { Platform } from "react-native";
-
-const API_URL = (
-  process.env.EXPO_PUBLIC_API_URL ||
-  (Platform.OS === "android" ? "http://10.0.2.2:5140" : "http://localhost:5140")
-).replace(/\/$/, "");
+import { sessionVersion, setAuthSession } from "./session";
+const API_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, "");
+if (!API_URL) throw new Error("Configura EXPO_PUBLIC_API_URL en el archivo .env.");
 
 export const apiUrl = (path: string) =>
-  `${API_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  /^https?:\/\//i.test(path) ? path : `${API_URL}${path.startsWith("/") ? path : `/${path}`}`;
 
 export class ApiError extends Error {
   constructor(
@@ -57,6 +53,10 @@ export async function apiRequest<T>(
       data = body ? JSON.parse(body) : undefined;
     } catch {
       throw new Error(`Respuesta inválida del servidor (${response.status}).`);
+    }
+    if (response.status === 401 && authenticated && identity === sessionVersion()) {
+      await SecureStore.deleteItemAsync("auth_token");
+      if (identity === sessionVersion()) setAuthSession(false);
     }
     if (!response.ok)
       throw new ApiError(

@@ -8,7 +8,14 @@
     "scheme": "jaliscoproblemsfrontnew",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Necesitamos tu ubicación para situar automáticamente en el mapa el problema urbano que deseas reportar en Jalisco.",
+        "NSCameraUsageDescription": "Permite tomar fotos de baches, luminarias o fallas de servicios para adjuntarlas como evidencia a tu reporte.",
+        "NSPhotoLibraryUsageDescription": "Permite seleccionar fotos de tu galería para adjuntarlas a tu reporte ciudadano.",
+        "NSMicrophoneUsageDescription": "Permite usar el micrófono para dictar la descripción de tu reporte mediante voz.",
+        "NSSpeechRecognitionUsageDescription": "Permite convertir tu voz a texto para describir el problema de forma rápida."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +24,14 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -42,11 +56,18 @@
       "expo-image",
       "expo-web-browser",
       [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Necesitamos tu ubicación para situar con precisión el problema reportado en Jalisco.",
+          "locationWhenInUsePermission": "Necesitamos tu ubicación para situar con precisión el problema reportado en Jalisco."
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Permite seleccionar fotos para documentar problemas de tu comunidad.",
           "cameraPermission": "Permite tomar fotos para documentar problemas de tu comunidad.",
-          "microphonePermission": false
+          "microphonePermission": "Permite grabar notas de voz para describir el problema."
         }
       ]
     ],

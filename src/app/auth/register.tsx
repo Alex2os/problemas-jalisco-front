@@ -10,12 +10,13 @@ import {
 } from "@/components/app/ui";
 import { space } from "@/src/constants/design";
 import { RegisterUser } from "@/src/services/RegisterUser";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View, type TextInputInstance } from "react-native";
 
 export default function Register() {
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -46,7 +47,7 @@ export default function Register() {
       if (active.current)
         router.replace({
           pathname: "/auth/login",
-          params: { registered: "1" },
+          params: { registered: "1", returnTo },
         });
     } catch (error) {
       if (active.current)
@@ -73,7 +74,7 @@ export default function Register() {
           back
           backDisabled={submitting}
           onBack={() => {
-            if (!submission.current) router.replace("/(tabs)/account");
+            if (!submission.current) router.replace("/(tabs)/perfil");
           }}
         />
       }
@@ -155,7 +156,7 @@ export default function Register() {
           variant="text"
           label="Iniciar sesión"
           disabled={submitting}
-          onPress={() => router.replace("/auth/login")}
+          onPress={() => router.replace({ pathname: "/auth/login", params: { returnTo } })}
         />
       </View>
     </Screen>

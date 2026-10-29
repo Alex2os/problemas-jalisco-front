@@ -1,3 +1,6 @@
+import { EvidencePhotos } from "@/src/components/EvidencePhotos";
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import type { ReportPhoto } from "@/src/services/types";
 import { space } from "@/src/constants/design";
 import { MAX_PHOTO_BYTES, type SelectedPhoto } from "@/src/services/ReportMedia";
 import { Image } from "expo-image";
@@ -13,12 +16,18 @@ export function PhotoPicker({
   disabled = false,
   capacity = 3,
   onBusyChange,
+  variant = "default",
+  existingPhotos,
+  onRemoveExisting,
 }: {
   photos: SelectedPhoto[];
+  existingPhotos?: ReportPhoto[];
+  onRemoveExisting?: (id: number) => void;
   onChange: (photos: SelectedPhoto[]) => void;
   disabled?: boolean;
   capacity?: number;
   onBusyChange?: (busy: boolean) => void;
+  variant?: "default" | "evidence";
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -123,6 +132,18 @@ export function PhotoPicker({
       }
     }
   }
+  if (variant === "evidence") return (
+    <View style={{ gap: space.md }}>
+      <EvidencePhotos photos={photos} capacity={capacity} busy={busy} disabled={disabled}
+        existingPhotos={existingPhotos} onRemoveExisting={onRemoveExisting}
+        onChoose={(camera) => { void choose(camera); }}
+        onRemove={(index) => onChange(photos.filter((_, i) => i !== index))} />
+      {!!error && <ErrorBanner message={error} />}
+      {denied && <Button variant="text" label="Abrir ajustes" onPress={() => {
+        void Linking.openSettings().catch(() => setError("Abre los ajustes del teléfono y permite el acceso."));
+      }} />}
+    </View>
+  );
   return (
     <View style={{ gap: space.md }}>
       <AppText variant="label">

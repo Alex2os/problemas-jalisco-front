@@ -1,4 +1,5 @@
 import { apiRequest, apiUrl } from "./api";
+import { normalizeReport } from "./normalize-report";
 import { apiCache } from "./cache";
 import {
   invalidateInteractionQueries,
@@ -50,8 +51,9 @@ async function mutate(
         throw new Error(
           "No se pudo confirmar el cambio. Actualiza el reporte.",
         );
-      if (identity === sessionVersion()) confirm(response.report);
-      return response.report;
+      const report = normalizeReport(response.report);
+      if (identity === sessionVersion()) confirm(report);
+      return report;
     } catch (error) {
       invalidateInteractionQueries(id);
       apiCache.invalidate(`status-history:${id}:`);

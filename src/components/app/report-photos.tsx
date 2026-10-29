@@ -1,27 +1,21 @@
 import { space } from "@/src/constants/design";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
-import {
-    AddReportPhotos,
-    RemoveReportPhoto,
-    photoUrl,
-    type SelectedPhoto,
-} from "@/src/services/ReportMedia";
-import { sessionVersion } from "@/src/services/session";
+import { photoUrl } from "@/src/services/ReportMedia";
 import type { Report } from "@/src/services/types";
 import { Image } from "expo-image";
-import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Modal, Pressable, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Modal, Pressable, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { PhotoPicker } from "./photo-picker";
-import { AppText, Button, Notice } from "./ui";
+import { AppText, Notice } from "./ui";
 
 export function ReportImage({
   url,
   thumbnail = false,
+  hero = false,
 }: {
   url: string;
   thumbnail?: boolean;
+  hero?: boolean;
 }) {
   const { colors } = useAppTheme();
   const [failed, setFailed] = useState(false);
@@ -30,8 +24,8 @@ export function ReportImage({
     <View
       style={{
         width: thumbnail ? 80 : "100%",
-        height: thumbnail ? 80 : 210,
-        borderRadius: 6,
+        height: thumbnail ? 80 : hero ? 240 : 210,
+        borderRadius: hero ? 0 : 6,
         overflow: "hidden",
         justifyContent: "center",
         backgroundColor: colors.raised,
@@ -81,184 +75,48 @@ export function ReportImage({
     </View>
   );
 }
-export function ReportPhotos({ report }: { report: Report }) {
-  const identity = useCacheValue<number>("session:version") || 0;
-  return (
-    <ReportPhotosContent key={`${report.id}:${identity}`} report={report} />
-  );
+export function ReportPhotos({ report, hero = false }: { report: Report; hero?: boolean }) {
+  return <ReportPhotosContent key={report.id} report={report} hero={hero} />;
 }
-function ReportPhotosContent({ report }: { report: Report }) {
-  const authenticated = useAuthSession();
-  const owner = authenticated && report.can_manage;
+function ReportPhotosContent({ report, hero }: { report: Report; hero: boolean }) {
   const photos = report.photos || [];
-  const [selected, setSelected] = useState<SelectedPhoto[]>([]);
-  const [picking, setPicking] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [viewing, setViewing] = useState<number | null>(null);
-  const operation = useRef(false);
-  const mounted = useRef(true);
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-  async function change(action: () => Promise<Report>, uploaded = false) {
-    if (operation.current || picking || !owner) return;
-    operation.current = true;
-    setBusy(true);
-    setError("");
-    setSuccess("");
-    const identity = sessionVersion();
-    try {
-      await action();
-      if (mounted.current && identity === sessionVersion()) {
-        if (uploaded) setSelected([]);
-        setSuccess(uploaded ? "Fotos guardadas." : "Foto eliminada.");
-      }
-    } catch (failure) {
-      if (mounted.current && identity === sessionVersion())
-        setError(
-          failure instanceof Error
-            ? `${failure.message} Actualiza antes de volver a intentar la carga.`
-            : "No se pudo guardar. Actualiza el reporte.",
-        );
-    } finally {
-      operation.current = false;
-      if (mounted.current) setBusy(false);
-    }
-  }
+  const [error, setError] = useState("");
+  const index = photos.findIndex((photo) => photo.id === viewing);
+  if (!photos.length) return null;
   return (
     <View style={{ gap: space.md }}>
-      <AppText variant="heading">Fotos del reporte</AppText>
-      {!photos.length && (
-        <AppText variant="caption" tone="muted">
-          Este reporte todavía no tiene fotos.
-        </AppText>
-      )}
+      {!hero && <AppText variant="heading">Fotos del reporte</AppText>}
       {photos.map((photo, index) => (
-        <View key={photo.id} style={{ gap: space.xs }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Abrir foto ${index + 1} en pantalla completa`}
-            onPress={() => setViewing(index)}
-          >
-            <ReportImage key={photo.url} url={photo.url} />
-          </Pressable>
-          {owner && (
-            <Button
-              variant="text"
-              label={`Eliminar foto ${index + 1}`}
-              disabled={busy || picking}
-              onPress={() =>
-                Alert.alert("¿Eliminar esta foto?", "Se quitará del reporte.", [
-                  { text: "Cancelar", style: "cancel" },
-                  {
-                    text: "Eliminar",
-                    style: "destructive",
-                    onPress: () => {
-                      void change(() => RemoveReportPhoto(report.id, photo.id));
-                    },
-                  },
-                ])
-              }
-            />
-          )}
-        </View>
+        <Pressable key={photo.id} accessibilityRole="button"
+          accessibilityLabel={`Abrir foto ${index + 1} en pantalla completa`}
+          onPress={() => setViewing(photo.id)}>
+          <ReportImage key={photo.url} url={photo.url} hero={hero} />
+        </Pressable>
       ))}
-      {owner && photos.length < 3 && (
-        <>
-          <PhotoPicker
-            photos={selected}
-            onChange={setSelected}
-            capacity={3 - photos.length}
-            disabled={busy}
-            onBusyChange={setPicking}
-          />
-          {!!selected.length && (
-            <Button
-              label="Guardar fotos"
-              loadingLabel="Subiendo fotos…"
-              loading={busy}
-              disabled={picking || selected.length + photos.length > 3}
-              onPress={() =>
-                change(() => AddReportPhotos(report.id, selected), true)
-              }
-            />
-          )}
-        </>
-      )}
-      {busy && (
-        <AppText variant="caption" tone="muted">
-          Guardando cambios en las fotos…
-        </AppText>
-      )}
       <Notice message={error} />
-      <Notice message={success} success />
-      <Modal
-        visible={viewing !== null}
-        animationType="none"
-        onRequestClose={() => setViewing(null)}
-      >
+      <Modal visible={viewing !== null && index >= 0} animationType="none" onRequestClose={() => setViewing(null)}>
         <SafeAreaProvider>
           <SafeAreaView style={{ flex: 1, backgroundColor: "#101310" }}>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setViewing(null)}
-              style={{ minHeight: 48, padding: space.lg }}
-            >
+            <Pressable accessibilityRole="button" accessibilityLabel="Cerrar foto" onPress={() => setViewing(null)}
+              style={{ minHeight: 48, padding: space.lg }}>
               <AppText style={{ color: "white" }}>Cerrar</AppText>
             </Pressable>
-            {viewing !== null && photos[viewing] && (
-              <Image
-                source={{ uri: photoUrl(photos[viewing].url) }}
-                contentFit="contain"
-                style={{ flex: 1 }}
-                accessibilityLabel={`Foto ${viewing + 1} de ${photos.length}`}
-                onError={() => {
-                  setViewing(null);
-                  setError(
-                    "No se pudo abrir la foto. Actualiza el reporte e intenta de nuevo.",
-                  );
-                }}
-              />
+            {photos[index] && (
+              <Image source={{ uri: photoUrl(photos[index].url) }} contentFit="contain" style={{ flex: 1 }}
+                accessibilityLabel={`Foto ${index + 1} de ${photos.length}`}
+                onError={() => { setViewing(null); setError("No se pudo abrir la foto. Intenta de nuevo."); }} />
             )}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                padding: space.lg,
-              }}
-            >
-              <Pressable
-                accessibilityRole="button"
-                disabled={viewing === null || viewing <= 0}
-                onPress={() => setViewing((i) => Math.max(0, (i || 0) - 1))}
-                style={{
-                  minHeight: 44,
-                  justifyContent: "center",
-                  opacity: viewing === 0 ? 0.4 : 1,
-                }}
-              >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: space.lg }}>
+              <Pressable accessibilityRole="button" disabled={index <= 0}
+                onPress={() => { if (photos[index - 1]) setViewing(photos[index - 1].id); }}
+                style={{ minHeight: 44, justifyContent: "center", opacity: index <= 0 ? 0.4 : 1 }}>
                 <AppText style={{ color: "white" }}>Anterior</AppText>
               </Pressable>
-              <AppText style={{ color: "white" }}>
-                {(viewing ?? 0) + 1}/{photos.length}
-              </AppText>
-              <Pressable
-                accessibilityRole="button"
-                disabled={viewing === null || viewing >= photos.length - 1}
-                onPress={() =>
-                  setViewing((i) => Math.min(photos.length - 1, (i || 0) + 1))
-                }
-                style={{
-                  minHeight: 44,
-                  justifyContent: "center",
-                  opacity: viewing === photos.length - 1 ? 0.4 : 1,
-                }}
-              >
+              <AppText style={{ color: "white" }}>{index + 1}/{photos.length}</AppText>
+              <Pressable accessibilityRole="button" disabled={index >= photos.length - 1}
+                onPress={() => { if (photos[index + 1]) setViewing(photos[index + 1].id); }}
+                style={{ minHeight: 44, justifyContent: "center", opacity: index >= photos.length - 1 ? 0.4 : 1 }}>
                 <AppText style={{ color: "white" }}>Siguiente</AppText>
               </Pressable>
             </View>

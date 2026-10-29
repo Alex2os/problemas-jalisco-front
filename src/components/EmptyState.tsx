@@ -1,0 +1,93 @@
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { space } from "@/src/constants/design";
+import { Button } from "./Button";
+
+export interface EmptyStateProps {
+  icon?: React.ComponentProps<typeof Ionicons>["name"];
+  title: string;
+  description: string;
+  actionTitle?: string;
+  onAction?: () => void;
+  style?: StyleProp<ViewStyle>;
+}
+
+export function EmptyState({
+  icon = "folder-open-outline",
+  title,
+  description,
+  actionTitle,
+  onAction,
+  style,
+}: EmptyStateProps) {
+  const { colors, dark } = useAppTheme();
+
+  return (
+    <View style={[styles.container, style]}>
+      <View
+        style={[
+          styles.iconCircle,
+          { backgroundColor: dark ? "#1E2B3A" : "#FFF7ED" },
+        ]}
+      >
+        <Ionicons name={icon} size={48} color={colors.accent} />
+      </View>
+
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+      <Text style={[styles.description, { color: colors.muted }]}>
+        {description}
+      </Text>
+
+      {actionTitle && onAction && (
+        <Button
+          title={actionTitle}
+          variant="primary"
+          size="md"
+          onPress={onAction}
+          style={styles.actionBtn}
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: space.xxl,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: space.lg,
+  },
+  title: {
+    fontSize: 19,
+    fontWeight: "700",
+    textAlign: "center",
+    letterSpacing: -0.3,
+    marginBottom: space.xs,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: "center",
+    maxWidth: 320,
+    marginBottom: space.lg,
+  },
+  actionBtn: {
+    minWidth: 200,
+  },
+});

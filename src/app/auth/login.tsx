@@ -45,9 +45,16 @@ export default function Login() {
       const data = await UserLogIn(email, password);
 
       await SecureStore.setItemAsync("auth_token", data.token);
-      setAuthSession(true);
+      setAuthSession(true, data.user);
 
-      if (active.current) router.replace("/(tabs)/account");
+      if (active.current) {
+        if (returnTo === "/reportar/categoria" || returnTo === "/reportar/revisar") router.replace(returnTo);
+        else if (returnTo && /^\/reporte\/editar\/\d+$/.test(returnTo))
+          router.replace({ pathname: "/reporte/editar/[id]", params: { id: returnTo.split("/").pop()! } });
+        else if (returnTo && /^\/reporte\/\d+$/.test(returnTo))
+          router.replace({ pathname: "/reporte/[id]", params: { id: returnTo.split("/").pop()! } });
+        else router.replace("/(tabs)/perfil");
+      }
     } catch (error) {
       if (active.current)
         setError(
@@ -63,7 +70,7 @@ export default function Login() {
   const passwordInput = useRef<TextInputInstance>(null);
   const emailInput = useRef<TextInputInstance>(null);
   const [visiblePassword, setVisiblePassword] = useState(false);
-  const { registered } = useLocalSearchParams<{ registered?: string }>();
+  const { registered, returnTo } = useLocalSearchParams<{ registered?: string; returnTo?: string }>();
 
   return (
     <Screen
@@ -74,7 +81,7 @@ export default function Login() {
           back
           backDisabled={submitting}
           onBack={() => {
-            if (!submission.current) router.replace("/(tabs)/account");
+            if (!submission.current) router.replace("/(tabs)/perfil");
           }}
         />
       }
@@ -149,7 +156,7 @@ export default function Login() {
           variant="text"
           label="Crear una cuenta"
           disabled={submitting}
-          onPress={() => router.replace("/auth/register")}
+          onPress={() => router.replace({ pathname: "/auth/register", params: { returnTo } })}
         />
       </View>
     </Screen>
