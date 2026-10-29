@@ -1,6 +1,6 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { View, type TextInputInstance } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { setAuthSession } from "@/services/session";
 import { UserLogIn } from "@/services/UserLogIn";
@@ -60,8 +60,8 @@ export default function Login() {
       if (active.current) setSubmitting(false);
     }
   };
-  const passwordInput = useRef<TextInput>(null);
-  const emailInput = useRef<TextInput>(null);
+  const passwordInput = useRef<TextInputInstance>(null);
+  const emailInput = useRef<TextInputInstance>(null);
   const [visiblePassword, setVisiblePassword] = useState(false);
   const { registered } = useLocalSearchParams<{ registered?: string }>();
 

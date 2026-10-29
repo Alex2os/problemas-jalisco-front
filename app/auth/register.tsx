@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { View, type TextInputInstance } from "react-native";
 import { RegisterUser } from "@/services/RegisterUser";
 import {
   Screen,
@@ -60,8 +60,8 @@ export default function Register() {
       if (active.current) setSubmitting(false);
     }
   };
-  const passwordInput = useRef<TextInput>(null);
-  const emailInput = useRef<TextInput>(null);
+  const passwordInput = useRef<TextInputInstance>(null);
+  const emailInput = useRef<TextInputInstance>(null);
   const [visiblePassword, setVisiblePassword] = useState(false);
 
   return (

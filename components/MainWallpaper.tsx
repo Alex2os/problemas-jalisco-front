@@ -1,13 +1,13 @@
 import {BlurTargetView, BlurView} from 'expo-blur';
 import {useRef} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, type ViewInstance} from 'react-native';
 
 // component to export the main wallpaper, used across the app.
 export function MainWallpaper() {
 
     // first we declare our blur target. in this case we are blurring a view (later we use this variable to specify our blur target.)
     // we declare it as <View | null> instead of just <View> because of the component starting as null before it mounts, so we prevent errors from happening.
-    const blurTarget = useRef<View | null>(null);
+    const blurTarget = useRef<ViewInstance>(null);
 
     return (
         <>
@@ -25,4 +25,3 @@ export function MainWallpaper() {
         </>
     );
 }
-

@@ -473,7 +473,7 @@ function ReportContent({
                 />
               )}
             </View>
-          ) : null
+          ) : undefined
         }
       />
     </Screen>

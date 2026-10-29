@@ -36,8 +36,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Mapa",
-          tabBarIcon: ({ color }) => (
-            <Feather name="map" size={20} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Feather
+              name="map"
+              size={20}
+              color={focused ? colors.accent : colors.muted}
+            />
           ),
         }}
       />
@@ -45,8 +49,12 @@ export default function TabLayout() {
         name="reports"
         options={{
           title: "Reportes",
-          tabBarIcon: ({ color }) => (
-            <Feather name="layers" size={20} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Feather
+              name="layers"
+              size={20}
+              color={focused ? colors.accent : colors.muted}
+            />
           ),
         }}
       />
@@ -54,8 +62,12 @@ export default function TabLayout() {
         name="account"
         options={{
           title: "Cuenta",
-          tabBarIcon: ({ color }) => (
-            <Feather name="user" size={20} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Feather
+              name="user"
+              size={20}
+              color={focused ? colors.accent : colors.muted}
+            />
           ),
         }}
       />
@@ -63,8 +75,12 @@ export default function TabLayout() {
         name="about"
         options={{
           title: "Acerca de",
-          tabBarIcon: ({ color }) => (
-            <Feather name="info" size={20} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <Feather
+              name="info"
+              size={20}
+              color={focused ? colors.accent : colors.muted}
+            />
           ),
         }}
       />
