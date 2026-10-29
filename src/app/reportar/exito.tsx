@@ -14,8 +14,8 @@ export default function ExitoScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const params = useLocalSearchParams<{ id?: string; folio?: string }>();
-  const folio = params.folio || "PJ-000123";
-  const reportId = params.id || "101";
+  const folio = params.folio || params.id || "";
+  const reportId = params.id;
 
   const [copied, setCopied] = useState(false);
 
@@ -32,7 +32,7 @@ export default function ExitoScreen() {
 
   const handleViewReport = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace(`/reporte/${reportId}`);
+    if (reportId) router.replace(`/reporte/${reportId}`);
   };
 
   const handleDone = () => {
@@ -77,7 +77,7 @@ export default function ExitoScreen() {
             <Pressable
               onPress={handleCopy}
               accessibilityRole="button"
-              accessibilityLabel="Copiar folio"
+              accessibilityLabel="Copiar número de reporte"
               style={[
                 styles.copyBtn,
                 { backgroundColor: copied ? colors.successSoft : colors.raised },
@@ -111,6 +111,7 @@ export default function ExitoScreen() {
       >
         <Button
           title={es.success.viewReport}
+          disabled={!reportId}
           variant="primary"
           size="lg"
           fullWidth

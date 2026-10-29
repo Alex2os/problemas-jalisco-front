@@ -11,11 +11,10 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/src/components/Button";
-import { PhotoPicker } from "@/src/components/PhotoPicker";
+import { PhotoPicker } from "@/src/components/app/photo-picker";
 import { StepProgress } from "@/src/components/StepProgress";
 import { radius, space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
@@ -28,28 +27,12 @@ export default function EvidenciaScreen() {
 
   const photos = useDraftStore((s) => s.photos);
   const description = useDraftStore((s) => s.description);
-  const addPhoto = useDraftStore((s) => s.addPhoto);
-  const removePhoto = useDraftStore((s) => s.removePhoto);
+  const setPhotos = useDraftStore((s) => s.setPhotos);
   const setDescription = useDraftStore((s) => s.setDescription);
   const setStep = useDraftStore((s) => s.setStep);
 
-  const [isListening, setIsListening] = useState(false);
-  const charLimit = 280;
-
-  const handleToggleVoice = () => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (isListening) {
-      setIsListening(false);
-    } else {
-      setIsListening(true);
-      setTimeout(() => {
-        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        const addition = description ? `${description}. Problema en la vía pública.` : "Problema en la vía pública.";
-        setDescription(addition.slice(0, charLimit));
-        setIsListening(false);
-      }, 1800);
-    }
-  };
+  const [picking, setPicking] = useState(false);
+  const charLimit = 255;
 
   const handleQuickTag = (tag: string) => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -100,9 +83,8 @@ export default function EvidenciaScreen() {
         {/* Photo Picker */}
         <PhotoPicker
           photos={photos}
-          maxPhotos={3}
-          onAddPhoto={addPhoto}
-          onRemovePhoto={removePhoto}
+          onChange={setPhotos}
+          onBusyChange={setPicking}
         />
 
         {/* Description Section with Mic Button */}
@@ -111,32 +93,6 @@ export default function EvidenciaScreen() {
             {es.evidence.descriptionLabel}
           </Text>
 
-          <Pressable
-            onPress={handleToggleVoice}
-            accessibilityRole="button"
-            accessibilityLabel="Dictar reporte por voz"
-            style={[
-              styles.micBtn,
-              {
-                backgroundColor: isListening ? colors.danger : colors.surface,
-                borderColor: isListening ? colors.danger : colors.border,
-              },
-            ]}
-          >
-            <Ionicons
-              name={isListening ? "mic" : "mic-outline"}
-              size={16}
-              color={isListening ? "#FFFFFF" : colors.accent}
-            />
-            <Text
-              style={[
-                styles.micBtnText,
-                { color: isListening ? "#FFFFFF" : colors.accent },
-              ]}
-            >
-              {isListening ? es.common.listening : es.common.mic}
-            </Text>
-          </Pressable>
         </View>
 
         <TextInput
@@ -197,6 +153,7 @@ export default function EvidenciaScreen() {
       >
         <Button
           title={es.evidence.next}
+          disabled={picking}
           variant="primary"
           size="lg"
           fullWidth
@@ -234,19 +191,6 @@ const styles = StyleSheet.create({
   },
   descLabel: {
     fontSize: 15,
-    fontWeight: "700",
-  },
-  micBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: space.sm,
-    paddingVertical: 5,
-    borderRadius: radius.full,
-    borderWidth: 1,
-  },
-  micBtnText: {
-    fontSize: 12,
     fontWeight: "700",
   },
   textarea: {

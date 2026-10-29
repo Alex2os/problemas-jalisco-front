@@ -2,6 +2,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const ts = require('typescript');
 
+// Node tests do not run through Expo's .env loader.
+process.env.EXPO_PUBLIC_API_URL ??= 'http://localhost:5140';
+
 // Only native platform/secure-storage bindings are substituted. API services themselves are loaded unchanged.
 function createServiceClient({storage = new Map(), api} = {}) {
   const modules = new Map();

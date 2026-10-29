@@ -19,9 +19,11 @@ import { AppText, Button, Notice } from "./ui";
 export function ReportImage({
   url,
   thumbnail = false,
+  hero = false,
 }: {
   url: string;
   thumbnail?: boolean;
+  hero?: boolean;
 }) {
   const { colors } = useAppTheme();
   const [failed, setFailed] = useState(false);
@@ -30,8 +32,8 @@ export function ReportImage({
     <View
       style={{
         width: thumbnail ? 80 : "100%",
-        height: thumbnail ? 80 : 210,
-        borderRadius: 6,
+        height: thumbnail ? 80 : hero ? 240 : 210,
+        borderRadius: hero ? 0 : 6,
         overflow: "hidden",
         justifyContent: "center",
         backgroundColor: colors.raised,
@@ -81,13 +83,13 @@ export function ReportImage({
     </View>
   );
 }
-export function ReportPhotos({ report }: { report: Report }) {
+export function ReportPhotos({ report, hero = false }: { report: Report; hero?: boolean }) {
   const identity = useCacheValue<number>("session:version") || 0;
   return (
-    <ReportPhotosContent key={`${report.id}:${identity}`} report={report} />
+    <ReportPhotosContent key={`${report.id}:${identity}`} report={report} hero={hero} />
   );
 }
-function ReportPhotosContent({ report }: { report: Report }) {
+function ReportPhotosContent({ report, hero }: { report: Report; hero: boolean }) {
   const authenticated = useAuthSession();
   const owner = authenticated && report.can_manage;
   const photos = report.photos || [];
@@ -105,6 +107,8 @@ function ReportPhotosContent({ report }: { report: Report }) {
       mounted.current = false;
     };
   }, []);
+  if (!photos.length && !owner) return null;
+
   async function change(action: () => Promise<Report>, uploaded = false) {
     if (operation.current || picking || !owner) return;
     operation.current = true;
@@ -132,12 +136,7 @@ function ReportPhotosContent({ report }: { report: Report }) {
   }
   return (
     <View style={{ gap: space.md }}>
-      <AppText variant="heading">Fotos del reporte</AppText>
-      {!photos.length && (
-        <AppText variant="caption" tone="muted">
-          Este reporte todavía no tiene fotos.
-        </AppText>
-      )}
+      {!!photos.length && !hero && <AppText variant="heading">Fotos del reporte</AppText>}
       {photos.map((photo, index) => (
         <View key={photo.id} style={{ gap: space.xs }}>
           <Pressable
@@ -145,7 +144,7 @@ function ReportPhotosContent({ report }: { report: Report }) {
             accessibilityLabel={`Abrir foto ${index + 1} en pantalla completa`}
             onPress={() => setViewing(index)}
           >
-            <ReportImage key={photo.url} url={photo.url} />
+            <ReportImage key={photo.url} url={photo.url} hero={hero} />
           </Pressable>
           {owner && (
             <Button

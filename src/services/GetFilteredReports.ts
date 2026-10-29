@@ -1,4 +1,5 @@
 import { apiRequest } from "./api";
+import { normalizeReport } from "./normalize-report";
 import { apiCache } from "./cache";
 import { recordReportReads } from "./reportState";
 import type { Report } from "./types";
@@ -18,8 +19,9 @@ export function GetFilteredReports(
       );
       if (!Array.isArray(data?.reports))
         throw new Error("Respuesta inválida del servidor.");
-      recordReportReads(data.reports, revision);
-      return data.reports;
+      const reports = data.reports.map(normalizeReport);
+      recordReportReads(reports, revision);
+      return reports;
     },
     refresh,
   );

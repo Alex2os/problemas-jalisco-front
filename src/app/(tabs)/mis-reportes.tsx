@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -10,9 +11,10 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import { useBackendReports } from "@/src/hooks/use-backend-reports";
 import { EmptyState } from "@/src/components/EmptyState";
 import { ReportCard } from "@/src/components/ReportCard";
 import { radius, space } from "@/src/constants/design";
@@ -26,19 +28,15 @@ export default function MisReportesScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
 
+  useBackendReports();
+  const error = useReportsStore((s) => s.error);
   const reports = useReportsStore((s) => s.reports);
-  const userReportIds = useReportsStore((s) => s.userReportIds);
   const isLoading = useReportsStore((s) => s.isLoading);
   const refreshReports = useReportsStore((s) => s.refreshReports);
 
   const [activeFilter, setActiveFilter] = useState<string>("todos");
 
-  const displayedReports =
-    userReportIds.length > 0
-      ? reports.filter((r) => userReportIds.includes(r.id))
-      : reports;
-
-  const filteredReports = displayedReports.filter((r) => {
+  const filteredReports = reports.filter((r) => {
     if (activeFilter === "todos") return true;
     return normalizeReportStatus(r.status) === activeFilter;
   });
@@ -121,21 +119,24 @@ export default function MisReportesScreen() {
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
-            onRefresh={refreshReports}
+            onRefresh={() => { void refreshReports(); }}
             tintColor={colors.accent}
           />
         }
         renderItem={({ item }) => (
           <ReportCard report={item} onPress={handlePress} />
         )}
+        ListHeaderComponent={error ? <ErrorBanner message={error} /> : undefined}
         ListEmptyComponent={
-          <EmptyState
-            icon="document-text-outline"
-            title={es.myReports.emptyTitle}
-            description={es.myReports.emptySubtitle}
-            actionTitle={es.myReports.emptyAction}
-            onAction={() => router.push("/reportar/categoria")}
-          />
+          isLoading ? <ActivityIndicator color={colors.accent} /> : error ? <View /> : (
+            <EmptyState
+              icon="document-text-outline"
+              title={activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
+              description={activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
+              actionTitle={activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
+              onAction={() => router.push("/reportar/categoria")}
+            />
+          )
         }
       />
     </View>

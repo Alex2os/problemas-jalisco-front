@@ -1,4 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { Button } from "@/src/components/Button";
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import { useBackendReports } from "@/src/hooks/use-backend-reports";
+import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
+import { setAuthSession, sessionUserKey, type SessionUser } from "@/src/services/session";
 import {
   Linking,
   Pressable,
@@ -20,14 +27,31 @@ export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
   const { colors, dark, setPreference } = useAppTheme();
 
+  useBackendReports();
+  const authenticated = useAuthSession();
+  const user = useCacheValue<SessionUser>(sessionUserKey);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [sessionError, setSessionError] = useState("");
+  const error = useReportsStore((s) => s.error);
   const userReportIds = useReportsStore((s) => s.userReportIds);
   const reports = useReportsStore((s) => s.reports);
 
-  const userReports = reports.filter((r) => userReportIds.includes(r.id));
+  const userReports = authenticated ? reports.filter((r) => userReportIds.includes(r.id)) : [];
   const resolvedCount = userReports.filter(
     (r) => r.status === "resuelto" || r.status === "resolved"
   ).length;
   const upvotedCount = reports.filter((r) => r.liked_by_me).length;
+
+  const logOut = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    setSessionError("");
+    try {
+      await SecureStore.deleteItemAsync("auth_token");
+      setAuthSession(false);
+    } catch { setSessionError("No se pudo cerrar la sesión. Intenta de nuevo."); }
+    finally { setLoggingOut(false); }
+  };
 
   const handleCall = (phone: string) => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -71,14 +95,22 @@ export default function PerfilScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.userName, { color: colors.text }]}>
-              {es.profile.citizenName}
+              {authenticated ? user?.username || "Mi cuenta" : "Invitado"}
             </Text>
             <Text style={[styles.userRegion, { color: colors.muted }]}>
-              Jalisco, México
+              {authenticated ? user?.email || "Sesión iniciada" : "Inicia sesión para publicar y comentar"}
             </Text>
           </View>
         </View>
 
+        {!!sessionError && <ErrorBanner message={sessionError} />}
+        {authenticated ? <Button title="Cerrar sesión" variant="outline" loading={loggingOut} onPress={() => { void logOut(); }} /> : (
+          <View style={{ gap: space.sm }}>
+            <Button title="Iniciar sesión" onPress={() => router.push("/auth/login")} />
+            <Button title="Crear cuenta" variant="outline" onPress={() => router.push("/auth/register")} />
+          </View>
+        )}
+        {!!error && <ErrorBanner message={error} />}
         {/* 3 Useful Stats */}
         <View style={[styles.statsRow, { borderTopColor: colors.border }]}>
           <View style={styles.statCol}>

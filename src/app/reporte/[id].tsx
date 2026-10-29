@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  Dimensions,
-  Image,
+  ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   Share,
@@ -15,24 +15,29 @@ import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import { ReportPhotos } from "@/src/components/app/report-photos";
+import { ReportStatusActions } from "@/src/components/ReportStatusActions";
+import { useBackendReport } from "@/src/hooks/use-backend-reports";
+import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
+import { SetReportLike, likePendingKey } from "@/src/services/ReportInteractions";
+import { ApiError } from "@/src/services/api";
+import { ReportComments } from "@/src/components/ReportComments";
+import { reportDate } from "@/src/services/report-format";
 import { StatusChip } from "@/src/components/StatusChip";
 import { categoryDefFor } from "@/src/constants/report-categories";
-import { radius, shadows, size, space } from "@/src/constants/design";
+import { radius, shadows, space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useReportsStore } from "@/src/store/useReportsStore";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function ReporteDetailScreen() {
   const insets = useSafeAreaInsets();
   const { colors, dark } = useAppTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const getReportById = useReportsStore((s) => s.getReportById);
-  const toggleUpvote = useReportsStore((s) => s.toggleUpvote);
-
-  const report = getReportById(id || "");
+  const { report, loading, error } = useBackendReport(id || "");
+  const authenticated = useAuthSession();
+  const likePending = useCacheValue<boolean>(likePendingKey(Number(id))) === true;
 
   if (!report) {
     return (
@@ -45,19 +50,21 @@ export default function ReporteDetailScreen() {
         <Pressable onPress={() => router.back()} style={{ padding: space.md }}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
+        {loading ? <ActivityIndicator color={colors.accent} /> : <ErrorBanner message={error || "No se encontró el reporte."} />}
       </View>
     );
   }
 
   const categoryDef = categoryDefFor(report.category || report.type);
-  const photos =
-    report.photos && report.photos.length > 0
-      ? report.photos.map((p) => (typeof p === "string" ? p : (p as any).url))
-      : [];
-
-  const handleUpvote = () => {
+  const handleUpvote = async () => {
+    if (!authenticated) { router.push({ pathname: "/auth/login", params: { returnTo: `/reporte/${report.id}` } }); return; }
+    if (likePending) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    toggleUpvote(report.id);
+    try { await SetReportLike(report.id, !report.liked_by_me); }
+    catch (failure) {
+      if (failure instanceof ApiError && failure.status === 401) router.push({ pathname: "/auth/login", params: { returnTo: `/reporte/${report.id}` } });
+      else Alert.alert("No se pudo guardar", failure instanceof Error ? failure.message : "Intenta de nuevo.");
+    }
   };
 
   const handleShare = async () => {
@@ -65,7 +72,7 @@ export default function ReporteDetailScreen() {
     try {
       await Share.share({
         title: `Reporte #${report.folio}`,
-        message: `${categoryDef.label} en ${report.ubication}. Folio #${report.folio} en ProblemasJalisco.`,
+        message: `${categoryDef.label} en ${report.ubication}. Reporte #${report.id} en ProblemasJalisco.`,
       });
     } catch {
       // Ignored
@@ -116,32 +123,23 @@ export default function ReporteDetailScreen() {
           { paddingBottom: Math.max(insets.bottom, 24) + 20 },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
       >
-        {/* Photo Carousel / Single Photo */}
-        {photos.length > 0 ? (
-          <View style={styles.photoContainer}>
-            <Image
-              source={{ uri: photos[0] }}
-              style={styles.photo}
-              resizeMode="cover"
-            />
-          </View>
-        ) : (
-          <View
-            style={[
-              styles.noPhotoBanner,
-              { backgroundColor: dark ? "#1E2A38" : categoryDef.bgLight },
-            ]}
-          >
+        {!report.photos.length && (
+          <View style={[styles.noPhotoBanner, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
             <Ionicons
-              name={categoryDef.ionicon as any}
+              name={categoryDef.ionicon}
               size={48}
               color={categoryDef.color}
+              accessibilityLabel={categoryDef.label}
             />
           </View>
         )}
-
+        <ReportPhotos report={report} hero />
         <View style={styles.body}>
+          {!!error && <ErrorBanner message={error} />}
           {/* Status Chip & Category Row */}
           <View style={styles.metaRow}>
             <StatusChip status={report.status} size="md" />
@@ -156,10 +154,26 @@ export default function ReporteDetailScreen() {
             </View>
           </View>
 
+          <View style={styles.authorRow}>
+            <View style={[styles.authorAvatar, { backgroundColor: colors.raised }]}>
+              <Ionicons name="person-outline" size={20} color={colors.muted} />
+            </View>
+            <View style={{ flex: 1, gap: space.xs }}>
+              <Text style={[styles.authorName, { color: colors.text }]}>
+                Reportado por: {report.username || "Usuario"}
+              </Text>
+              <Text style={[styles.authorLabel, { color: colors.muted }]}>
+                {reportDate(report.created_at)}
+              </Text>
+            </View>
+          </View>
+
           {/* Description */}
           <Text style={[styles.description, { color: colors.text }]}>
             {report.description}
           </Text>
+
+          <ReportStatusActions key={`${report.id}:${report.can_manage}`} report={report} />
 
           {/* "Yo también lo vi" Upvote Card */}
           <View
@@ -186,7 +200,9 @@ export default function ReporteDetailScreen() {
             </View>
 
             <Pressable
-              onPress={handleUpvote}
+              onPress={() => { void handleUpvote(); }}
+              disabled={likePending}
+              accessibilityState={{ disabled: likePending, busy: likePending }}
               accessibilityRole="button"
               accessibilityLabel="Confirmar problema"
               style={[
@@ -256,6 +272,7 @@ export default function ReporteDetailScreen() {
               </MapView>
             </View>
           </View>
+          <ReportComments key={report.id} reportId={report.id} />
         </View>
       </ScrollView>
     </View>
@@ -287,16 +304,8 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 40,
   },
-  photoContainer: {
-    width: SCREEN_WIDTH,
-    height: 240,
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-  },
   noPhotoBanner: {
-    width: SCREEN_WIDTH,
+    width: "100%",
     height: 160,
     alignItems: "center",
     justifyContent: "center",
@@ -324,6 +333,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
+  authorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+  },
+  authorAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  authorLabel: { fontSize: 12 },
+  authorName: { fontSize: 15, fontWeight: "700" },
   description: {
     fontSize: 16,
     lineHeight: 24,

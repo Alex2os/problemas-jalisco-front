@@ -1,3 +1,5 @@
+import type { SelectedPhoto } from "./ReportMedia";
+
 export interface ReportInteractions {
   report_id: number;
   like_count: number;
@@ -8,7 +10,7 @@ export interface ReportInteractions {
 export type ReportStatus =
   | "reportado"
   | "resuelto"
-  // Legacy aliases accepted from saved reports and API responses
+  // Legacy aliases accepted from API responses
   | "en_proceso"
   | "recibido"
   | "en_revision"
@@ -59,11 +61,9 @@ export interface Report {
   status_updated_at?: string;
   status_version: number;
   can_manage: boolean;
-  created_at: string;
+  created_at: string | null;
   user_id: number;
   username: string;
-  is_anonymous?: boolean;
-  contact_phone?: string;
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
@@ -78,11 +78,8 @@ export interface ReportDraft {
   colonia: string;
   municipality: string;
   reference: string;
-  photos: string[]; // local uris or remote urls
+  photos: SelectedPhoto[]; // Prepared uploads, held only while the form is open
   description: string;
-  isAnonymous: boolean;
-  contactPhone: string;
-  contactName: string;
   lastUpdated: number;
 }
 

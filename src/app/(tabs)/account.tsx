@@ -109,7 +109,7 @@ export default function Account() {
       <View style={{ gap: space.sm }}>
         <AppText variant="heading">Apariencia</AppText>
         <AppText tone="muted" variant="caption">
-          Se guarda en este dispositivo.
+          Se aplica durante esta sesión.
         </AppText>
         <View accessibilityRole="radiogroup">
           {appearances.map((option) => {

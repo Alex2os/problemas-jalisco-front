@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
   type StyleProp,
   type ViewStyle,
@@ -14,7 +13,7 @@ import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, size, space, shadows } from "@/src/constants/design";
+import { radius, space, shadows } from "@/src/constants/design";
 
 export interface LocationPickerProps {
   initialLatitude?: number;
@@ -49,11 +48,7 @@ export function LocationPicker({
   });
 
   const [locating, setLocating] = useState(false);
-  const [editingAddress, setEditingAddress] = useState(false);
-
-  useEffect(() => {
-    void handleAutoLocate();
-  }, []);
+  const geocodeRequest = useRef(0);
 
   const handleAutoLocate = async () => {
     setLocating(true);
@@ -80,11 +75,14 @@ export function LocationPicker({
   };
 
   const reverseGeocode = async (lat: number, lng: number) => {
+    const request = ++geocodeRequest.current;
+    onLocationChange({ latitude: lat, longitude: lng });
     try {
       const results = await Location.reverseGeocodeAsync({
         latitude: lat,
         longitude: lng,
       });
+      if (request !== geocodeRequest.current) return;
       if (results && results.length > 0) {
         const item = results[0];
         const street = item.street ? `${item.street} ${item.streetNumber || ""}`.trim() : "";
@@ -101,7 +99,7 @@ export function LocationPicker({
         onLocationChange({ latitude: lat, longitude: lng });
       }
     } catch {
-      onLocationChange({ latitude: lat, longitude: lng });
+      // Coordinates were already selected; the API resolves the address on submission.
     }
   };
 
@@ -167,38 +165,9 @@ export function LocationPicker({
               {colonia ? `Col. ${colonia}, ` : ""}{municipality}
             </Text>
           </View>
-          <Pressable
-            onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setEditingAddress(!editingAddress);
-            }}
-            hitSlop={8}
-          >
-            <Text style={[styles.editLink, { color: colors.accent }]}>
-              {editingAddress ? "Listo" : "Editar"}
-            </Text>
-          </Pressable>
         </View>
 
-        {editingAddress && (
-          <TextInput
-            value={address}
-            onChangeText={(text) =>
-              onLocationChange({
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-                address: text,
-              })
-            }
-            placeholder="Escribe calle y número o cruce..."
-            placeholderTextColor={colors.muted}
-            autoFocus
-            style={[
-              styles.input,
-              { backgroundColor: colors.raised, borderColor: colors.border, color: colors.text },
-            ]}
-          />
-        )}
+
       </View>
     </View>
   );
@@ -257,17 +226,5 @@ const styles = StyleSheet.create({
   addressSub: {
     fontSize: 13,
     marginTop: 1,
-  },
-  editLink: {
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  input: {
-    height: 42,
-    borderRadius: radius.control,
-    borderWidth: 1,
-    paddingHorizontal: space.md,
-    fontSize: 14,
-    marginTop: space.sm,
   },
 });

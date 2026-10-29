@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, space } from "@/src/constants/design";
+import { space } from "@/src/constants/design";
 import { Button } from "./Button";
 
 export interface EmptyStateProps {

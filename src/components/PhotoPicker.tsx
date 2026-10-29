@@ -13,7 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, size, space, shadows } from "@/src/constants/design";
+import { radius, space, shadows } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
 
 export interface PhotoPickerProps {

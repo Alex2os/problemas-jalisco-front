@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import { useAuthSession } from "@/src/hooks/use-report-state";
 import { Button } from "@/src/components/Button";
 import { StepProgress } from "@/src/components/StepProgress";
 import { categoryDefFor } from "@/src/constants/report-categories";
@@ -16,7 +18,7 @@ import { useReportsStore } from "@/src/store/useReportsStore";
 
 export default function RevisarScreen() {
   const insets = useSafeAreaInsets();
-  const { colors, dark } = useAppTheme();
+  const { colors } = useAppTheme();
 
   const draft = useDraftStore();
   const resetDraft = useDraftStore((s) => s.resetDraft);
@@ -24,9 +26,16 @@ export default function RevisarScreen() {
   const submitReport = useReportsStore((s) => s.submitReport);
 
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const pending = useRef(false);
+  const authenticated = useAuthSession();
   const categoryDef = categoryDefFor(draft.category || "otro");
 
   const handleSubmit = async () => {
+    if (!authenticated) { router.push({ pathname: "/auth/login", params: { returnTo: "/reportar/revisar" } }); return; }
+    if (pending.current) return;
+    pending.current = true;
+    setError("");
     setSubmitting(true);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
@@ -37,8 +46,11 @@ export default function RevisarScreen() {
         pathname: "/reportar/exito",
         params: { id: String(created.id), folio: created.folio },
       });
-    } catch {
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "No se pudo enviar el reporte.");
       setSubmitting(false);
+    } finally {
+      pending.current = false;
     }
   };
 
@@ -50,8 +62,7 @@ export default function RevisarScreen() {
           totalSteps={4}
           stepTitle="Revisar"
           onBack={() => {
-            setStep(3);
-            router.back();
+            if (!pending.current) { setStep(3); router.back(); }
           }}
         />
       </View>
@@ -81,7 +92,7 @@ export default function RevisarScreen() {
           {/* Photo */}
           {draft.photos?.[0] ? (
             <Image
-              source={{ uri: draft.photos[0] }}
+              source={{ uri: draft.photos[0].uri }}
               style={styles.heroImage}
               resizeMode="cover"
             />
@@ -118,11 +129,12 @@ export default function RevisarScreen() {
             {/* Restored Short Description */}
             {draft.description.trim() ? (
               <Text style={[styles.descText, { color: colors.textSecondary }]}>
-                "{draft.description.trim()}"
+                {draft.description.trim()}
               </Text>
             ) : null}
           </View>
         </View>
+        {!!error && <ErrorBanner message={error} />}
       </ScrollView>
 
       {/* Sticky Bottom "Enviar reporte" Button */}
@@ -138,7 +150,7 @@ export default function RevisarScreen() {
         ]}
       >
         <Button
-          title={submitting ? "Enviando..." : es.review.send}
+          title={authenticated ? es.review.send : "Inicia sesión para enviar"}
           variant="primary"
           size="lg"
           fullWidth

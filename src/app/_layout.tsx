@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useReducedMotion } from "react-native-reanimated";
 
 import { AppThemeProvider, useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
+import { clearLegacyStorage } from "@/src/services/clear-legacy-storage";
 import { useReportsStore } from "@/src/store/useReportsStore";
 import "../../global.css";
 
@@ -29,12 +29,11 @@ function Navigation() {
   const reducedMotion = useReducedMotion();
   const { dark, colors, ready } = useAppTheme();
   const initializeReports = useReportsStore((s) => s.initialize);
-  const restoreDraft = useDraftStore((s) => s.restoreDraft);
 
   useEffect(() => {
     void initializeReports();
-    void restoreDraft();
-  }, []);
+    void clearLegacyStorage().catch(() => undefined);
+  }, [initializeReports]);
 
   if (!ready) return null;
 

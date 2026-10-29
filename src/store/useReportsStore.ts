@@ -1,196 +1,117 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { MOCK_REPORTS } from "../services/mockReports";
+import { apiCache } from "../services/cache";
+import { CreateReport } from "../services/CreateReport";
+import { GetAllReports } from "../services/GetAllReports";
+import { GetReportById } from "../services/GetReportById";
+import { normalizeReport } from "../services/normalize-report";
+import { SetReportLike } from "../services/ReportInteractions";
+import { reportKey } from "../services/reportState";
+import { loadSession, sessionVersion } from "../services/session";
 import type { Report, ReportDraft } from "../services/types";
 
-const REPORTS_STORAGE_KEY = "@problemas_jalisco_reports_v1";
-const USER_REPORTS_KEY = "@problemas_jalisco_user_reports";
-const OFFLINE_QUEUE_KEY = "@problemas_jalisco_offline_queue";
-
-export interface ReportsState {
+interface ReportsState {
   reports: Report[];
   userReportIds: number[];
-  offlineQueue: ReportDraft[];
   isLoading: boolean;
-  isSyncing: boolean;
-  filterCategory: string | "todos";
-  filterStatus: string | "todos";
-  searchQuery: string;
-
-  // Actions
+  error: string;
   initialize: () => Promise<void>;
-  submitReport: (draft: ReportDraft) => Promise<Report>;
-  toggleUpvote: (reportId: number) => void;
-  getReportById: (id: number | string) => Report | undefined;
-  setFilterCategory: (category: string) => void;
-  setFilterStatus: (status: string) => void;
-  setSearchQuery: (query: string) => void;
-  refreshReports: () => Promise<void>;
-  syncOfflineQueue: () => Promise<void>;
+  submitReport: (draft: ReportDraft) => Promise<Pick<Report, "id" | "folio">>;
+  toggleUpvote: (id: number) => Promise<void>;
+  refreshReports: (background?: boolean) => Promise<void>;
+}
+let initialized = false;
+let readEpoch = 0;
+let pendingRead: { version: number; promise: Promise<void> } | undefined;
+const subscriptions = new Map<number, () => void>();
+
+function watchReports(reports: Report[]) {
+  const ids = new Set(reports.map((report) => report.id));
+  for (const [id, unsubscribe] of subscriptions) {
+    if (!ids.has(id)) { unsubscribe(); subscriptions.delete(id); }
+  }
+  for (const id of ids) {
+    if (subscriptions.has(id)) continue;
+    subscriptions.set(id, apiCache.subscribe(reportKey(id), () => {
+      const updated = apiCache.peek<Report>(reportKey(id));
+      if (!updated) return;
+      useReportsStore.setState((state) => {
+        const reports = state.reports.map((report) => report.id === id ? updated : report);
+        return { reports, userReportIds: reports.filter((report) => report.can_manage).map((report) => report.id) };
+      });
+    }));
+  }
 }
 
 export const useReportsStore = create<ReportsState>((set, get) => ({
-  reports: MOCK_REPORTS,
-  userReportIds: [],
-  offlineQueue: [],
-  isLoading: false,
-  isSyncing: false,
-  filterCategory: "todos",
-  filterStatus: "todos",
-  searchQuery: "",
-
+  reports: [], userReportIds: [], isLoading: true, error: "",
   initialize: async () => {
-    try {
-      const [storedReports, storedUserReports, storedQueue] = await Promise.all([
-        AsyncStorage.getItem(REPORTS_STORAGE_KEY),
-        AsyncStorage.getItem(USER_REPORTS_KEY),
-        AsyncStorage.getItem(OFFLINE_QUEUE_KEY),
-      ]);
-
-      let allReports = MOCK_REPORTS;
-      if (storedReports) {
-        const parsed = JSON.parse(storedReports) as Report[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const idMap = new Map<number, Report>();
-          allReports.forEach((r) => idMap.set(r.id, r));
-          parsed.forEach((r) => idMap.set(r.id, r));
-          allReports = Array.from(idMap.values());
-        }
-      }
-
-      let userIds: number[] = [];
-      if (storedUserReports) {
-        userIds = JSON.parse(storedUserReports) as number[];
-      }
-
-      let queue: ReportDraft[] = [];
-      if (storedQueue) {
-        queue = JSON.parse(storedQueue) as ReportDraft[];
-      }
-
-      set({
-        reports: allReports,
-        userReportIds: userIds,
-        offlineQueue: queue,
-      });
-    } catch {
-      // Storage read failed, rely on default state
-    }
-  },
-
-  submitReport: async (draft: ReportDraft): Promise<Report> => {
-    const nextId = Date.now();
-    const folioNumber = Math.floor(100000 + Math.random() * 900000);
-    const folio = `PJ-${folioNumber}`;
-    const nowIso = new Date().toISOString();
-
-    const categoryKey = draft.category || "otro";
-    const newReport: Report = {
-      id: nextId,
-      folio,
-      category: categoryKey,
-      type: categoryKey,
-      title: `${categoryKey.toUpperCase()}: ${draft.address || "Problema en " + draft.municipality}`,
-      description: draft.description.trim() || "Reporte generado sin descripción adicional.",
-      latitude: draft.latitude || 20.6767,
-      longitude: draft.longitude || -103.3472,
-      ubication: `${draft.address || "Vía pública"}, ${draft.colonia ? "Col. " + draft.colonia + ", " : ""}${draft.municipality}`,
-      address: draft.address || "Vía pública",
-      colonia: draft.colonia || "",
-      municipality: draft.municipality || "Guadalajara",
-      reference: draft.reference || "",
-      photos: draft.photos.map((uri, index) => ({
-        id: nextId + index,
-        url: uri,
-        display_order: index + 1,
-        created_at: nowIso,
-      })),
-      status: "reportado",
-      created_at: nowIso,
-      status_updated_at: nowIso,
-      status_version: 1,
-      can_manage: true,
-      user_id: 1,
-      username: draft.isAnonymous ? "Ciudadano Invitado" : draft.contactName || "Vecino de Jalisco",
-      like_count: 1,
-      comment_count: 0,
-      liked_by_me: true,
-      is_anonymous: draft.isAnonymous,
-      contact_phone: draft.contactPhone,
-    };
-
-    const currentReports = get().reports;
-    const currentUserIds = get().userReportIds;
-    const updatedReports = [newReport, ...currentReports];
-    const updatedUserIds = [newReport.id, ...currentUserIds];
-
-    set({
-      reports: updatedReports,
-      userReportIds: updatedUserIds,
+    if (initialized) return;
+    initialized = true;
+    apiCache.subscribe("session:version", () => {
+      readEpoch++;
+      watchReports([]);
+      set({ reports: [], userReportIds: [], error: "" });
+      void get().refreshReports();
     });
-
-    try {
-      await Promise.all([
-        AsyncStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(updatedReports)),
-        AsyncStorage.setItem(USER_REPORTS_KEY, JSON.stringify(updatedUserIds)),
-      ]);
-    } catch {
-      // Local storage failure
-    }
-
-    return newReport;
+    try { await loadSession(); }
+    catch { set({ error: "No se pudo leer la sesión. Inicia sesión de nuevo." }); }
+    await get().refreshReports();
   },
-
-  toggleUpvote: (reportId: number) => {
-    const reports = get().reports.map((report) => {
-      if (report.id === reportId) {
-        const liked = !report.liked_by_me;
-        return {
-          ...report,
-          liked_by_me: liked,
-          like_count: liked ? report.like_count + 1 : Math.max(0, report.like_count - 1),
-        };
+  refreshReports: (background = false) => {
+    const version = sessionVersion();
+    if (pendingRead?.version === version) return pendingRead.promise;
+    const request = ++readEpoch;
+    if (!background) set({ isLoading: true });
+    let promise: Promise<void>;
+    promise = (async () => {
+      try {
+        const fetched = await GetAllReports(true);
+        if (version !== sessionVersion() || request !== readEpoch) return;
+        const reports = fetched.map((report) => apiCache.peek<Report>(reportKey(report.id)) || report);
+        watchReports(reports);
+        set({ reports, userReportIds: reports.filter((report) => report.can_manage).map((report) => report.id), error: "" });
+      } catch (error) {
+        if (version === sessionVersion() && request === readEpoch)
+          set({ error: error instanceof Error ? error.message : "No se pudieron cargar los reportes." });
+      } finally {
+        if (request === readEpoch) set({ isLoading: false });
+        if (pendingRead?.version === version && request === readEpoch) pendingRead = undefined;
       }
-      return report;
-    });
-
-    set({ reports });
-    void AsyncStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
+    })();
+    pendingRead = { version, promise };
+    return promise;
   },
-
-  getReportById: (id: number | string) => {
-    return get().reports.find(
-      (r) => String(r.id) === String(id) || r.folio === String(id)
-    );
-  },
-
-  setFilterCategory: (category: string) => {
-    set({ filterCategory: category });
-  },
-
-  setFilterStatus: (status: string) => {
-    set({ filterStatus: status });
-  },
-
-  setSearchQuery: (query: string) => {
-    set({ searchQuery: query });
-  },
-
-  refreshReports: async () => {
-    set({ isLoading: true });
-    await new Promise((res) => setTimeout(res, 600));
+  submitReport: async (draft) => {
+    if (!draft.category) throw new Error("Selecciona una categoría.");
+    if (draft.latitude === null || draft.longitude === null) throw new Error("Selecciona la ubicación del problema.");
+    if (draft.description.trim().length > 255) throw new Error("La descripción debe tener hasta 255 caracteres.");
+    const version = sessionVersion();
+    const response = await CreateReport(draft.category, draft.description, draft.latitude, draft.longitude, draft.photos);
+    if (!Number.isSafeInteger(response?.report_id) || response.report_id <= 0)
+      throw new Error("No se pudo confirmar el reporte. Consulta Mis reportes antes de volver a enviarlo.");
+    let report: Report;
+    try {
+      report = response.report ? normalizeReport(response.report) : await GetReportById(response.report_id, true);
+    } catch {
+      if (version !== sessionVersion()) throw new Error("La sesión cambió. Consulta tus reportes al iniciar sesión.");
+      // Creation is already confirmed. A failed detail read must not invite a duplicate submission.
+      void get().refreshReports(true);
+      return { id: response.report_id, folio: String(response.report_id) };
+    }
+    if (version !== sessionVersion()) throw new Error("La sesión cambió. Consulta tus reportes al iniciar sesión.");
+    readEpoch++;
+    pendingRead = undefined;
+    apiCache.set(reportKey(report.id), report);
     set({ isLoading: false });
+    set((state) => {
+      const reports = [report, ...state.reports.filter((item) => item.id !== report.id)];
+      watchReports(reports);
+      return { reports, userReportIds: reports.filter((item) => item.can_manage).map((item) => item.id) };
+    });
+    return report;
   },
-
-  syncOfflineQueue: async () => {
-    const queue = get().offlineQueue;
-    if (queue.length === 0) return;
-
-    set({ isSyncing: true });
-    for (const draft of queue) {
-      await get().submitReport(draft);
-    }
-    set({ offlineQueue: [], isSyncing: false });
-    await AsyncStorage.removeItem(OFFLINE_QUEUE_KEY);
+  toggleUpvote: async (id) => {
+    const report = apiCache.peek<Report>(reportKey(id)) || get().reports.find((item) => item.id === id);
+    if (report) await SetReportLike(id, !report.liked_by_me);
   },
 }));

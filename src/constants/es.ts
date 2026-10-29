@@ -24,7 +24,7 @@ export const es = {
   navigation: {
     home: "Inicio",
     map: "Mapa",
-    myReports: "Mis reportes",
+    myReports: "Reportes",
     profile: "Perfil",
   },
 
@@ -118,25 +118,25 @@ export const es = {
     locationLabel: "Ubicación",
     evidenceLabel: "Fotos",
     descriptionLabel: "Detalles",
-    anonymousLabel: "Reporte anónimo",
-    anonymousHint: "No se publicarán tus datos de contacto",
     send: "Enviar reporte",
   },
 
   success: {
-    title: "Reporte guardado",
-    subtitle: "Puedes ver los detalles de tu reporte con este folio.",
-    folioLabel: "Folio del reporte",
+    title: "Reporte enviado",
+    subtitle: "Tu reporte se publicó. Puedes consultarlo con este número.",
+    folioLabel: "Número de reporte",
     copied: "Folio copiado",
     viewReport: "Ver mi reporte",
     homeCta: "Volver al mapa",
   },
 
   myReports: {
-    title: "Mis reportes",
-    subtitle: "Consulta los reportes que has creado.",
-    emptyTitle: "Aún no tienes reportes",
-    emptySubtitle: "Cuando reportes un problema, aparecerá aquí.",
+    title: "Reportes",
+    subtitle: "Consulta los problemas reportados en tu comunidad.",
+    emptyResolvedTitle: "Aún no hay reportes marcados como resueltos",
+    emptyResolvedSubtitle: "Cuando un reporte se marque como resuelto, aparecerá aquí.",
+    emptyTitle: "Aún no hay reportes",
+    emptySubtitle: "Cuando se publique un reporte, aparecerá aquí.",
     emptyAction: "Crear reporte",
     filterAll: "Todos",
   },

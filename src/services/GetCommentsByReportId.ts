@@ -36,6 +36,7 @@ export function GetCommentsByReportId(
   return apiCache.get(
     `comments:${reportId}:all`,
     async () => {
+      const revision = apiCache.revision();
       const data = await apiRequest<CommentsPage>(
         `/reports/${reportId}/comments`,
         {},
@@ -43,6 +44,7 @@ export function GetCommentsByReportId(
       );
       if (!Array.isArray(data?.comments))
         throw new Error("Respuesta inválida del servidor.");
+      if (data.interactions) recordInteractionRead(data.interactions, revision);
       return data.comments;
     },
     refresh,

@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -12,6 +13,9 @@ import * as Location from "expo-location";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorBanner } from "@/src/components/ErrorBanner";
+import { useBackendReports } from "@/src/hooks/use-backend-reports";
+import { useAuthSession } from "@/src/hooks/use-report-state";
 import { categoryDefFor } from "@/src/constants/report-categories";
 import { radius, shadows, space } from "@/src/constants/design";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
@@ -23,7 +27,11 @@ export default function MapaScreen() {
   const { colors } = useAppTheme();
   const mapRef = useRef<MapView>(null);
 
+  useBackendReports();
+  const authenticated = useAuthSession();
   const reports = useReportsStore((s) => s.reports);
+  const loading = useReportsStore((s) => s.isLoading);
+  const error = useReportsStore((s) => s.error);
 
   const handleRecenterGPS = async () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -56,7 +64,8 @@ export default function MapaScreen() {
 
   const handleStartReport = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push("/reportar/categoria");
+    if (authenticated) router.push("/reportar/categoria");
+    else router.push({ pathname: "/auth/login", params: { returnTo: "/reportar/categoria" } });
   };
 
   return (
@@ -107,9 +116,11 @@ export default function MapaScreen() {
             </Text>
             <View style={[styles.activeDot, { backgroundColor: colors.success }]} />
             <Text style={[styles.activeCount, { color: colors.muted }]}>
-              {reports.length} reportes
+              {loading ? "Cargando…" : `${reports.length} reportes`}
             </Text>
           </View>
+          {loading && <ActivityIndicator color={colors.accent} style={{ marginTop: space.sm }} />}
+          {!!error && <ErrorBanner message={error} />}
         </View>
 
         {/* Floating GPS Button */}

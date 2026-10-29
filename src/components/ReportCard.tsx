@@ -11,7 +11,7 @@ import {
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, shadows, size, space } from "@/src/constants/design";
+import { radius, shadows, space } from "@/src/constants/design";
 import { categoryDefFor } from "@/src/constants/report-categories";
 import { StatusChip } from "./StatusChip";
 import type { Report } from "@/src/services/types";
@@ -38,7 +38,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
     onPress(report);
   };
 
-  const formatDate = (isoString?: string) => {
+  const formatDate = (isoString?: string | null) => {
     if (!isoString) return "";
     try {
       const d = new Date(isoString);

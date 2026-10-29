@@ -47,7 +47,33 @@ const reportId = Number(process.env.JALISCO_TEST_REPORT_ID);
   assert.equal(report.comment_count, initialComments);
   assert.ok(!(await load('GetCommentsByReportId').GetCommentsPage(reportId, true)).comments.some(comment => comment.id === created.comment.id));
 
+  // Exercise the store used by the actual map, report form, and profile screens.
+  const store = client.load('store/useReportsStore').useReportsStore;
+  await store.getState().initialize();
+  const submitted = await store.getState().submitReport({
+    category: 'agua', description: 'Created by the current report form store',
+    latitude: 20.6597, longitude: -103.3496, photos: [],
+  });
+  const persisted = await load('GetReportById').GetReportById(submitted.id, true);
+  assert.equal(persisted.user_id, login.user.id);
+  assert.equal(persisted.username, login.user.username);
+  assert.equal(persisted.folio, String(persisted.id));
+  assert.ok(store.getState().userReportIds.includes(persisted.id));
+  await store.getState().toggleUpvote(persisted.id);
+  assert.equal(store.getState().reports.find(item => item.id === persisted.id).liked_by_me, true);
+  await load('CreateNewComment').CreateComment('Shared with the current screen store', persisted.id);
+  assert.equal(store.getState().reports.find(item => item.id === persisted.id).comment_count, 1);
+  await load('ReportMedia').UpdateReportStatus(persisted.id, 'resolved', persisted.status_version);
+  assert.equal(store.getState().reports.find(item => item.id === persisted.id).status, 'resolved');
+  const reopened = createServiceClient({storage});
+  const restoredStore = reopened.load('store/useReportsStore').useReportsStore;
+  await restoredStore.getState().initialize();
+  assert.ok(restoredStore.getState().userReportIds.includes(persisted.id));
+  assert.equal(restoredStore.getState().reports.find(item => item.id === persisted.id).comment_count, 1);
+
   storage.delete('auth_token'); load('session').setAuthSession(false);
+  await store.getState().refreshReports();
+  assert.deepEqual(store.getState().userReportIds, []);
   report = await load('GetReportById').GetReportById(reportId);
   assert.equal(report.liked_by_me, false);
   await assert.rejects(load('ReportInteractions').SetReportLike(reportId, true), error => error.status === 401);

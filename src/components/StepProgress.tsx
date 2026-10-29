@@ -10,7 +10,7 @@ import {
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { size, space } from "@/src/constants/design";
+import { space } from "@/src/constants/design";
 
 export interface StepProgressProps {
   currentStep: number;
