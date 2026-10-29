@@ -1,13 +1,16 @@
 import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider,
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { useReducedMotion } from "react-native-reanimated";
 
 import { AppThemeProvider, useAppTheme } from "@/src/hooks/use-app-theme";
+import { useDraftStore } from "@/src/store/useDraftStore";
+import { useReportsStore } from "@/src/store/useReportsStore";
 import "../../global.css";
 
 export const unstable_settings = {
@@ -25,6 +28,13 @@ export default function RootLayout() {
 function Navigation() {
   const reducedMotion = useReducedMotion();
   const { dark, colors, ready } = useAppTheme();
+  const initializeReports = useReportsStore((s) => s.initialize);
+  const restoreDraft = useDraftStore((s) => s.restoreDraft);
+
+  useEffect(() => {
+    void initializeReports();
+    void restoreDraft();
+  }, []);
 
   if (!ready) return null;
 
@@ -49,18 +59,35 @@ function Navigation() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* Report Stepper Flow */}
         <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Cómo participar" }}
+          name="reportar"
+          options={{
+            headerShown: false,
+            presentation: "card",
+          }}
         />
 
-        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+        {/* Report Detail Screen */}
+        <Stack.Screen
+          name="reporte/[id]"
+          options={{
+            headerShown: false,
+          }}
+        />
 
+        {/* Legacy routes preserved */}
         <Stack.Screen
           name="reports/[report_id]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: "modal", title: "Cómo participar" }}
+        />
+        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/register" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={dark ? "light" : "dark"} />
     </ThemeProvider>
