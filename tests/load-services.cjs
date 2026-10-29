@@ -12,8 +12,8 @@ function createServiceClient({storage = new Map(), api} = {}) {
     deleteItemAsync: async key => {storage.delete(key);},
   };
   function load(filename) {
-    const full = path.resolve(root, filename.endsWith('.ts') ? filename : filename + '.ts');
-    if (api && full === path.join(root, 'services/api.ts')) return api;
+    const full = path.resolve(root, 'src', filename.endsWith('.ts') ? filename : filename + '.ts');
+    if (api && full === path.join(root, 'src/services/api.ts')) return api;
     if (modules.has(full)) return modules.get(full).exports;
     const module = {exports: {}};
     modules.set(full, module);

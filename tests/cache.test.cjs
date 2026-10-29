@@ -3,7 +3,7 @@ const { readFileSync } = require('node:fs');
 const { test } = require('node:test');
 const vm = require('node:vm');
 const ts = require('typescript');
-const source = ts.transpileModule(readFileSync('services/cache.ts', 'utf8'), {
+const source = ts.transpileModule(readFileSync('src/services/cache.ts', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText;
 const context = { exports: {} };
