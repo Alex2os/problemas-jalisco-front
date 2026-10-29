@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useCallback, useState, useRef } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -8,6 +8,8 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { createAddressLookup, type AddressLookupState } from "@/src/services/address-lookup";
 import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
@@ -42,71 +44,87 @@ export function LocationPicker({
 }: LocationPickerProps) {
   const { colors } = useAppTheme();
 
-  const [coords, setCoords] = useState<{ latitude: number; longitude: number }>({
-    latitude: initialLatitude,
-    longitude: initialLongitude,
+  const map = useRef<MapView>(null);
+  const position = useRef<Region>({
+    latitude: initialLatitude, longitude: initialLongitude,
+    latitudeDelta: 0.005, longitudeDelta: 0.005,
+  });
+  const lookup = useRef<ReturnType<typeof createAddressLookup> | null>(null);
+  const active = useRef(false);
+  const gpsPending = useRef(false);
+  const movement = useRef(0);
+  const [locating, setLocating] = useState(false);
+  const [gpsError, setGpsError] = useState("");
+  const [addressState, setAddressState] = useState<AddressLookupState>({
+    latitude: initialLatitude, longitude: initialLongitude,
+    address, colonia, municipality, status: address ? "ready" : "loading",
   });
 
-  const [locating, setLocating] = useState(false);
-  const geocodeRequest = useRef(0);
+  useFocusEffect(useCallback(() => {
+    active.current = true;
+    setLocating(gpsPending.current);
+    const controller = createAddressLookup({
+      lookup: async (coordinates) => {
+        // Android's native geocoder also requires foreground location permission.
+        const permission = await Location.getForegroundPermissionsAsync();
+        if (!permission.granted) {
+          const requested = await Location.requestForegroundPermissionsAsync();
+          if (!requested.granted) throw new Error("Location permission denied");
+        }
+        return Location.reverseGeocodeAsync(coordinates);
+      },
+      onChange: (state) => {
+        setAddressState(state);
+        onLocationChange({
+          latitude: state.latitude, longitude: state.longitude,
+          address: state.address, colonia: state.colonia, municipality: state.municipality,
+        });
+      },
+    });
+    lookup.current = controller;
+    controller.select(position.current);
+    return () => {
+      active.current = false;
+      controller.dispose();
+      lookup.current = null;
+    };
+  }, [onLocationChange]));
 
   const handleAutoLocate = async () => {
+    if (gpsPending.current) return;
+    gpsPending.current = true;
+    const startingMovement = movement.current;
     setLocating(true);
+    setGpsError("");
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setLocating(false);
-        return;
-      }
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      const newCoords = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      };
-      setCoords(newCoords);
-      void reverseGeocode(newCoords.latitude, newCoords.longitude);
-    } catch {
-      // Keep default Guadalajara coordinates
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (!permission.granted) throw new Error("Permite el acceso a tu ubicación para usar el GPS.");
+      const current = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      if (!active.current || startingMovement !== movement.current) return;
+      const next = { ...position.current, latitude: current.coords.latitude, longitude: current.coords.longitude };
+      position.current = next;
+      lookup.current?.select(next);
+      map.current?.animateToRegion(next);
+    } catch (failure) {
+      if (active.current) setGpsError(failure instanceof Error ? failure.message : "No se pudo obtener tu ubicación.");
     } finally {
-      setLocating(false);
+      gpsPending.current = false;
+      if (active.current) setLocating(false);
     }
   };
 
-  const reverseGeocode = async (lat: number, lng: number) => {
-    const request = ++geocodeRequest.current;
-    onLocationChange({ latitude: lat, longitude: lng });
-    try {
-      const results = await Location.reverseGeocodeAsync({
-        latitude: lat,
-        longitude: lng,
-      });
-      if (request !== geocodeRequest.current) return;
-      if (results && results.length > 0) {
-        const item = results[0];
-        const street = item.street ? `${item.street} ${item.streetNumber || ""}`.trim() : "";
-        const district = item.district || item.subregion || colonia || "";
-        const city = item.city || municipality || "Guadalajara";
-        onLocationChange({
-          latitude: lat,
-          longitude: lng,
-          address: street || address || "Vía pública",
-          colonia: district,
-          municipality: city,
-        });
-      } else {
-        onLocationChange({ latitude: lat, longitude: lng });
-      }
-    } catch {
-      // Coordinates were already selected; the API resolves the address on submission.
-    }
+  const handleRegionChange = (region: Region) => {
+    if (region.latitude !== position.current.latitude || region.longitude !== position.current.longitude) movement.current++;
+    position.current = region;
+    lookup.current?.select(region);
   };
-
-  const handleRegionChangeComplete = (region: Region) => {
-    setCoords({ latitude: region.latitude, longitude: region.longitude });
-    void reverseGeocode(region.latitude, region.longitude);
-  };
+  const findingAddress = addressState.status === "loading";
+  const addressTitle = findingAddress ? "Localizando calle…" : addressState.status === "error"
+    ? "No se pudo obtener la calle" : addressState.address || "Ubicación seleccionada";
+  const addressSubtitle = findingAddress ? "Buscando la dirección del punto seleccionado."
+    : addressState.status === "error" || addressState.status === "unavailable"
+      ? "Puedes reintentar la búsqueda o confirmar este punto."
+      : [addressState.colonia, addressState.municipality].filter(Boolean).join(", ");
 
   return (
     <View style={[styles.container, style]}>
@@ -114,13 +132,10 @@ export function LocationPicker({
       <View style={[styles.mapWrap, { borderColor: colors.border }]}>
         <MapView
           style={StyleSheet.absoluteFill}
-          region={{
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }}
-          onRegionChangeComplete={handleRegionChangeComplete}
+          ref={map}
+          initialRegion={{ latitude: initialLatitude, longitude: initialLongitude, latitudeDelta: 0.005, longitudeDelta: 0.005 }}
+          onRegionChange={handleRegionChange}
+          onRegionChangeComplete={handleRegionChange}
         />
 
         {/* Center Target Pin */}
@@ -137,6 +152,8 @@ export function LocationPicker({
           }}
           accessibilityRole="button"
           accessibilityLabel="Centrar en mi ubicación GPS"
+          disabled={locating}
+          accessibilityState={{ disabled: locating, busy: locating }}
           style={[styles.gpsBtn, { backgroundColor: colors.surface }, shadows.md as any]}
         >
           {locating ? (
@@ -156,18 +173,24 @@ export function LocationPicker({
         ]}
       >
         <View style={styles.addressHeader}>
-          <Ionicons name="location-sharp" size={20} color={colors.accent} />
+          {findingAddress ? <ActivityIndicator color={colors.accent} accessibilityLabel="Buscando calle" /> : <Ionicons name="location-sharp" size={20} color={colors.accent} />}
           <View style={{ flex: 1 }}>
             <Text style={[styles.addressText, { color: colors.text }]}>
-              {address || "Localizando calle..."}
+              {addressTitle}
             </Text>
             <Text style={[styles.addressSub, { color: colors.muted }]}>
-              {colonia ? `Col. ${colonia}, ` : ""}{municipality}
+              {addressSubtitle}
             </Text>
           </View>
         </View>
-
-
+        {(addressState.status === "error" || addressState.status === "unavailable") && (
+          <Pressable accessibilityRole="button" accessibilityLabel="Reintentar búsqueda de calle"
+            onPress={() => lookup.current?.select(position.current, true)}
+            style={{ minHeight: 48, justifyContent: "center" }}>
+            <Text style={{ color: colors.accent, fontWeight: "700" }}>Reintentar búsqueda</Text>
+          </Pressable>
+        )}
+        {!!gpsError && <Text accessibilityRole="alert" style={{ color: colors.danger, marginTop: space.sm }}>{gpsError}</Text>}
       </View>
     </View>
   );

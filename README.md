@@ -16,7 +16,7 @@ Reports and interactions are cached only in memory. Report screens and comments 
 
 Only the bearer token is persisted, in Expo SecureStore. User identity comes from the login response/server-issued token; every write is authorized by the API. Expired or rejected tokens return the app to a signed-out state. Unsubmitted form entries and appearance preferences are held in memory. Startup removes report/draft/comment storage keys from the old demo implementation; those records are never uploaded.
 
-Login and registration are available in Perfil. Login returns users to the report form or comment thread that requested authentication. Public report and comment reads work without login. Creating reports, posting/deleting comments, likes, photo management, and status changes require authentication. Only API-authorized owners see photo and status controls; comment deletion also follows server permissions.
+Login and registration are available in Perfil. Login returns users to the report form or comment thread that requested authentication. Public report and comment reads work without login. Creating reports, posting/deleting comments, likes, photo management, and status changes require authentication. Only API-authorized owners see the Editar reporte button; comment deletion also follows server permissions.
 
 ## Reporting
 
@@ -25,6 +25,8 @@ The existing four-step form submits to `POST /reports/create` or `/reports/creat
 Successful submissions show the server-confirmed report number. Failed writes retain form entries. If creation succeeds but loading its details fails, the confirmed report number still appears so the user is not prompted to submit a duplicate.
 
 The API stores category (`type`), description, coordinates, author, photos, and status, and resolves the address from the coordinates. It currently has no custom address, anonymous author, or contact-information fields. The form does not offer unsupported persistence controls.
+
+The owner-only Editar reporte screen stages photo additions/removals and status changes behind one Guardar cambios button. Public details keep the photo gallery at the top and contain no upload or status-management controls. The backend currently supports editing photos and status, not category, description, or coordinates. Ownership and photo capacity are rechecked before saving; status changes use the original server version. The API exposes separate operations, so an interrupted save requires reloading the confirmed server state before retrying to avoid duplicate uploads. Unsaved changes are held only in memory and leaving the editor prompts to discard them.
 
 The UI displays only Reportado and Resuelto. Existing older status values display as Reportado. Owners can mark a report resolved or reported with server version checks. There is no follow-up timeline or status history in the current details page. Comments appear at the bottom and update automatically, without a refresh button.
 

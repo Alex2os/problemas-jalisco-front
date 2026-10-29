@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as Location from "expo-location";
@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorBanner } from "@/src/components/ErrorBanner";
 import { useBackendReports } from "@/src/hooks/use-backend-reports";
 import { useAuthSession } from "@/src/hooks/use-report-state";
-import { categoryDefFor } from "@/src/constants/report-categories";
+import { ReportMapMarker } from "@/src/components/ReportMapMarker";
 import { radius, shadows, space } from "@/src/constants/design";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
 import { useReportsStore } from "@/src/store/useReportsStore";
@@ -26,6 +26,7 @@ export default function MapaScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const mapRef = useRef<MapView>(null);
+  const [reportPressed, setReportPressed] = useState(false);
 
   useBackendReports();
   const authenticated = useAuthSession();
@@ -82,17 +83,9 @@ export default function MapaScreen() {
             longitudeDelta: 0.08,
           }}
         >
-          {reports.map((r) => {
-            const cat = categoryDefFor(r.category || r.type);
-            return (
-              <Marker
-                key={r.id}
-                coordinate={{ latitude: r.latitude, longitude: r.longitude }}
-                pinColor={cat.color}
-                onPress={() => handleSelectReport(r)}
-              />
-            );
-          })}
+          {reports.map((report) => (
+            <ReportMapMarker key={report.id} report={report} onPress={() => handleSelectReport(report)} />
+          ))}
         </MapView>
 
         {/* Top Floating Status Pill */}
@@ -140,21 +133,31 @@ export default function MapaScreen() {
         </Pressable>
 
       </View>
-      <View style={[styles.reportBar, { borderTopColor: colors.border }]}>
+      <View style={[styles.reportBar, { borderTopColor: colors.border, backgroundColor: colors.surface }]}>
         <Pressable
           onPress={handleStartReport}
           accessibilityRole="button"
           accessibilityLabel="Reportar un problema"
-          accessibilityHint="Abre el formulario para crear un reporte"
-          style={({ pressed }) => [
+          accessibilityHint={authenticated ? "Abre el formulario para crear un reporte" : "Inicia sesión para crear un reporte"}
+          onPressIn={() => setReportPressed(true)}
+          onPressOut={() => setReportPressed(false)}
+          style={[
             styles.reportButton,
-            { backgroundColor: pressed ? colors.accentDark : colors.accent },
+            {
+              backgroundColor: reportPressed ? colors.accentDark : colors.accent,
+              transform: [{ scale: reportPressed ? 0.99 : 1 }],
+            },
           ]}
         >
-          <Ionicons name="add-circle-outline" size={24} color={colors.onAccent} />
-          <Text style={[styles.reportButtonText, { color: colors.onAccent }]}>
-            Reportar un problema
-          </Text>
+          <View pointerEvents="none" style={styles.reportButtonContent}>
+            <View style={styles.reportIconWrap}>
+              <Ionicons name="add-circle-outline" size={24} color={colors.onAccent}
+                allowFontScaling={false} style={styles.reportIcon} />
+            </View>
+            <Text style={[styles.reportButtonText, { color: colors.onAccent }]}>
+              Reportar un problema
+            </Text>
+          </View>
         </Pressable>
       </View>
     </View>
@@ -225,11 +228,31 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingVertical: space.md,
     paddingHorizontal: space.lg,
-    borderRadius: radius.control,
+    borderRadius: radius.group,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reportButtonContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
     gap: space.sm,
+  },
+  reportIconWrap: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  reportIcon: {
+    width: 24,
+    height: 24,
+    lineHeight: 24,
+    textAlign: "center",
+    includeFontPadding: false,
   },
   reportButtonText: {
     fontSize: 16,
@@ -237,5 +260,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     flexShrink: 1,
     textAlign: "center",
+    includeFontPadding: false,
   },
 });

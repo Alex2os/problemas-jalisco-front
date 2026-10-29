@@ -108,7 +108,17 @@ export const categories: Record<
 export const categoryFor = (type: string) =>
   categories[type] || categories.otro || categories.otros;
 
+const legacyCategoryIds: Record<string, string> = {
+  accidente: "baches",
+  bloqueo: "otro",
+  "corte-de-servicios": "alumbrado",
+  "transporte-publico": "otro",
+  "robo-asalto": "seguridad",
+  otros: "otro",
+};
+
 export const categoryDefFor = (type: string): CategoryDefinition => {
-  const match = CATEGORIES_LIST.find((c) => c.id === type);
-  return match || CATEGORIES_LIST[CATEGORIES_LIST.length - 1];
+  const normalized = type.trim().toLowerCase();
+  const id = legacyCategoryIds[normalized] || normalized;
+  return CATEGORIES_LIST.find((category) => category.id === id) || CATEGORIES_LIST[CATEGORIES_LIST.length - 1];
 };

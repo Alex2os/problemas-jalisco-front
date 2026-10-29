@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -17,7 +17,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/src/components/ErrorBanner";
 import { ReportPhotos } from "@/src/components/app/report-photos";
-import { ReportStatusActions } from "@/src/components/ReportStatusActions";
+import { ReportMapMarker } from "@/src/components/ReportMapMarker";
+import { ReportEditButton } from "@/src/components/ReportEditButton";
 import { useBackendReport } from "@/src/hooks/use-backend-reports";
 import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
 import { SetReportLike, likePendingKey } from "@/src/services/ReportInteractions";
@@ -173,7 +174,7 @@ export default function ReporteDetailScreen() {
             {report.description}
           </Text>
 
-          <ReportStatusActions key={`${report.id}:${report.can_manage}`} report={report} />
+          <ReportEditButton report={report} />
 
           {/* "Yo también lo vi" Upvote Card */}
           <View
@@ -262,13 +263,7 @@ export default function ReporteDetailScreen() {
                 scrollEnabled={false}
                 zoomEnabled={false}
               >
-                <Marker
-                  coordinate={{
-                    latitude: report.latitude,
-                    longitude: report.longitude,
-                  }}
-                  pinColor={categoryDef.color}
-                />
+                <ReportMapMarker report={report} />
               </MapView>
             </View>
           </View>

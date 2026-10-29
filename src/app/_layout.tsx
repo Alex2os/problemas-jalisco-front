@@ -76,6 +76,8 @@ function Navigation() {
           }}
         />
 
+        <Stack.Screen name="reporte/editar/[id]" options={{ headerShown: false }} />
+
         {/* Legacy routes preserved */}
         <Stack.Screen
           name="reports/[report_id]"

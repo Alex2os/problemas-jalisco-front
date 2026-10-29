@@ -1,12 +1,9 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
-import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button } from "@/src/components/Button";
 import { CategoryCard } from "@/src/components/CategoryCard";
-import { StepProgress } from "@/src/components/StepProgress";
 import { CATEGORIES_LIST } from "@/src/constants/report-categories";
 import { space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
@@ -23,31 +20,17 @@ export default function CategoriaScreen() {
 
   const handleSelect = (id: string) => {
     setCategory(id);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  };
-
-  const handleNext = () => {
-    if (!selectedCategory) return;
     setStep(2);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push("/reportar/ubicacion");
+    router.navigate("/reportar/ubicacion");
   };
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <View style={{ paddingTop: insets.top }}>
-        <StepProgress
-          currentStep={1}
-          totalSteps={4}
-          stepTitle="Categoría"
-          onBack={() => router.back()}
-        />
-      </View>
 
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: Math.max(insets.bottom, 16) + 80 },
+          { paddingBottom: Math.max(insets.bottom, space.lg) },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -71,28 +54,6 @@ export default function CategoriaScreen() {
           ))}
         </View>
       </ScrollView>
-
-      {/* Sticky Bottom Next Button */}
-      <View
-        style={[
-          styles.bottomBar,
-          {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-            paddingBottom: Math.max(insets.bottom, 12),
-          },
-        ]}
-      >
-        <Button
-          title={selectedCategory ? es.common.continue : "Selecciona una categoría"}
-          disabled={!selectedCategory}
-          variant="primary"
-          size="lg"
-          fullWidth
-          onPress={handleNext}
-        />
-      </View>
     </View>
   );
 }
@@ -118,17 +79,11 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: space.md,
+    rowGap: space.md,
+    marginHorizontal: -space.sm,
   },
   gridItem: {
-    width: "47.5%",
-  },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: space.lg,
-    paddingTop: space.sm,
+    width: "50%",
+    paddingHorizontal: space.sm,
   },
 });

@@ -1,207 +1,106 @@
-import React, { useEffect, useState } from "react";
-import { Clipboard, Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button } from "@/src/components/Button";
-import { radius, shadows, space } from "@/src/constants/design";
+import { ReportSuccessAnimation } from "@/src/components/ReportSuccessAnimation";
+import { radius, space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
 
 export default function ExitoScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-  const params = useLocalSearchParams<{ id?: string; folio?: string }>();
-  const folio = params.folio || params.id || "";
-  const reportId = params.id;
-
-  const [copied, setCopied] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const reportId = Number(id);
+  const hasReport = Number.isSafeInteger(reportId) && reportId > 0;
+  const [pressed, setPressed] = useState<"report" | "map" | null>(null);
 
   useEffect(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, []);
 
-  const handleCopy = () => {
-    Clipboard.setString(folio);
-    setCopied(true);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const handleViewReport = () => {
+    if (!hasReport) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (reportId) router.replace(`/reporte/${reportId}`);
+    router.replace({ pathname: "/reporte/[id]", params: { id: String(reportId) } });
   };
-
   const handleDone = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace("/(tabs)");
+    router.dismissTo("/mapa");
   };
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <View style={styles.content}>
-        {/* Checkmark */}
-        <View
-          style={[styles.checkCircle, { backgroundColor: colors.successSoft }]}
-        >
-          <Ionicons name="checkmark-circle" size={80} color={colors.success} />
-        </View>
-
-        <Text style={[styles.title, { color: colors.text }]}>
-          {es.success.title}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          {es.success.subtitle}
-        </Text>
-
-        {/* Folio Card with Copy button */}
-        <View
-          style={[
-            styles.folioCard,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-            shadows.sm as any,
-          ]}
-        >
-          <Text style={[styles.folioLabel, { color: colors.muted }]}>
-            {es.success.folioLabel}
-          </Text>
-
-          <View style={styles.folioRow}>
-            <Text style={[styles.folioText, { color: colors.primary }]}>
-              #{folio}
-            </Text>
-
+      <ScrollView contentContainerStyle={[styles.content, {
+        paddingTop: insets.top + space.xxl,
+        paddingBottom: insets.bottom + space.xxl,
+      }]} showsVerticalScrollIndicator={false}>
+        <View style={styles.panel}>
+          <ReportSuccessAnimation />
+          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(180).duration(360)} style={styles.message}>
+            <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{es.success.title}</Text>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>{es.success.subtitle}</Text>
+          </Animated.View>
+          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(320).duration(360)} style={styles.actions}>
             <Pressable
-              onPress={handleCopy}
               accessibilityRole="button"
-              accessibilityLabel="Copiar número de reporte"
-              style={[
-                styles.copyBtn,
-                { backgroundColor: copied ? colors.successSoft : colors.raised },
-              ]}
+              accessibilityLabel={es.success.viewReport}
+              accessibilityState={{ disabled: !hasReport }}
+              disabled={!hasReport}
+              onPress={handleViewReport}
+              onPressIn={() => setPressed("report")}
+              onPressOut={() => setPressed(null)}
+              style={[styles.button, {
+                backgroundColor: pressed === "report" ? colors.accentDark : colors.accent,
+                opacity: hasReport ? 1 : 0.5,
+                transform: [{ scale: pressed === "report" ? 0.99 : 1 }],
+              }]}
             >
-              <Ionicons
-                name={copied ? "checkmark" : "copy-outline"}
-                size={16}
-                color={copied ? colors.success : colors.text}
-              />
-              <Text
-                style={[
-                  styles.copyBtnText,
-                  { color: copied ? colors.success : colors.text },
-                ]}
-              >
-                {copied ? "Copiado" : "Copiar"}
-              </Text>
+              <Text style={[styles.buttonText, { color: colors.onAccent }]}>{es.success.viewReport}</Text>
+              <View pointerEvents="none" style={styles.trailingIcon}>
+                <Ionicons name="arrow-forward" size={22} color={colors.onAccent} />
+              </View>
             </Pressable>
-          </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={es.success.homeCta}
+              onPress={handleDone}
+              onPressIn={() => setPressed("map")}
+              onPressOut={() => setPressed(null)}
+              style={[styles.button, styles.mapButton, {
+                backgroundColor: pressed === "map" ? colors.raised : colors.surface,
+                borderColor: colors.border,
+                transform: [{ scale: pressed === "map" ? 0.99 : 1 }],
+              }]}
+            >
+              <View style={styles.mapLabel}>
+                <Ionicons name="map-outline" size={20} color={colors.textSecondary} />
+                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>{es.success.homeCta}</Text>
+              </View>
+            </Pressable>
+          </Animated.View>
         </View>
-
-      </View>
-
-      {/* Buttons */}
-      <View
-        style={[
-          styles.bottomBar,
-          { paddingBottom: Math.max(insets.bottom, 16) },
-        ]}
-      >
-        <Button
-          title={es.success.viewReport}
-          disabled={!reportId}
-          variant="primary"
-          size="lg"
-          fullWidth
-          onPress={handleViewReport}
-          style={{ marginBottom: space.sm }}
-        />
-
-        <Button
-          title={es.success.homeCta}
-          variant="outline"
-          size="md"
-          fullWidth
-          onPress={handleDone}
-        />
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: space.xl,
-    gap: space.sm,
-  },
-  checkCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: space.sm,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "900",
-    letterSpacing: -0.4,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: space.md,
-  },
-  folioCard: {
-    width: "100%",
-    borderRadius: radius.group,
-    borderWidth: 1,
-    padding: space.md,
-    alignItems: "center",
-    marginBottom: space.xs,
-  },
-  folioLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    marginBottom: 4,
-  },
-  folioRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space.md,
-  },
-  folioText: {
-    fontSize: 24,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-  },
-  copyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: space.sm,
-    paddingVertical: 5,
-    borderRadius: radius.full,
-  },
-  copyBtnText: {
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: space.lg,
-  },
+  screen: { flex: 1 },
+  content: { flexGrow: 1, justifyContent: "center", paddingHorizontal: space.xxl },
+  panel: { width: "100%", maxWidth: 420, alignSelf: "center" },
+  message: { gap: space.md, alignItems: "center" },
+  title: { fontSize: 30, lineHeight: 38, fontWeight: "800", letterSpacing: -0.7, textAlign: "center", alignSelf: "center" },
+  subtitle: { fontSize: 15, lineHeight: 23, maxWidth: 300, textAlign: "center", alignSelf: "center" },
+  actions: { width: "100%", marginTop: space.xxxl, gap: space.md },
+  button: { width: "100%", minHeight: 56, borderRadius: radius.group, paddingHorizontal: 48, paddingVertical: space.lg, alignItems: "center", justifyContent: "center" },
+  buttonText: { fontSize: 16, lineHeight: 22, fontWeight: "700", textAlign: "center", alignSelf: "center", includeFontPadding: false },
+  trailingIcon: { position: "absolute", right: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
+  mapButton: { borderWidth: 1, minHeight: 52, paddingHorizontal: space.lg },
+  mapLabel: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: space.sm },
 });

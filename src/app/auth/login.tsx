@@ -49,6 +49,8 @@ export default function Login() {
 
       if (active.current) {
         if (returnTo === "/reportar/categoria" || returnTo === "/reportar/revisar") router.replace(returnTo);
+        else if (returnTo && /^\/reporte\/editar\/\d+$/.test(returnTo))
+          router.replace({ pathname: "/reporte/editar/[id]", params: { id: returnTo.split("/").pop()! } });
         else if (returnTo && /^\/reporte\/\d+$/.test(returnTo))
           router.replace({ pathname: "/reporte/[id]", params: { id: returnTo.split("/").pop()! } });
         else router.replace("/(tabs)/perfil");

@@ -94,20 +94,12 @@ export const es = {
 
   evidence: {
     title: "Fotos y detalles",
-    hint: "Agrega una foto y describe lo que pasa.",
+    hint: "Agrega fotos y los detalles que quieras compartir.",
     photoHero: "Tomar foto",
     gallery: "Elegir de la galería",
     photosCount: "{count} de 3 fotos",
     descriptionLabel: "Descripción del problema",
     descriptionPlaceholder: "¿Qué pasa y desde cuándo?",
-    quickTagsTitle: "Sugerencias:",
-    quickTags: [
-      "Bache profundo",
-      "Fuga de agua limpia",
-      "Lámpara fundida",
-      "Cables expuestos",
-      "Banqueta rota",
-    ],
     next: "Revisar reporte",
   },
 
@@ -123,10 +115,8 @@ export const es = {
 
   success: {
     title: "Reporte enviado",
-    subtitle: "Tu reporte se publicó. Puedes consultarlo con este número.",
-    folioLabel: "Número de reporte",
-    copied: "Folio copiado",
-    viewReport: "Ver mi reporte",
+    subtitle: "Tu reporte ya está publicado. Puedes ver los detalles o volver al mapa.",
+    viewReport: "Ver reporte",
     homeCta: "Volver al mapa",
   },
 

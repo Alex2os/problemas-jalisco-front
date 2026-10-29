@@ -3,12 +3,10 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/src/components/ErrorBanner";
 import { useAuthSession } from "@/src/hooks/use-report-state";
-import { Button } from "@/src/components/Button";
-import { StepProgress } from "@/src/components/StepProgress";
+import { ReportStepFooter } from "@/src/components/ReportStepFooter";
 import { categoryDefFor } from "@/src/constants/report-categories";
 import { radius, shadows, space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
@@ -17,15 +15,14 @@ import { useDraftStore } from "@/src/store/useDraftStore";
 import { useReportsStore } from "@/src/store/useReportsStore";
 
 export default function RevisarScreen() {
-  const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
 
   const draft = useDraftStore();
   const resetDraft = useDraftStore((s) => s.resetDraft);
-  const setStep = useDraftStore((s) => s.setStep);
   const submitReport = useReportsStore((s) => s.submitReport);
 
-  const [submitting, setSubmitting] = useState(false);
+  const submitting = useDraftStore((s) => s.isSubmitting);
+  const setSubmitting = useDraftStore((s) => s.setSubmitting);
   const [error, setError] = useState("");
   const pending = useRef(false);
   const authenticated = useAuthSession();
@@ -41,10 +38,9 @@ export default function RevisarScreen() {
     try {
       const created = await submitReport(draft);
       await resetDraft();
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace({
         pathname: "/reportar/exito",
-        params: { id: String(created.id), folio: created.folio },
+        params: { id: String(created.id) },
       });
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "No se pudo enviar el reporte.");
@@ -56,22 +52,9 @@ export default function RevisarScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <View style={{ paddingTop: insets.top }}>
-        <StepProgress
-          currentStep={4}
-          totalSteps={4}
-          stepTitle="Revisar"
-          onBack={() => {
-            if (!pending.current) { setStep(3); router.back(); }
-          }}
-        />
-      </View>
-
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: Math.max(insets.bottom, 16) + 80 },
-        ]}
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.heading, { color: colors.text }]}>
@@ -137,27 +120,12 @@ export default function RevisarScreen() {
         {!!error && <ErrorBanner message={error} />}
       </ScrollView>
 
-      {/* Sticky Bottom "Enviar reporte" Button */}
-      <View
-        style={[
-          styles.bottomBar,
-          {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-            paddingBottom: Math.max(insets.bottom, 12),
-          },
-        ]}
-      >
-        <Button
-          title={authenticated ? es.review.send : "Inicia sesión para enviar"}
-          variant="primary"
-          size="lg"
-          fullWidth
-          loading={submitting}
-          onPress={handleSubmit}
-        />
-      </View>
+      <ReportStepFooter
+        title={submitting ? "Enviando reporte…" : authenticated ? es.review.send : "Inicia sesión para enviar"}
+        icon={authenticated ? "paper-plane-outline" : "log-in-outline"}
+        loading={submitting}
+        onPress={() => { void handleSubmit(); }}
+      />
     </View>
   );
 }
@@ -228,13 +196,5 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontStyle: "italic",
     marginTop: 2,
-  },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: space.lg,
-    paddingTop: space.sm,
   },
 });

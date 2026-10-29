@@ -2,18 +2,15 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button } from "@/src/components/Button";
+import { ReportStepFooter } from "@/src/components/ReportStepFooter";
 import { LocationPicker } from "@/src/components/LocationPicker";
-import { StepProgress } from "@/src/components/StepProgress";
 import { space } from "@/src/constants/design";
 import { es } from "@/src/constants/es";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
 import { useDraftStore } from "@/src/store/useDraftStore";
 
 export default function UbicacionScreen() {
-  const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
 
   const latitude = useDraftStore((s) => s.latitude) || 20.6767;
@@ -33,23 +30,9 @@ export default function UbicacionScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <View style={{ paddingTop: insets.top }}>
-        <StepProgress
-          currentStep={2}
-          totalSteps={4}
-          stepTitle="Ubicación"
-          onBack={() => {
-            setStep(1);
-            router.back();
-          }}
-        />
-      </View>
-
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: Math.max(insets.bottom, 16) + 80 },
-        ]}
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.heading, { color: colors.text }]}>
@@ -69,26 +52,7 @@ export default function UbicacionScreen() {
         />
       </ScrollView>
 
-      {/* Single "Confirmar" Button */}
-      <View
-        style={[
-          styles.bottomBar,
-          {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-            paddingBottom: Math.max(insets.bottom, 12),
-          },
-        ]}
-      >
-        <Button
-          title={es.location.confirm}
-          variant="primary"
-          size="lg"
-          fullWidth
-          onPress={handleConfirm}
-        />
-      </View>
+      <ReportStepFooter title={es.location.confirm} onPress={handleConfirm} />
     </View>
   );
 }
@@ -110,13 +74,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: space.md,
     lineHeight: 20,
-  },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: space.lg,
-    paddingTop: space.sm,
   },
 });

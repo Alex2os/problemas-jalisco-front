@@ -48,7 +48,7 @@ export function CategoryCard({
               : category.bgLight
             : colors.surface,
           borderColor: selected ? category.color : colors.border,
-          borderWidth: selected ? 2.5 : 1,
+          borderWidth: 2,
           opacity: pressed ? 0.9 : 1,
           transform: [{ scale: pressed ? 0.97 : 1 }],
         },
@@ -56,12 +56,6 @@ export function CategoryCard({
         style,
       ]}
     >
-      {selected && (
-        <View style={[styles.badge, { backgroundColor: category.color }]}>
-          <Ionicons name="checkmark" size={14} color="#FFFFFF" />
-        </View>
-      )}
-
       {/* Category Icon */}
       <View
         style={[
@@ -72,6 +66,8 @@ export function CategoryCard({
         <Ionicons
           name={category.ionicon as any}
           size={32}
+          allowFontScaling={false}
+          style={styles.icon}
           color={selected ? "#FFFFFF" : category.color}
         />
       </View>
@@ -108,23 +104,22 @@ const styles = StyleSheet.create({
     position: "relative",
     minHeight: 124,
   },
-  badge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   iconWrap: {
     width: 52,
     height: 52,
     borderRadius: 26,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: space.xs,
+  },
+  icon: {
+    width: 32,
+    height: 32,
+    lineHeight: 32,
+    textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
   label: {
     fontSize: 15,

@@ -177,5 +177,6 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: space.lg,
+    gap: space.md,
   },
 });
