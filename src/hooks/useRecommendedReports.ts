@@ -22,7 +22,7 @@ export function useRecommendedReports(enabled: boolean, searching: boolean, loca
     const operation = Symbol();
     pending.current = operation;
     const request = generation.current;
-    setState((current) => ({ ...current, loading: offset === 0, loadingMore: offset > 0, error: "" }));
+    setState((current) => ({ ...current, loading: offset === 0, loadingMore: offset > 0 }));
     try {
       await loadSession();
       if (request !== generation.current || identity !== sessionVersion()) return;

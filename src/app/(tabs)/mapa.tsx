@@ -33,6 +33,7 @@ export default function MapaScreen() {
   const reports = useReportsStore((s) => s.reports);
   const loading = useReportsStore((s) => s.isLoading);
   const error = useReportsStore((s) => s.error);
+  const refreshReports = useReportsStore((s) => s.refreshReports);
 
   const handleRecenterGPS = async () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -111,8 +112,8 @@ export default function MapaScreen() {
               {loading ? "Cargando…" : `${reports.length} reportes`}
             </Text>
           </View>
-          {loading && <ActivityIndicator color={colors.accent} style={{ marginTop: space.sm }} />}
-          {!!error && <ErrorBanner message={error} />}
+          {loading && !error && <ActivityIndicator color={colors.accent} style={{ marginTop: space.sm }} />}
+          {!!error && <ErrorBanner message={error} retrying={loading} onRetry={() => { void refreshReports(); }} />}
         </View>
 
         {/* Floating GPS Button */}

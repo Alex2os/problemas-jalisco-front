@@ -1,4 +1,5 @@
 import { ReportInteractions } from "@/features/reports/components/ReportInteractions";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import { Button as CommentButton } from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
@@ -9,7 +10,6 @@ import {
     AppText,
     Button,
     Divider,
-    EmptyState,
     Field,
     IconButton,
     Notice,
@@ -273,8 +273,8 @@ function ReportContent({
             <IconButton
               icon="refresh-cw"
               label="Actualizar reporte"
-              loading={refreshing}
-              disabled={loading || busy}
+              loading={refreshing && !error}
+              disabled={loading || refreshing || busy}
               onPress={refresh}
             />
           }
@@ -304,7 +304,7 @@ function ReportContent({
         }}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
+            refreshing={refreshing && !error}
             enabled={!busy}
             onRefresh={refresh}
             tintColor={colors.accent}
@@ -364,7 +364,7 @@ function ReportContent({
                   report={live}
                   onCommentsPress={scrollToComments}
                 />
-                <Notice message={error} />
+                {!!error && <ErrorBanner message={error} retrying={refreshing} onRetry={refresh} />}
                 <Divider />
                 <View
                   onLayout={(event) => {
@@ -422,12 +422,8 @@ function ReportContent({
               </>
             ) : (
               <>
-                <EmptyState
-                  icon="alert-circle"
-                  title="No se pudo abrir el reporte"
-                  description={error || "Vuelve a intentarlo en un momento."}
-                />
-                <Button label="Reintentar" onPress={refresh} />
+                <AppText variant="heading">No se pudo abrir el reporte</AppText>
+                <ErrorBanner message={error || "No se pudo abrir el reporte."} retrying={refreshing} onRetry={refresh} />
               </>
             )}
           </View>

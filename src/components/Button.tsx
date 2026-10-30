@@ -135,7 +135,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={textColor} size="small" />
       ) : (
-        <View style={styles.contentRow}>
+        <View style={[styles.contentRow, fullWidth && styles.fullWidthContent]}>
           {icon && iconPosition === "left" && <View style={styles.iconLeft}>{icon}</View>}
           <Text
             style={[
@@ -165,19 +165,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   contentRow: {
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: space.sm,
   },
+  fullWidthContent: { width: "100%" },
   text: {
+    flexShrink: 1,
     fontWeight: "700",
     letterSpacing: -0.2,
     textAlign: "center",
   },
   iconLeft: {
-    marginRight: space.sm,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconRight: {
-    marginLeft: space.sm,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

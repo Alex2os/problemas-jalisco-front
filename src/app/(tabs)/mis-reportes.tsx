@@ -183,7 +183,7 @@ export default function MisReportesScreen() {
         keyboardDismissMode="on-drag"
         refreshControl={
           <RefreshControl
-            refreshing={listLoading}
+            refreshing={listLoading && !listError}
             onRefresh={() => { if (forYou) recommended.refresh(); else void refreshReports(); }}
             tintColor={colors.accent}
           />
@@ -224,18 +224,18 @@ export default function MisReportesScreen() {
               </View>
             </>}
             {!!listError && <>
-              <ErrorBanner message={listError} />
-              {forYou && <Button title="Reintentar" variant="outline" onPress={recommended.refresh} />}
+              <ErrorBanner message={listError} retrying={listLoading || (forYou && recommended.loadingMore)}
+                onRetry={() => { if (forYou) recommended.refresh(); else void refreshReports(); }} />
             </>}
           </View>
         ) : undefined}
-        ListFooterComponent={forYou && recommended.nextOffset !== null ? (
+        ListFooterComponent={forYou && !listError && recommended.nextOffset !== null ? (
           <Button title={searchQuery.trim() ? "Buscar en más reportes" : "Ver más reportes"}
             variant="outline" loading={recommended.loadingMore}
             disabled={recommended.loading} onPress={recommended.loadMore} />
         ) : undefined}
         ListEmptyComponent={
-          listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.accent} /> : listError ? <View /> : (
+          listError ? <View /> : listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.accent} /> : (
             <EmptyState
               icon="document-text-outline"
               title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay recomendaciones" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}

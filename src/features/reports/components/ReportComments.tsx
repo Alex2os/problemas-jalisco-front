@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, AppState, StyleSheet, Text, TextInput, View }
 import { router, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Button } from "@/components/Button";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import { radius, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
@@ -150,9 +151,9 @@ export function ReportComments({ reportId }: { reportId: number }) {
           )}
         </View>
       ))}
-      {loading && <ActivityIndicator color={colors.accent} accessibilityLabel="Cargando comentarios" />}
+      {loading && !loadError && <ActivityIndicator color={colors.accent} accessibilityLabel="Cargando comentarios" />}
       {loaded && !loading && !comments.length && !loadError && <Text style={{ color: colors.muted }}>Aún no hay comentarios.</Text>}
-      {!!loadError && <Text accessibilityRole="alert" style={{ color: colors.danger }}>{loadError}</Text>}
+      {!!loadError && <ErrorBanner message={loadError} retrying={loading} onRetry={() => { void load(); }} />}
     </View>
   );
 }

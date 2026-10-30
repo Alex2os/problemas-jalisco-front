@@ -8,13 +8,15 @@ import {
   type ViewStyle,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Button } from "@/components/Button";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, space } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
 
 export interface ErrorBannerProps {
   message: string;
   variant?: "danger" | "warning";
   onRetry?: () => void;
+  retrying?: boolean;
   onDismiss?: () => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -23,6 +25,7 @@ export function ErrorBanner({
   message,
   variant = "danger",
   onRetry,
+  retrying = false,
   onDismiss,
   style,
 }: ErrorBannerProps) {
@@ -45,42 +48,41 @@ export function ErrorBanner({
         style,
       ]}
     >
-      <Ionicons
-        name={isDanger ? "alert-circle" : "warning"}
-        size={22}
-        color={textColor}
-        style={styles.icon}
-      />
-
-      <View style={styles.contentCol}>
-        <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
-
-        {onRetry && (
+      <View style={styles.messageRow}>
+        <Ionicons
+          name={isDanger ? "alert-circle" : "warning"}
+          size={22}
+          color={textColor}
+          style={styles.icon}
+        />
+        <View style={styles.contentCol}>
+          <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+        </View>
+        {onDismiss && (
           <Pressable
-            onPress={onRetry}
+            onPress={onDismiss}
             accessibilityRole="button"
-            accessibilityLabel="Reintentar operación"
-            style={({ pressed }) => [
-              styles.retryBtn,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
+            accessibilityLabel="Cerrar aviso"
+            style={styles.dismissBtn}
           >
-            <Ionicons name="reload" size={14} color={textColor} />
-            <Text style={[styles.retryText, { color: textColor }]}>Reintentar</Text>
+            <Ionicons name="close" size={18} color={colors.muted} />
           </Pressable>
         )}
       </View>
-
-      {onDismiss && (
-        <Pressable
-          onPress={onDismiss}
-          accessibilityRole="button"
-          accessibilityLabel="Cerrar aviso"
-          hitSlop={8}
-          style={styles.dismissBtn}
-        >
-          <Ionicons name="close" size={18} color={colors.muted} />
-        </Pressable>
+      {onRetry && (
+        <Button
+          title={retrying ? "Reintentando…" : "Reintentar"}
+          accessibilityLabel="Reintentar operación"
+          variant="danger"
+          size="sm"
+          style={styles.retryButton}
+          textStyle={styles.retryLabel}
+          hitSlop={{ top: space.xs, bottom: space.xs }}
+          fullWidth
+          loading={retrying}
+          icon={<Ionicons name="reload-outline" size={16} color="#FFFFFF" />}
+          onPress={onRetry}
+        />
       )}
     </View>
   );
@@ -88,39 +90,37 @@ export function ErrorBanner({
 
 const styles = StyleSheet.create({
   banner: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    width: "100%",
+    alignSelf: "stretch",
+    minWidth: 0,
+    flexShrink: 0,
+    gap: space.md,
     padding: space.md,
     borderRadius: radius.md,
     borderWidth: 1.5,
     marginVertical: space.sm,
   },
+  messageRow: { flexDirection: "row", alignItems: "flex-start" },
+  retryButton: { height: size.touch - space.sm, minHeight: size.touch - space.sm },
+  retryLabel: { fontSize: 13 },
   icon: {
     marginRight: space.sm,
     marginTop: 1,
   },
   contentCol: {
     flex: 1,
+    minWidth: 0,
   },
   message: {
     fontSize: 14,
     fontWeight: "600",
     lineHeight: 20,
   },
-  retryBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: space.xs,
-    alignSelf: "flex-start",
-    paddingVertical: 2,
-  },
-  retryText: {
-    fontSize: 13,
-    fontWeight: "700",
-  },
   dismissBtn: {
-    padding: 2,
-    marginLeft: space.sm,
+    minWidth: size.touch,
+    minHeight: size.touch,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: space.xs,
   },
 });

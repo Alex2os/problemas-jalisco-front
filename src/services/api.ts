@@ -16,6 +16,16 @@ export class ApiError extends Error {
   }
 }
 
+export class ApiConnectionError extends Error {
+  constructor(public readonly reason: "network" | "timeout", uncertainWrite = false) {
+    super((reason === "timeout"
+      ? "El servidor está tardando demasiado en responder. Intenta de nuevo en unos momentos."
+      : "No pudimos conectar con el servidor. Revisa tu conexión a internet o inténtalo más tarde.")
+      + (uncertainWrite ? " No se pudo confirmar el cambio. Revisa tus reportes antes de repetir la acción." : ""));
+    this.name = "ApiConnectionError";
+  }
+}
+
 export async function apiRequest<T>(
   path: string,
   options: RequestInit = {},
@@ -42,17 +52,25 @@ export async function apiRequest<T>(
     multipart ? 90000 : 15000,
   );
   try {
-    const response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    const body = await response.text();
+    let response: Response;
+    let body: string;
+    try {
+      response = await fetch(`${API_URL}${path}`, {
+        ...options,
+        headers,
+        signal: controller.signal,
+      });
+      body = await response.text();
+    } catch {
+      // Native fetch can reject with Error rather than TypeError. Only classify transport failures here.
+      const uncertainWrite = path.startsWith("/reports") && ["POST", "PUT", "DELETE", "PATCH"].includes((options.method || "GET").toUpperCase());
+      throw new ApiConnectionError(controller.signal.aborted ? "timeout" : "network", uncertainWrite);
+    }
     let data;
     try {
       data = body ? JSON.parse(body) : undefined;
     } catch {
-      throw new Error(`Respuesta inválida del servidor (${response.status}).`);
+      if (response.ok) throw new Error("No pudimos leer la respuesta del servidor. Intenta de nuevo más tarde.");
     }
     if (response.status === 401 && authenticated && identity === sessionVersion()) {
       await SecureStore.deleteItemAsync("auth_token");
@@ -64,19 +82,13 @@ export async function apiRequest<T>(
         data?.message ||
           data?.detail ||
           data?.title ||
-          `Error del servidor (${response.status}).`,
+          (response.status >= 500
+            ? "El servidor no está disponible en este momento. Intenta de nuevo más tarde."
+            : `No se pudo completar la solicitud (${response.status}).`),
       );
     if (authenticated && identity !== sessionVersion())
       throw new ApiError(409, "La sesión cambió. Actualiza la información.");
     return data as T;
-  } catch (error) {
-    if (controller.signal.aborted)
-      throw new Error("La solicitud tardó demasiado. Intenta de nuevo.");
-    if (error instanceof TypeError)
-      throw new Error(
-        "No se pudo conectar con el servidor. Revisa tu conexión.",
-      );
-    throw error;
   } finally {
     clearTimeout(timeout);
   }

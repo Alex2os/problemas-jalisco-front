@@ -1,12 +1,11 @@
 import { ReportRow } from "@/features/reports/components/ReportRow";
+import { ErrorBanner } from "@/components/ErrorBanner";
 import {
     AppText,
-    Button,
     Divider,
     EmptyState,
     Field,
     IconButton,
-    Notice,
     Screen,
     TopBar,
     ui,
@@ -38,12 +37,11 @@ export default function Reports() {
   const loadReports = useCallback(async (query: string, refresh = false) => {
     const id = ++requestId.current;
     setLoading(true);
-    setError("");
     try {
       const data = query
         ? await GetFilteredReports(query, refresh)
         : await GetAllReports(refresh);
-      if (id === requestId.current) setReports(data);
+      if (id === requestId.current) { setReports(data); setError(""); }
     } catch (error) {
       if (id === requestId.current)
         setError(
@@ -81,7 +79,8 @@ export default function Reports() {
             <IconButton
               icon="refresh-cw"
               label="Actualizar reportes"
-              loading={loading}
+              loading={loading && !error}
+              disabled={loading}
               onPress={() => loadReports(activeQuery, true)}
             />
           }
@@ -98,7 +97,7 @@ export default function Reports() {
         keyboardDismissMode="on-drag"
         refreshControl={
           <RefreshControl
-            refreshing={loading && reports.length > 0}
+            refreshing={loading && !error && reports.length > 0}
             onRefresh={() => loadReports(activeQuery, true)}
             tintColor={colors.accent}
             colors={[colors.accent]}
@@ -121,7 +120,7 @@ export default function Reports() {
                 />
               }
             />
-            <Notice message={error} />
+            {!!error && <ErrorBanner message={error} retrying={loading} onRetry={() => { void loadReports(activeQuery, true); }} />}
             <View
               style={{
                 flexDirection: "row",
@@ -150,19 +149,13 @@ export default function Reports() {
           </View>
         }
         ListEmptyComponent={
-          loading ? (
+          error ? <View /> : loading ? (
             <View style={{ paddingVertical: space.section, gap: space.md }}>
               <ActivityIndicator color={colors.accent} />
               <AppText tone="muted" style={{ textAlign: "center" }}>
                 Cargando reportes…
               </AppText>
             </View>
-          ) : error ? (
-            <Button
-              secondary
-              label="Reintentar"
-              onPress={() => loadReports(activeQuery, true)}
-            />
           ) : (
             <EmptyState
               title={activeQuery ? "Sin resultados" : "Aún no hay reportes"}
