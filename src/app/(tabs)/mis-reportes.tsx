@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { Field, IconButton } from "@/components/ui/AppUi";
 import { useBackendReports } from "@/hooks/useBackendReports";
 import { EmptyState } from "@/components/EmptyState";
 import { ReportCard } from "@/features/reports/components/ReportCard";
@@ -22,6 +23,7 @@ import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useReportsStore } from "@/store/useReportsStore";
 import { normalizeReportStatus } from "@/services/report-status";
+import { matchesReportSearch } from "@/services/report-search";
 import type { Report } from "@/services/types";
 
 export default function MisReportesScreen() {
@@ -35,8 +37,10 @@ export default function MisReportesScreen() {
   const refreshReports = useReportsStore((s) => s.refreshReports);
 
   const [activeFilter, setActiveFilter] = useState<string>("todos");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredReports = reports.filter((r) => {
+    if (!matchesReportSearch(r, searchQuery)) return false;
     if (activeFilter === "todos") return true;
     return normalizeReportStatus(r.status) === activeFilter;
   });
@@ -70,6 +74,23 @@ export default function MisReportesScreen() {
         <Text style={[styles.subtitle, { color: colors.muted }]}>
           {es.myReports.subtitle}
         </Text>
+
+        <View style={{ marginBottom: space.sm }}>
+          <Field
+            placeholder="Buscar por tipo o ubicación"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCorrect={false}
+            returnKeyType="search"
+            trailing={searchQuery ? (
+              <IconButton
+                icon="x"
+                label="Limpiar búsqueda"
+                onPress={() => setSearchQuery("")}
+              />
+            ) : undefined}
+          />
+        </View>
 
         {/* Status Filter Tabs */}
         <ScrollView
@@ -116,6 +137,8 @@ export default function MisReportesScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -131,9 +154,9 @@ export default function MisReportesScreen() {
           isLoading ? <ActivityIndicator color={colors.accent} /> : error ? <View /> : (
             <EmptyState
               icon="document-text-outline"
-              title={activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
-              description={activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
-              actionTitle={activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
+              title={searchQuery.trim() ? "Sin resultados" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
+              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
+              actionTitle={searchQuery.trim() || activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
               onAction={() => router.push("/reportar/categoria")}
             />
           )
