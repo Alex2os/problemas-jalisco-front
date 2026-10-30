@@ -110,7 +110,7 @@ export default function PerfilScreen() {
           {contacts.map((contact, index) => <React.Fragment key={contact.phone}>
             {index > 0 && <View style={[styles.rowDivider, { backgroundColor: colors.border }]} />}
             <SettingRow icon="call-outline" title={contact.label} subtitle={contact.description}
-              accessibilityLabel={`Llamar a ${contact.label}`} onPress={() => handleCall(contact.phone)} />
+              accessibilityLabel={`Llamar a ${contact.label}`} padded onPress={() => handleCall(contact.phone)} />
           </React.Fragment>)}
         </View>
       </View>
@@ -118,24 +118,28 @@ export default function PerfilScreen() {
       <View style={[styles.card, cardColors]}>
         <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>{es.profile.themeTitle}</Text>
         <SettingRow icon={dark ? "moon-outline" : "sunny-outline"} title={dark ? es.profile.themeDark : es.profile.themeLight}
-          accessibilityLabel="Cambiar apariencia de la app" onPress={toggleTheme} />
+          accessibilityLabel="Cambiar apariencia de la app" padded onPress={toggleTheme} />
       </View>
     </ScrollView>
   );
 }
 
-function SettingRow({ title, subtitle, icon, accessibilityLabel, onPress }: {
+function SettingRow({ title, subtitle, icon, accessibilityLabel, onPress, padded = false }: {
   title: string;
   subtitle?: string;
   icon: React.ComponentProps<typeof Ionicons>["name"];
   accessibilityLabel: string;
   onPress: () => void;
+  padded?: boolean;
 }) {
   const { colors } = useAppTheme();
   const [pressed, setPressed] = useState(false);
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}
     onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)}
-    style={[styles.settingRow, { backgroundColor: pressed ? colors.raised : "transparent" }]}>
+    style={[styles.settingContainer, {
+      backgroundColor: pressed ? colors.raised : "transparent",
+    }]}>
+    <View style={[styles.settingRow, padded && styles.paddedSettingRow]}>
     <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft }]}>
       <Ionicons name={icon} size={21} color={colors.accent} />
     </View>
@@ -144,6 +148,7 @@ function SettingRow({ title, subtitle, icon, accessibilityLabel, onPress }: {
       {!!subtitle && <Text style={[styles.caption, { color: colors.muted }]}>{subtitle}</Text>}
     </View>
     <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+    </View>
   </Pressable>;
 }
 
@@ -204,8 +209,10 @@ const styles = StyleSheet.create({
   accountButtonLabel: { alignSelf: "center", textAlign: "center", includeFontPadding: false },
   accountButtonIcon: { position: "absolute", left: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
   accountButtonArrow: { position: "absolute", right: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
-  settingRow: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md, borderRadius: radius.md },
+  settingContainer: { borderRadius: radius.md, overflow: "hidden" },
+  settingRow: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md },
+  paddedSettingRow: { padding: space.md },
   settingIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: "center", justifyContent: "center" },
   settingInfo: { flex: 1, minWidth: 0, gap: space.xs },
-  rowDivider: { height: StyleSheet.hairlineWidth, marginLeft: 52 },
+  rowDivider: { height: StyleSheet.hairlineWidth, marginLeft: 40 + space.md * 2, marginRight: space.md },
 });
