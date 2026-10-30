@@ -1,24 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
+import * as Location from "expo-location";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { Button } from "@/components/Button";
 import { Field, IconButton } from "@/components/ui/AppUi";
 import { useBackendReports } from "@/hooks/useBackendReports";
+import { useRecommendedReports } from "@/hooks/useRecommendedReports";
+import type { RecommendationLocation } from "@/services/get-recommended-reports";
 import { EmptyState } from "@/components/EmptyState";
 import { ReportCard } from "@/features/reports/components/ReportCard";
-import { radius, space } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useReportsStore } from "@/store/useReportsStore";
@@ -38,21 +42,63 @@ export default function MisReportesScreen() {
 
   const [activeFilter, setActiveFilter] = useState<string>("todos");
   const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState<RecommendationLocation>();
+  const [locating, setLocating] = useState(false);
+  const locationPending = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const forYou = activeFilter === "para-ti";
+  const recommended = useRecommendedReports(forYou, !!searchQuery.trim(), location);
+  const listLoading = forYou ? recommended.loading : isLoading;
+  const listError = forYou ? recommended.error : error;
 
-  const filteredReports = reports.filter((r) => {
+  const filteredReports = (forYou ? recommended.reports : reports).filter((r) => {
     if (!matchesReportSearch(r, searchQuery)) return false;
-    if (activeFilter === "todos") return true;
+    if (activeFilter === "todos" || forYou) return true;
     return normalizeReportStatus(r.status) === activeFilter;
   });
 
   const filterTabs = [
     { id: "todos", label: "Todos" },
+    { id: "para-ti", label: "Para ti" },
     { id: "reportado", label: "Reportado" },
     { id: "resuelto", label: "Resuelto" },
   ];
 
   const handlePress = (report: Report) => {
     router.push(`/reporte/${report.id}`);
+  };
+
+  async function enableLocation() {
+    if (locationPending.current) return;
+    locationPending.current = true;
+    setLocating(true);
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") {
+        return;
+      }
+      const position = await Promise.race([
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error("location-timeout")), 15000); }),
+      ]);
+      if (mounted.current) setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+    } catch {
+      // Keep recommendations available without location; the action can be retried.
+    } finally {
+      clearTimeout(timeout);
+      locationPending.current = false;
+      if (mounted.current) setLocating(false);
+    }
+  }
+
+  const reasons = new Map(recommended.recommendations.map((item) => [item.report_id, item]));
+  const reasonLabels = {
+    nearby_and_related: "Cerca de ti y relacionado con tus reportes",
+    nearby: "Cerca de ti",
+    related_category: "Relacionado con tus reportes",
+    recent: "Reporte reciente",
   };
 
   return (
@@ -93,11 +139,7 @@ export default function MisReportesScreen() {
         </View>
 
         {/* Status Filter Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
-        >
+        <View style={[styles.filterRow, { backgroundColor: colors.raised, borderColor: colors.border }]}>
           {filterTabs.map((tab) => {
             const isSelected = activeFilter === tab.id;
             return (
@@ -109,18 +151,18 @@ export default function MisReportesScreen() {
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={`Filtrar por ${tab.label}`}
+                accessibilityState={{ selected: isSelected }}
                 style={[
                   styles.filterTab,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.raised,
-                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: isSelected ? colors.primary : "transparent",
                   },
                 ]}
               >
                 <Text
                   style={[
                     styles.filterTabText,
-                    { color: isSelected ? colors.onPrimary : colors.text },
+                    { color: isSelected ? colors.onPrimary : colors.textSecondary },
                   ]}
                 >
                   {tab.label}
@@ -128,7 +170,7 @@ export default function MisReportesScreen() {
               </Pressable>
             );
           })}
-        </ScrollView>
+        </View>
       </View>
 
       {/* List of Reports */}
@@ -141,22 +183,64 @@ export default function MisReportesScreen() {
         keyboardDismissMode="on-drag"
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
-            onRefresh={() => { void refreshReports(); }}
+            refreshing={listLoading}
+            onRefresh={() => { if (forYou) recommended.refresh(); else void refreshReports(); }}
             tintColor={colors.accent}
           />
         }
-        renderItem={({ item }) => (
-          <ReportCard report={item} onPress={handlePress} />
-        )}
-        ListHeaderComponent={error ? <ErrorBanner message={error} /> : undefined}
+        renderItem={({ item }) => {
+          const recommendation = forYou ? reasons.get(item.id) : undefined;
+          return <View style={{ gap: space.xs }}>
+            {recommendation && <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
+              {reasonLabels[recommendation.reason] || "Recomendado para ti"}
+              {recommendation.distance_km !== null ? ` · ${recommendation.distance_km.toLocaleString("es-MX", { maximumFractionDigits: 1 })} km` : ""}
+            </Text>}
+            <ReportCard report={item} onPress={handlePress} />
+          </View>;
+        }}
+        ListHeaderComponent={forYou || listError ? (
+          <View style={{ gap: space.sm }}>
+            {forYou && <>
+              <Text style={[styles.recommendationIntro, { color: colors.textSecondary }]}>
+                {location
+                  ? "Tu ubicación nos ayuda a recomendarte reportes cercanos y más relevantes para ti."
+                  : "Activa tu ubicación para recibir mejores recomendaciones de reportes cerca de ti."}
+              </Text>
+              <View style={styles.locationActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={location ? "Actualizar mi ubicación" : "Activar ubicación para recibir recomendaciones cercanas"}
+                  accessibilityState={{ disabled: locating, busy: locating }}
+                  disabled={locating}
+                  onPress={() => { void enableLocation(); }}
+                  style={[styles.locationAction, { backgroundColor: colors.primary }]}
+                >
+                  {locating ? <ActivityIndicator size="small" color={colors.onPrimary} /> : <Ionicons name="location" size={20} color={colors.onPrimary} />}
+                  <Text style={[styles.locationActionText, { color: colors.onPrimary }]}>
+                    {locating ? "Buscando ubicación…" : location ? "Actualizar ubicación" : "Activar ubicación"}
+                  </Text>
+                </Pressable>
+                {location && <IconButton icon="x" label="Dejar de usar mi ubicación" disabled={locating} onPress={() => setLocation(undefined)} />}
+              </View>
+            </>}
+            {!!listError && <>
+              <ErrorBanner message={listError} />
+              {forYou && <Button title="Reintentar" variant="outline" onPress={recommended.refresh} />}
+            </>}
+          </View>
+        ) : undefined}
+        ListFooterComponent={forYou && recommended.nextOffset !== null ? (
+          <Button title={searchQuery.trim() ? "Buscar en más reportes" : "Ver más reportes"}
+            variant="outline" loading={recommended.loadingMore}
+            disabled={recommended.loading} onPress={recommended.loadMore} />
+        ) : undefined}
         ListEmptyComponent={
-          isLoading ? <ActivityIndicator color={colors.accent} /> : error ? <View /> : (
+          listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.accent} /> : listError ? <View /> : (
             <EmptyState
               icon="document-text-outline"
-              title={searchQuery.trim() ? "Sin resultados" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
-              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
-              actionTitle={searchQuery.trim() || activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
+              title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay recomendaciones" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
+              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : forYou ? "Cuando haya reportes disponibles, verás aquí los más relevantes para ti." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
+              actionTitle={searchQuery.trim() || forYou || activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
               onAction={() => router.push("/reportar/categoria")}
             />
           )
@@ -186,17 +270,30 @@ const styles = StyleSheet.create({
     marginBottom: space.sm,
   },
   filterRow: {
+    flexDirection: "row",
     gap: space.xs,
-  },
-  filterTab: {
-    paddingHorizontal: space.md,
-    paddingVertical: 6,
-    borderRadius: radius.full,
+    padding: space.xs,
     borderWidth: 1,
+    borderRadius: radius.control,
+  },
+  recommendationIntro: { fontSize: 13, lineHeight: 20, textAlign: "center" },
+  locationActions: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: space.xs },
+  locationAction: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: space.xs, minHeight: size.touch, paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: radius.control },
+  locationActionText: { fontSize: 15, fontWeight: "700", flexShrink: 1 },
+  filterTab: {
+    flex: 1,
+    minHeight: size.touch,
+    minWidth: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: space.xs,
+    paddingVertical: space.sm,
+    borderRadius: radius.sm,
   },
   filterTabText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
+    textAlign: "center",
   },
   list: {
     padding: space.lg,

@@ -83,6 +83,19 @@ export interface ReportDraft {
   lastUpdated: number;
 }
 
+export interface ReportRecommendation {
+  report_id: number;
+  reason: "nearby_and_related" | "nearby" | "related_category" | "recent";
+  distance_km: number | null;
+}
+
+export interface RecommendedReportsPage {
+  reports: Report[];
+  recommendations: ReportRecommendation[];
+  has_more: boolean;
+  next_offset: number | null;
+}
+
 export interface ReportComment {
   id: number;
   user_id: number;

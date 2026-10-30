@@ -6,6 +6,8 @@ ProblemasJalisco is a cross-platform application built with Expo, React Native, 
 
 Target platforms: Android, iOS and web. Android and iOS are currently the validated platforms; web compatibility remains a work in progress.
 
+The product is a practical civic reporting tool, not a social network. Prioritize accurate reports, useful discovery and follow-up over engagement mechanics.
+
 ## Architecture
 
 - `src/app/`: Expo Router routes, layouts and navigation entry points.
@@ -53,6 +55,24 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Preserve existing light/dark behavior where implemented.
 - NativeWind/Tailwind may be used where appropriate, but do not migrate working StyleSheet components solely for stylistic consistency.
 - Do not change visual identity, typography or component appearance during unrelated refactors.
+- Do not add shadows, glow, decorative elevation or simulated shadows. Use flat fills, borders and spacing for separation.
+- Support both light and dark themes using semantic colors, including contrasting foreground colors for filled buttons.
+- Keep touch targets at least `size.touch` (48 logical pixels). Allow labels to grow with accessibility text settings.
+- Reportes filters use one grouped control with equal-width rectangular tabs and a clear selected state. Preserve this design; do not turn them back into pills.
+- Put padding inside pressed/highlighted containers so icons, labels and chevrons do not touch the background edges. Preserve this in both themes.
+- Shared buttons use direct style arrays with explicit press state. Preserve the existing rendering fix; verify native rendering before switching back to callback-only Pressable styles.
+
+## Report screens and recommendations
+
+- The visible Reportes tab is `src/app/(tabs)/mis-reportes.tsx`; `reports.tsx` is a hidden legacy route. Inspect navigation before choosing which screen to edit.
+- There are two report detail paths: `/reporte/[id]` and `/reports/[report_id]`. Keep shared behavior consistent where both paths expose it; do not remove or rename routes as part of styling work.
+- Keep the comment form above existing comments. The character counter belongs beside the input label, not between the input and publish button.
+- Empty or whitespace-only descriptions show plain `No hay descripción.` text. Do not add a bordered description section or extra heading unless requested.
+- Para ti consumes `/reports/recommended`; preserve server ranking and recommendation reasons. It is currently rule-based, not an AI feature.
+- Preserve Todos, Para ti, Reportado and Resuelto, along with type/location search. Search in Para ti must include remaining recommendation pages, not silently stop at the first page.
+- Deduplicate paginated reports by ID, guard against stale responses after navigation or identity changes, and clear personalized caches on session changes. Reuse existing session/cache infrastructure.
+- Location is optional and requested through an explicit action. Keep the centered explanation and full-width, noticeable `Activar ubicación` button. Do not restore the removed secondary “Puedes seguir…” messages.
+- Preserve location timeouts and guest/permission-denied fallback. Do not persist location or add background tracking as part of unrelated work.
 
 ## Backend integration
 
@@ -60,7 +80,7 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Do not hardcode local network addresses, credentials or tokens in source files.
 - Use the existing environment-based API configuration.
 - Keep secrets out of Git.
-- Do not modify the backend repository from this frontend workspace.
+- Do not modify the backend repository unless the user explicitly authorizes backend or cross-repository work. For authorized API work, read and follow its own AGENTS.md and keep changes scoped to that task.
 
 ## Platform compatibility
 
@@ -89,6 +109,10 @@ npx expo export --platform android
 
 Report failures clearly. Distinguish pre-existing failures from regressions.
 
+For API integration changes, use the backend's disposable integration suite with `JALISCO_TEST_FRONTEND_DIR` pointing to this checkout. Keep integration-script imports consistent with current kebab-case service filenames. Never point these tests at the application database.
+
+Documentation-only changes require review and `git diff --check`; application builds are unnecessary.
+
 ## Git and change management
 
 - Inspect `git status` before making changes.
@@ -106,4 +130,6 @@ Report failures clearly. Distinguish pre-existing failures from regressions.
 - Avoid speculative refactoring.
 - Preserve working functionality and user-visible behavior unless explicitly asked to change them.
 - When uncertain about an architectural decision, inspect existing patterns before introducing a new one.
+- For staged feature work, finish and validate each agreed step and report its outcome before moving to the next stage.
+- Do not claim visual/device validation from typecheck, tests or export alone. If a reported visual issue is unclear, inspect the actual screen/pressed state before guessing. Expo Fast Refresh can lag; confirm the current build is visible before adding unnecessary UI changes.
 
