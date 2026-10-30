@@ -105,7 +105,7 @@ export default function MapaScreen() {
           >
             <Ionicons name="location" size={16} color={colors.accent} />
             <Text style={[styles.locationPillText, { color: colors.text }]}>
-              Guadalajara y Área Metro
+              Jalisco
             </Text>
             <View style={[styles.activeDot, { backgroundColor: colors.success }]} />
             <Text style={[styles.activeCount, { color: colors.muted }]}>

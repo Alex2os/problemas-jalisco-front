@@ -61,6 +61,28 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Reportes filters use one grouped control with equal-width rectangular tabs and a clear selected state. Preserve this design; do not turn them back into pills.
 - Put padding inside pressed/highlighted containers so icons, labels and chevrons do not touch the background edges. Preserve this in both themes.
 - Shared buttons use direct style arrays with explicit press state. Preserve the existing rendering fix; verify native rendering before switching back to callback-only Pressable styles.
+- Full-width button content must center the icon and label together. Apply full-width inner content only to full-width buttons to avoid intrinsic sizing regressions.
+
+## Connection errors and retries
+
+- Use the shared API client in `src/services/api.ts` for backend calls. Preserve Spanish connection/timeout messages and server validation messages; native fetch failures can be plain Error objects, not only TypeError.
+- Distinguish transport failures, timeouts, HTTP errors and unreadable responses. An HTML error page from a proxy must not hide the HTTP status behind a JSON parsing error.
+- Network failures must not log the user out. Preserve session handling for actual authentication failures.
+- Never automatically retry report writes. A lost response can follow a committed change; preserve the message asking users to check their reports before repeating the action.
+- Reuse `ErrorBanner`. Its retry action is compact, red, full-width and centered below the message, with no shadow. Preserve its 48px effective touch target even when its visible height is smaller.
+- Error banners need an explicit stable width, including in the map's centered overlay. Switching to a loading spinner must not collapse the banner or clip its message.
+- During an error retry, show only the retry control's spinner for that request. Suppress duplicate refresh-control, header, empty-list and pagination loaders across all relevant screens, not just the map.
+- Keep the error visible until recovery, and keep previously loaded reports visible if refresh fails. Clear the error on success instead of replacing the banner with a separate loading screen.
+
+## Report location address preview
+
+- `LocationPicker` uses `GetLocationAddress` in `src/services/get-location-address.ts`, calling authenticated `GET /locations/reverse?latitude=...&longitude=...`.
+- Manual map selection must not request device-location permission or use native reverse geocoding. Only the explicit GPS action requests permission; preserve its timeout and movement guard.
+- While the map moves, clear the old address and invalidate stale results without sending a request. Request the address after movement completes, using the debounce and lifecycle guards in `createAddressLookup`.
+- Keep the selected coordinates authoritative. Check that response coordinates match; preserve null/missing components and explicit no-coverage responses rather than inventing a street, colonia or municipality.
+- On lookup failure or no coverage, preserve the selected point and provide the shared retry UI with a single spinner. Successful retries clear the previous error.
+- Preserve OpenStreetMap attribution and backend provider limits. Do not add continuous per-movement calls, background tracking or a direct public-geocoder fallback.
+- The backend contract and provider behavior are documented in its `docs/location-preview.md`. Test mapping, no coverage, stale responses, movement scheduling and retry recovery; native map/permission behavior still needs device validation.
 
 ## Report screens and recommendations
 

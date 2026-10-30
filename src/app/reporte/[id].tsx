@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
 import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
+import { GoogleMapsButton } from "@/features/reports/components/GoogleMapsButton";
 import { ReportEditButton } from "@/features/reports/components/ReportEditButton";
 import { useBackendReport } from "@/hooks/useBackendReports";
 import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
@@ -264,6 +265,7 @@ export default function ReporteDetailScreen() {
                 <ReportMapMarker report={report} />
               </MapView>
             </View>
+            <GoogleMapsButton report={report} />
           </View>
           <ReportComments key={report.id} reportId={report.id} />
         </View>

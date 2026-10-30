@@ -174,6 +174,7 @@ export function IconButton({
   loading?: boolean;
 }) {
   const { colors } = useAppTheme();
+  const [pressed, setPressed] = useState(false);
   return (
     <Pressable
       accessibilityRole="button"
@@ -181,7 +182,10 @@ export function IconButton({
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       disabled={disabled || loading}
       onPress={onPress}
-      style={({ pressed }) => ({
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      style={{
+        width: size.touch,
         minWidth: size.touch,
         minHeight: size.touch,
         alignItems: "center",
@@ -189,7 +193,7 @@ export function IconButton({
         borderRadius: radius.control,
         backgroundColor: pressed ? colors.raised : "transparent",
         opacity: disabled ? 0.4 : 1,
-      })}
+      }}
     >
       {loading ? (
         <ActivityIndicator size="small" color={colors.accent} />

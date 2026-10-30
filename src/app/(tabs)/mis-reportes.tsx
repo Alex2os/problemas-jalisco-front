@@ -6,6 +6,7 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { router } from "expo-router";
@@ -16,7 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Button } from "@/components/Button";
-import { Field, IconButton } from "@/components/ui/AppUi";
+import { IconButton } from "@/components/ui/AppUi";
 import { useBackendReports } from "@/hooks/useBackendReports";
 import { useRecommendedReports } from "@/hooks/useRecommendedReports";
 import type { RecommendationLocation } from "@/services/get-recommended-reports";
@@ -42,6 +43,8 @@ export default function MisReportesScreen() {
 
   const [activeFilter, setActiveFilter] = useState<string>("todos");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [clearPressed, setClearPressed] = useState(false);
   const [location, setLocation] = useState<RecommendationLocation>();
   const [locating, setLocating] = useState(false);
   const locationPending = useRef(false);
@@ -121,21 +124,37 @@ export default function MisReportesScreen() {
           {es.myReports.subtitle}
         </Text>
 
-        <View style={{ marginBottom: space.sm }}>
-          <Field
+        <View style={[styles.searchField, { backgroundColor: colors.surface, borderColor: searchFocused ? colors.accent : colors.border }]}>
+          <TextInput
+            accessibilityLabel="Buscar reportes por tipo o ubicación"
             placeholder="Buscar por tipo o ubicación"
+            placeholderTextColor={colors.muted}
+            selectionColor={colors.accent}
+            style={[styles.searchInput, { color: colors.text }]}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             autoCorrect={false}
+            autoCapitalize="none"
+            spellCheck={false}
+            clearButtonMode="never"
             returnKeyType="search"
-            trailing={searchQuery ? (
-              <IconButton
-                icon="x"
-                label="Limpiar búsqueda"
-                onPress={() => setSearchQuery("")}
-              />
-            ) : undefined}
           />
+          {searchQuery ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Limpiar búsqueda"
+              onPress={() => { setSearchQuery(""); setClearPressed(false); }}
+              onPressIn={() => setClearPressed(true)}
+              onPressOut={() => setClearPressed(false)}
+              style={styles.searchClear}
+            >
+              <View style={[styles.searchClearCircle, { backgroundColor: clearPressed ? colors.primaryDark : colors.primary }]}>
+                <Ionicons name="close" size={14} color={colors.onPrimary} style={styles.searchClearIcon} />
+              </View>
+            </Pressable>
+          ) : <View style={styles.searchClear} />}
         </View>
 
         {/* Status Filter Tabs */}
@@ -269,6 +288,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: space.sm,
   },
+  searchField: { flexDirection: "row", alignItems: "center", minHeight: size.control, borderWidth: 1, borderRadius: radius.control, paddingLeft: space.md, paddingRight: space.sm, marginBottom: space.sm, gap: space.xs },
+  searchInput: { flex: 1, minWidth: 0, fontSize: 16, paddingHorizontal: 0, paddingVertical: space.md, includeFontPadding: false, textAlignVertical: "center" },
+  searchClear: { width: size.touch, height: size.touch, flexShrink: 0, alignItems: "center", justifyContent: "center", borderRadius: radius.sm },
+  searchClearCircle: { width: 24, height: 24, borderRadius: radius.full, alignItems: "center", justifyContent: "center" },
+  searchClearIcon: { width: 14, height: 14, lineHeight: 14, includeFontPadding: false, textAlign: "center" },
   filterRow: {
     flexDirection: "row",
     gap: space.xs,

@@ -1,4 +1,5 @@
 import { ReportInteractions } from "@/features/reports/components/ReportInteractions";
+import { GoogleMapsButton } from "@/features/reports/components/GoogleMapsButton";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Button as CommentButton } from "@/components/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -348,6 +349,7 @@ function ReportContent({
                   <AppText>
                     {live.ubication || "Ubicación señalada en el mapa"}
                   </AppText>
+                  <GoogleMapsButton report={live} />
                   <AppText tone="muted" variant="caption">
                     {reportDate(live.created_at)} ·{" "}
                     {live.username || "Comunidad"}
