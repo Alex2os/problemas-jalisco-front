@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, Alert, AppState, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Button } from "@/components/Button";
 import { radius, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -111,6 +112,30 @@ export function ReportComments({ reportId }: { reportId: number }) {
   return (
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Text accessibilityRole="header" style={[styles.heading, { color: colors.text }]}>Comentarios</Text>
+      {authenticated ? (
+        <>
+          <View style={styles.inputHeader}>
+            <Text style={[styles.author, { color: colors.text, flex: 1 }]}>Escribe un comentario</Text>
+            <Text accessibilityLabel={`${text.length} de 100 caracteres`} style={[styles.date, { color: colors.muted }]}>{text.length}/100</Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Escribe un comentario"
+            placeholder="Agrega información sobre el problema"
+            placeholderTextColor={colors.muted}
+            value={text}
+            onChangeText={setText}
+            maxLength={100}
+            multiline
+            editable={!busy}
+            style={[styles.input, { color: colors.text, backgroundColor: colors.background, borderColor: colors.border }]}
+          />
+          <Button title="Publicar comentario" variant="secondary"
+            icon={<Ionicons name="send-outline" size={18} color={!text.trim() || loading || busy ? colors.muted : colors.onPrimary} />}
+            loading={busy} disabled={!text.trim() || loading || busy}
+            onPress={() => { void save(); }} fullWidth />
+        </>
+      ) : <Button title="Inicia sesión para comentar" variant="outline" fullWidth onPress={() => router.push({ pathname: "/auth/login", params: { returnTo: `/reporte/${reportId}` } })} />}
+      {!!error && <Text accessibilityRole="alert" style={{ color: colors.danger }}>{error}</Text>}
       {comments.map((comment) => (
         <View key={comment.id} style={[styles.comment, { borderBottomColor: colors.border }]}>
           <Text style={[styles.author, { color: colors.text }]}>{comment.username || "Usuario"}</Text>
@@ -127,27 +152,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
       ))}
       {loading && <ActivityIndicator color={colors.accent} accessibilityLabel="Cargando comentarios" />}
       {loaded && !loading && !comments.length && !loadError && <Text style={{ color: colors.muted }}>Aún no hay comentarios.</Text>}
-      {!!error && <Text accessibilityRole="alert" style={{ color: colors.danger }}>{error}</Text>}
       {!!loadError && <Text accessibilityRole="alert" style={{ color: colors.danger }}>{loadError}</Text>}
-      {authenticated ? (
-        <>
-          <Text style={[styles.author, { color: colors.text }]}>Escribe un comentario</Text>
-          <TextInput
-            accessibilityLabel="Escribe un comentario"
-            placeholder="Agrega información sobre el problema"
-            placeholderTextColor={colors.muted}
-            value={text}
-            onChangeText={setText}
-            maxLength={100}
-            multiline
-            editable={!busy}
-            style={[styles.input, { color: colors.text, backgroundColor: colors.background, borderColor: colors.border }]}
-          />
-          <Text style={[styles.date, { color: colors.muted, textAlign: "right" }]}>{text.length}/100</Text>
-          <Button title="Publicar comentario" loading={busy} disabled={!text.trim() || loading || busy}
-            onPress={() => { void save(); }} fullWidth />
-        </>
-      ) : <Button title="Inicia sesión para comentar" variant="outline" fullWidth onPress={() => router.push({ pathname: "/auth/login", params: { returnTo: `/reporte/${reportId}` } })} />}
     </View>
   );
 }
@@ -157,6 +162,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 18, fontWeight: "700" },
   comment: { gap: space.xs, paddingVertical: space.sm, borderBottomWidth: 1 },
   author: { fontSize: 14, fontWeight: "700" },
+  inputHeader: { flexDirection: "row", alignItems: "center", gap: space.sm },
   date: { fontSize: 12 },
   body: { fontSize: 15, lineHeight: 22, paddingVertical: space.xs },
   input: { minHeight: 96, borderWidth: 1, borderRadius: radius.control, padding: space.md, fontSize: 16, textAlignVertical: "top" },

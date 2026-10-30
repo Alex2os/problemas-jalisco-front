@@ -11,7 +11,7 @@ import {
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, shadows, space } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 import { categoryDefFor } from "@/constants/report-categories";
 import { StatusChip } from "./StatusChip";
 import type { Report } from "@/services/types";
@@ -61,7 +61,6 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
           opacity: pressed ? 0.92 : 1,
           transform: [{ scale: pressed ? 0.985 : 1 }],
         },
-        shadows.sm as any,
         style,
       ]}
     >

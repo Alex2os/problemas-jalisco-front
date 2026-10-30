@@ -15,7 +15,7 @@ import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, space, shadows } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 
 export interface LocationPickerProps {
   initialLatitude?: number;
@@ -154,7 +154,7 @@ export function LocationPicker({
           accessibilityLabel="Centrar en mi ubicación GPS"
           disabled={locating}
           accessibilityState={{ disabled: locating, busy: locating }}
-          style={[styles.gpsBtn, { backgroundColor: colors.surface }, shadows.md as any]}
+          style={[styles.gpsBtn, { backgroundColor: colors.surface }]}
         >
           {locating ? (
             <ActivityIndicator size="small" color={colors.accent} />
@@ -169,7 +169,6 @@ export function LocationPicker({
         style={[
           styles.addressCard,
           { backgroundColor: colors.surface, borderColor: colors.border },
-          shadows.sm as any,
         ]}
       >
         <View style={styles.addressHeader}>

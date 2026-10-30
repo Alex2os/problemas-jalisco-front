@@ -10,7 +10,7 @@ import {
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, shadows, space } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 import type { CategoryDefinition } from "@/constants/report-categories";
 
 export interface CategoryCardProps {
@@ -52,7 +52,6 @@ export function CategoryCard({
           opacity: pressed ? 0.9 : 1,
           transform: [{ scale: pressed ? 0.97 : 1 }],
         },
-        shadows.sm as any,
         style,
       ]}
     >

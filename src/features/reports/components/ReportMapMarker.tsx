@@ -50,7 +50,6 @@ export const ReportMapMarker = memo(function ReportMapMarker({ report, onPress }
             allowFontScaling={false} style={styles.icon} />}
         </View>
         <View style={[styles.tip, { borderTopColor: category.color }]} />
-        <View style={styles.shadow} />
       </View>
     </Marker>
   );
@@ -61,5 +60,4 @@ const styles = StyleSheet.create({
   head: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, alignSelf: "center", alignItems: "center", justifyContent: "center" },
   icon: { width: 24, height: 24, lineHeight: 24, includeFontPadding: false, textAlign: "center", textAlignVertical: "center" },
   tip: { width: 0, height: 0, marginTop: -2, borderLeftWidth: 7, borderRightWidth: 7, borderTopWidth: 8, borderLeftColor: "transparent", borderRightColor: "transparent", alignSelf: "center" },
-  shadow: { width: 12, height: 3, borderRadius: 6, backgroundColor: "rgba(15,23,42,0.2)", marginTop: 2, alignSelf: "center" },
 });

@@ -8,7 +8,7 @@ import { ErrorBanner } from "@/components/ErrorBanner";
 import { useAuthSession } from "@/hooks/useReportState";
 import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
 import { categoryDefFor } from "@/constants/report-categories";
-import { radius, shadows, space } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
@@ -69,7 +69,6 @@ export default function RevisarScreen() {
           style={[
             styles.card,
             { backgroundColor: colors.surface, borderColor: colors.border },
-            shadows.sm as any,
           ]}
         >
           {/* Photo */}

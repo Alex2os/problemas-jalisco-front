@@ -27,7 +27,7 @@ import { ReportComments } from "@/features/reports/components/ReportComments";
 import { reportDate } from "@/services/report-format";
 import { StatusChip } from "@/features/reports/components/StatusChip";
 import { categoryDefFor } from "@/constants/report-categories";
-import { radius, shadows, space } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
@@ -188,7 +188,6 @@ export default function ReporteDetailScreen() {
                   : colors.surface,
                 borderColor: report.liked_by_me ? colors.accent : colors.border,
               },
-              shadows.sm as any,
             ]}
           >
             <View style={{ flex: 1 }}>
@@ -237,7 +236,6 @@ export default function ReporteDetailScreen() {
             style={[
               styles.sectionCard,
               { backgroundColor: colors.surface, borderColor: colors.border },
-              shadows.sm as any,
             ]}
           >
             <Text style={[styles.sectionTitle, { color: colors.text }]}>

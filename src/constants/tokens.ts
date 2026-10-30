@@ -1,4 +1,4 @@
-import { border, radius, shadows, size, space, type } from "./design";
+import { border, radius, size, space, type } from "./design";
 import { brandColors, palette, type AppColors } from "./palette";
 import { Colors, FontFamily, Fonts } from "./theme";
 
@@ -7,7 +7,6 @@ export const tokens = {
   radius,
   size,
   border,
-  shadows,
   type,
   brand: brandColors,
   palette,
@@ -19,7 +18,7 @@ export const tokens = {
 export type DesignTokens = typeof tokens;
 export type { AppColors };
 
-export { border, radius, shadows, size, space, type } from "./design";
+export { border, radius, size, space, type } from "./design";
 export { palette, brandColors } from "./palette";
 export { Colors, Fonts, FontFamily } from "./theme";
 export { es } from "./es";

@@ -1,4 +1,6 @@
 import { ReportInteractions } from "@/features/reports/components/ReportInteractions";
+import { Button as CommentButton } from "@/components/Button";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
 import { reportDate } from "@/features/reports/components/ReportRow";
 import { ReportEditButton } from "@/features/reports/components/ReportEditButton";
@@ -380,6 +382,43 @@ function ReportContent({
                     {live.comment_count}
                   </AppText>
                 </View>
+                <View style={{ gap: space.lg, paddingBottom: space.lg }}>
+                  <Notice message={sessionError || commentError} />
+                  <Notice message={success} success />
+                  <Divider />
+                  {authenticated ? (
+                    <>
+                      <Field
+                        label="Añadir un comentario"
+                        maxLength={100}
+                        placeholder="Comparte información sobre este reporte"
+                        value={userComment}
+                        onChangeText={setUserComment}
+                        editable={!busy && !refreshing}
+                        multiline
+                        style={{ minHeight: 88, textAlignVertical: "top" }}
+                      />
+                      <AppText tone="muted" variant="caption">
+                        {userComment.length}/100
+                      </AppText>
+                      <CommentButton
+                        title="Publicar comentario"
+                        variant="secondary"
+                        fullWidth
+                        icon={<Ionicons name="send-outline" size={18} color={!userComment.trim() || busy || refreshing ? colors.muted : colors.onPrimary} />}
+                        loading={submitting}
+                        disabled={!userComment.trim() || busy || refreshing}
+                        onPress={postComment}
+                      />
+                    </>
+                  ) : (
+                    <Button
+                      secondary
+                      label="Inicia sesión para comentar"
+                      onPress={() => router.push("/auth/login")}
+                    />
+                  )}
+                </View>
               </>
             ) : (
               <>
@@ -441,39 +480,7 @@ function ReportContent({
                   onPress={loadMore}
                 />
               )}
-              <Notice message={sessionError || commentError} />
-              <Notice message={success} success />
-              <Divider />
-              {authenticated ? (
-                <>
-                  <Field
-                    label="Añadir un comentario"
-                    maxLength={100}
-                    placeholder="Comparte información sobre este reporte"
-                    value={userComment}
-                    onChangeText={setUserComment}
-                    editable={!busy && !refreshing}
-                    multiline
-                    style={{ minHeight: 88, textAlignVertical: "top" }}
-                  />
-                  <AppText tone="muted" variant="caption">
-                    {userComment.length}/100
-                  </AppText>
-                  <Button
-                    label="Publicar comentario"
-                    loading={submitting}
-                    loadingLabel="Publicando…"
-                    disabled={!userComment.trim() || busy || refreshing}
-                    onPress={postComment}
-                  />
-                </>
-              ) : (
-                <Button
-                  secondary
-                  label="Inicia sesión para comentar"
-                  onPress={() => router.push("/auth/login")}
-                />
-              )}
+
             </View>
           ) : undefined
         }

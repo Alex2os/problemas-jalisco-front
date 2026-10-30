@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, size, space, shadows } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "agave";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -45,9 +45,12 @@ export function Button({
   style,
   textStyle,
   accessibilityLabel,
+  onPressIn,
+  onPressOut,
   ...props
 }: ButtonProps) {
-  const { colors, dark } = useAppTheme();
+  const { colors } = useAppTheme();
+  const [pressed, setPressed] = useState(false);
 
   const handlePress = (e: any) => {
     if (disabled || loading) return;
@@ -71,23 +74,19 @@ export function Button({
   let backgroundColor: string;
   let textColor: string;
   let borderColor: string | undefined;
-  let shadowStyle = shadows.none;
 
   switch (variant) {
     case "primary":
       backgroundColor = colors.accent;
       textColor = colors.onAccent;
-      shadowStyle = dark ? shadows.none : (shadows.primaryGlow as any);
       break;
     case "secondary":
       backgroundColor = colors.primary;
       textColor = colors.onPrimary;
-      shadowStyle = shadows.sm as any;
       break;
     case "agave":
       backgroundColor = colors.agave;
       textColor = colors.onAgave;
-      shadowStyle = shadows.sm as any;
       break;
     case "outline":
       backgroundColor = "transparent";
@@ -114,20 +113,21 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
-      style={({ pressed }) => [
+      onPressIn={(event) => { setPressed(true); onPressIn?.(event); }}
+      onPressOut={(event) => { setPressed(false); onPressOut?.(event); }}
+      style={[
         styles.base,
         {
           height,
           paddingHorizontal,
-          backgroundColor,
-          borderColor,
-          borderWidth: borderColor ? 1.5 : 0,
+          backgroundColor: disabled && !loading ? colors.raised : backgroundColor,
+          borderColor: disabled && !loading ? colors.borderStrong : borderColor,
+          borderWidth: disabled && !loading ? 1 : borderColor ? 1.5 : 0,
           borderRadius: radius.control,
-          opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
+          opacity: pressed && !disabled && !loading ? 0.85 : 1,
           transform: [{ scale: pressed && !disabled && !loading ? 0.98 : 1 }],
           width: fullWidth ? "100%" : undefined,
         },
-        shadowStyle,
         style,
       ]}
       {...props}
@@ -141,7 +141,7 @@ export function Button({
             style={[
               styles.text,
               {
-                color: textColor,
+                color: disabled ? colors.muted : textColor,
                 fontSize,
               },
               textStyle,

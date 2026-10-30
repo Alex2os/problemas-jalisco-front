@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 // Shared spacing scale
 export const space = {
@@ -42,62 +42,6 @@ export const border = {
   hairline: StyleSheet.hairlineWidth,
   normal: 1,
   thick: 2,
-};
-
-// Soft shadows with cross-platform support (elevation on Android)
-// Actualizado con tonos botánicos orgánicos (#141A16) y acento Warm Orange
-export const shadows = {
-  none: {
-    shadowColor: "transparent",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 0,
-  },
-  sm: Platform.select({
-    ios: {
-      shadowColor: "#141A16",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 3,
-    },
-    default: {
-      elevation: 2,
-    },
-  }),
-  md: Platform.select({
-    ios: {
-      shadowColor: "#141A16",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-    },
-    default: {
-      elevation: 4,
-    },
-  }),
-  lg: Platform.select({
-    ios: {
-      shadowColor: "#141A16",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.14,
-      shadowRadius: 12,
-    },
-    default: {
-      elevation: 8,
-    },
-  }),
-  primaryGlow: Platform.select({
-    ios: {
-      shadowColor: "#687D31",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 10,
-    },
-    default: {
-      elevation: 6,
-    },
-  }),
 };
 
 // Accessible typography: body font 16px+, high contrast line heights

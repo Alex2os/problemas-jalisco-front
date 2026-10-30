@@ -17,7 +17,7 @@ import { ErrorBanner } from "@/components/ErrorBanner";
 import { useBackendReports } from "@/hooks/useBackendReports";
 import { useAuthSession } from "@/hooks/useReportState";
 import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
-import { radius, shadows, space } from "@/constants/design";
+import { radius, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useReportsStore } from "@/store/useReportsStore";
 import type { Report } from "@/services/types";
@@ -100,7 +100,6 @@ export default function MapaScreen() {
             style={[
               styles.locationPill,
               { backgroundColor: colors.surface, borderColor: colors.border },
-              shadows.md as any,
             ]}
           >
             <Ionicons name="location" size={16} color={colors.accent} />
@@ -126,7 +125,6 @@ export default function MapaScreen() {
             {
               backgroundColor: colors.surface,
             },
-            shadows.md as any,
           ]}
         >
           <Ionicons name="locate" size={22} color={colors.accent} />
