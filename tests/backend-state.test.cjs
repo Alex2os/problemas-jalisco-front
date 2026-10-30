@@ -12,17 +12,17 @@ function client(apiRequest) {
 
 test('empty server feeds stay empty and failures never become sample reports', async () => {
   const empty = client(async () => ({ reports: [] }));
-  assert.deepEqual(await empty.load('services/GetAllReports').GetAllReports(), []);
+  assert.deepEqual(await empty.load('services/get-all-reports').GetAllReports(), []);
   const unavailable = client(async () => { throw new Error('offline'); });
-  await assert.rejects(unavailable.load('services/GetAllReports').GetAllReports(), /offline/);
-  await assert.rejects(unavailable.load('services/GetReportById').GetReportById(999), /offline/);
+  await assert.rejects(unavailable.load('services/get-all-reports').GetAllReports(), /offline/);
+  await assert.rejects(unavailable.load('services/get-report-by-id').GetReportById(999), /offline/);
   const malformed = client(async () => ({}));
-  await assert.rejects(malformed.load('services/GetAllReports').GetAllReports(), /inválida/);
+  await assert.rejects(malformed.load('services/get-all-reports').GetAllReports(), /inválida/);
 });
 
 test('backend IDs, categories, authors, and photo URLs drive the UI', async () => {
   const c = client(async () => ({ report: { ...report, photos: [{ id: 2, url: '/reports/42/photos/2/content' }] } }));
-  const result = await c.load('services/GetReportById').GetReportById(42);
+  const result = await c.load('services/get-report-by-id').GetReportById(42);
   assert.equal(result.folio, '42');
   assert.equal(result.category, 'agua');
   assert.equal(result.username, 'Alex');

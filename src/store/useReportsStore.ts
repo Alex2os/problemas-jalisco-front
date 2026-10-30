@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { apiCache } from "../services/cache";
-import { CreateReport } from "../services/CreateReport";
-import { GetAllReports } from "../services/GetAllReports";
-import { GetReportById } from "../services/GetReportById";
+import { CreateReport } from "../services/create-report";
+import { GetAllReports } from "../services/get-all-reports";
+import { GetReportById } from "../services/get-report-by-id";
 import { normalizeReport } from "../services/normalize-report";
-import { SetReportLike } from "../services/ReportInteractions";
-import { reportKey } from "../services/reportState";
+import { SetReportLike } from "../services/report-interactions";
+import { reportKey } from "../services/report-state";
 import { loadSession, sessionVersion } from "../services/session";
 import type { Report, ReportDraft } from "../services/types";
 

@@ -1,4 +1,4 @@
-import { ReportRow } from "@/components/app/report-row";
+import { ReportRow } from "@/features/reports/components/ReportRow";
 import {
     AppText,
     Button,
@@ -10,12 +10,12 @@ import {
     Screen,
     TopBar,
     ui,
-} from "@/components/app/ui";
-import { space } from "@/src/constants/design";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { GetAllReports } from "@/src/services/GetAllReports";
-import { GetFilteredReports } from "@/src/services/GetFilteredReports";
-import type { Report } from "@/src/services/types";
+} from "@/components/ui/AppUi";
+import { space } from "@/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { GetAllReports } from "@/services/get-all-reports";
+import { GetFilteredReports } from "@/services/get-filtered-reports";
+import type { Report } from "@/services/types";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {

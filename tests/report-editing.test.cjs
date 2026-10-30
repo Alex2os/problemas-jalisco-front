@@ -32,7 +32,7 @@ test('editor saves status, staged deletions, and new photos through authenticate
     } else throw new Error('Unexpected endpoint');
     return { report };
   });
-  const result = await c.load('services/ReportEditing').SaveReportEdits({ report: initial, status: 'resuelto', removedPhotoIds: [7], photos: [photo] });
+  const result = await c.load('services/report-editing').SaveReportEdits({ report: initial, status: 'resuelto', removedPhotoIds: [7], photos: [photo] });
   assert.deepEqual(calls, [['/reports/23', 'GET'], ['/reports/23/status', 'PUT'], ['/reports/23/photos/7', 'DELETE'], ['/reports/23/photos', 'POST']]);
   assert.equal(result.status, 'resolved');
   assert.deepEqual(result.photos.map(item => item.id), [8, 9]);
@@ -44,7 +44,7 @@ test('editor saves status, staged deletions, and new photos through authenticate
 test('ownership is rechecked on the server and a non-owner cannot save any edits', async () => {
   const calls = [];
   const c = client(async path => { calls.push(path); return { report: { ...initial, can_manage: false } }; });
-  await assert.rejects(c.load('services/ReportEditing').SaveReportEdits({ report: initial, removedPhotoIds: [7], photos: [], status: 'resuelto' }), error => error.status === 403);
+  await assert.rejects(c.load('services/report-editing').SaveReportEdits({ report: initial, removedPhotoIds: [7], photos: [], status: 'resuelto' }), error => error.status === 403);
   assert.deepEqual(calls, ['/reports/23']);
 });
 
@@ -56,7 +56,7 @@ test('stale status versions stop the edit before any photos are removed', async 
     assert.equal(path, '/reports/23/status');
     throw new Error('El estado cambió. Actualiza el reporte.');
   });
-  const { SaveReportEdits, ReportEditFailure } = c.load('services/ReportEditing');
+  const { SaveReportEdits, ReportEditFailure } = c.load('services/report-editing');
   await assert.rejects(SaveReportEdits({ report: initial, removedPhotoIds: [7], photos: [photo], status: 'resuelto' }), error => error instanceof ReportEditFailure);
   assert.deepEqual(calls, ['/reports/23', '/reports/23/status']);
 });
@@ -64,7 +64,7 @@ test('stale status versions stop the edit before any photos are removed', async 
 test('photo capacity is checked against fresh server data before making changes', async () => {
   let calls = 0;
   const c = client(async () => { calls++; return { report: { ...initial, photos: [...initial.photos, { id: 10, url: '/photo/10' }] } }; });
-  await assert.rejects(c.load('services/ReportEditing').SaveReportEdits({ report: initial, removedPhotoIds: [], photos: [photo] }), /hasta 3/);
+  await assert.rejects(c.load('services/report-editing').SaveReportEdits({ report: initial, removedPhotoIds: [], photos: [photo] }), /hasta 3/);
   assert.equal(calls, 1);
 });
 
@@ -75,7 +75,7 @@ test('an uncertain upload requires reconciliation and never invents a saved phot
     if (path === '/reports/23/status') { report = { ...report, status: 'resolved', status_version: 1 }; return { report }; }
     throw new Error('Connection interrupted');
   });
-  const { SaveReportEdits, ReportEditFailure } = c.load('services/ReportEditing');
+  const { SaveReportEdits, ReportEditFailure } = c.load('services/report-editing');
   await assert.rejects(SaveReportEdits({ report: initial, removedPhotoIds: [], photos: [photo], status: 'resuelto' }), error => error instanceof ReportEditFailure);
   const confirmed = c.load('services/cache').apiCache.peek('entity:report:23');
   assert.equal(confirmed.status, 'resolved');
@@ -92,6 +92,6 @@ test('a session change prevents later queued edit operations', async () => {
     c.load('services/session').setAuthSession(false);
     return { report: { ...initial, photos: [initial.photos[1]] } };
   });
-  await assert.rejects(c.load('services/ReportEditing').SaveReportEdits({ report: initial, removedPhotoIds: [7], photos: [photo] }), /sesión cambió/);
+  await assert.rejects(c.load('services/report-editing').SaveReportEdits({ report: initial, removedPhotoIds: [7], photos: [photo] }), /sesión cambió/);
   assert.deepEqual(calls, ['/reports/23', '/reports/23/photos/7']);
 });

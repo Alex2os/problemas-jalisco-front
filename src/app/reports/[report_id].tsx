@@ -1,8 +1,8 @@
-import { ReportInteractions } from "@/components/app/report-interactions";
-import { ReportPhotos } from "@/components/app/report-photos";
-import { reportDate } from "@/components/app/report-row";
-import { ReportEditButton } from "@/src/components/ReportEditButton";
-import { ReportStatusPanel } from "@/components/app/report-status";
+import { ReportInteractions } from "@/features/reports/components/ReportInteractions";
+import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
+import { reportDate } from "@/features/reports/components/ReportRow";
+import { ReportEditButton } from "@/features/reports/components/ReportEditButton";
+import { ReportStatusPanel } from "@/features/reports/components/ReportStatus";
 import {
     AppText,
     Button,
@@ -14,22 +14,22 @@ import {
     Screen,
     TopBar,
     ui,
-} from "@/components/app/ui";
-import { space } from "@/src/constants/design";
-import { categoryFor } from "@/src/constants/report-categories";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+} from "@/components/ui/AppUi";
+import { space } from "@/constants/design";
+import { categoryFor } from "@/constants/report-categories";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import {
     useAuthSession,
     useCacheValue,
     useLiveReport,
-} from "@/src/hooks/use-report-state";
-import { ApiError } from "@/src/services/api";
-import { CreateComment } from "@/src/services/CreateNewComment";
-import { GetCommentsPage } from "@/src/services/GetCommentsByReportId";
-import { GetReportById } from "@/src/services/GetReportById";
-import { DeleteComment } from "@/src/services/ReportInteractions";
-import { sessionVersion } from "@/src/services/session";
-import type { Report, ReportComment } from "@/src/services/types";
+} from "@/hooks/useReportState";
+import { ApiError } from "@/services/api";
+import { CreateComment } from "@/services/create-new-comment";
+import { GetCommentsPage } from "@/services/get-comments-by-report-id";
+import { GetReportById } from "@/services/get-report-by-id";
+import { DeleteComment } from "@/services/report-interactions";
+import { sessionVersion } from "@/services/session";
+import type { Report, ReportComment } from "@/services/types";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {

@@ -7,8 +7,8 @@ import {
   type ViewStyle,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { space } from "@/src/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { space } from "@/constants/design";
 import { Button } from "./Button";
 
 export interface EmptyStateProps {

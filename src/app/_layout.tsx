@@ -8,9 +8,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useReducedMotion } from "react-native-reanimated";
 
-import { AppThemeProvider, useAppTheme } from "@/src/hooks/use-app-theme";
-import { clearLegacyStorage } from "@/src/services/clear-legacy-storage";
-import { useReportsStore } from "@/src/store/useReportsStore";
+import { AppThemeProvider, useAppTheme } from "@/hooks/useAppTheme";
+import { clearLegacyStorage } from "@/services/clear-legacy-storage";
+import { useReportsStore } from "@/store/useReportsStore";
 import "../../global.css";
 
 export const unstable_settings = {

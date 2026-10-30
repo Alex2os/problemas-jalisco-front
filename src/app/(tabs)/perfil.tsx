@@ -5,14 +5,14 @@ import * as SecureStore from "expo-secure-store";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ErrorBanner } from "@/src/components/ErrorBanner";
-import { radius, size, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useBackendReports } from "@/src/hooks/use-backend-reports";
-import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
-import { setAuthSession, sessionUserKey, type SessionUser } from "@/src/services/session";
-import { useReportsStore } from "@/src/store/useReportsStore";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { radius, size, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useBackendReports } from "@/hooks/useBackendReports";
+import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
+import { setAuthSession, sessionUserKey, type SessionUser } from "@/services/session";
+import { useReportsStore } from "@/store/useReportsStore";
 
 const contacts = [
   { label: "Emergencias 911", phone: "911", description: "Policía y Protección Civil" },

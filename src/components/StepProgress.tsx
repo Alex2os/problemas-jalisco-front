@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { space } from "@/src/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { space } from "@/constants/design";
 
 export interface StepProgressProps {
   currentStep: number;

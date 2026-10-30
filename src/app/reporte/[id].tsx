@@ -15,21 +15,21 @@ import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ErrorBanner } from "@/src/components/ErrorBanner";
-import { ReportPhotos } from "@/src/components/app/report-photos";
-import { ReportMapMarker } from "@/src/components/ReportMapMarker";
-import { ReportEditButton } from "@/src/components/ReportEditButton";
-import { useBackendReport } from "@/src/hooks/use-backend-reports";
-import { useAuthSession, useCacheValue } from "@/src/hooks/use-report-state";
-import { SetReportLike, likePendingKey } from "@/src/services/ReportInteractions";
-import { ApiError } from "@/src/services/api";
-import { ReportComments } from "@/src/components/ReportComments";
-import { reportDate } from "@/src/services/report-format";
-import { StatusChip } from "@/src/components/StatusChip";
-import { categoryDefFor } from "@/src/constants/report-categories";
-import { radius, shadows, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
+import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
+import { ReportEditButton } from "@/features/reports/components/ReportEditButton";
+import { useBackendReport } from "@/hooks/useBackendReports";
+import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
+import { SetReportLike, likePendingKey } from "@/services/report-interactions";
+import { ApiError } from "@/services/api";
+import { ReportComments } from "@/features/reports/components/ReportComments";
+import { reportDate } from "@/services/report-format";
+import { StatusChip } from "@/features/reports/components/StatusChip";
+import { categoryDefFor } from "@/constants/report-categories";
+import { radius, shadows, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function ReporteDetailScreen() {
   const insets = useSafeAreaInsets();

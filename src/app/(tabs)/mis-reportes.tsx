@@ -13,16 +13,16 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ErrorBanner } from "@/src/components/ErrorBanner";
-import { useBackendReports } from "@/src/hooks/use-backend-reports";
-import { EmptyState } from "@/src/components/EmptyState";
-import { ReportCard } from "@/src/components/ReportCard";
-import { radius, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useReportsStore } from "@/src/store/useReportsStore";
-import { normalizeReportStatus } from "@/src/services/report-status";
-import type { Report } from "@/src/services/types";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { useBackendReports } from "@/hooks/useBackendReports";
+import { EmptyState } from "@/components/EmptyState";
+import { ReportCard } from "@/features/reports/components/ReportCard";
+import { radius, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useReportsStore } from "@/store/useReportsStore";
+import { normalizeReportStatus } from "@/services/report-status";
+import type { Report } from "@/services/types";
 
 export default function MisReportesScreen() {
   const insets = useSafeAreaInsets();

@@ -3,12 +3,12 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CategoryCard } from "@/src/components/CategoryCard";
-import { CATEGORIES_LIST } from "@/src/constants/report-categories";
-import { space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
+import { CategoryCard } from "@/features/reports/components/CategoryCard";
+import { CATEGORIES_LIST } from "@/constants/report-categories";
+import { space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useDraftStore } from "@/store/useDraftStore";
 
 export default function CategoriaScreen() {
   const insets = useSafeAreaInsets();

@@ -11,8 +11,8 @@ import {
   type TextStyle,
 } from "react-native";
 import * as Haptics from "expo-haptics";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, size, space, shadows } from "@/src/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { radius, size, space, shadows } from "@/constants/design";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "agave";
 export type ButtonSize = "sm" | "md" | "lg";

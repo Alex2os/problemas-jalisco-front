@@ -7,10 +7,10 @@ import {
     Notice,
     Screen,
     TopBar,
-} from "@/components/app/ui";
-import { space } from "@/src/constants/design";
-import { setAuthSession } from "@/src/services/session";
-import { UserLogIn } from "@/src/services/UserLogIn";
+} from "@/components/ui/AppUi";
+import { space } from "@/constants/design";
+import { setAuthSession } from "@/services/session";
+import { UserLogIn } from "@/services/user-login";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";

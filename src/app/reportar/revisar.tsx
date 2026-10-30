@@ -4,15 +4,15 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { ErrorBanner } from "@/src/components/ErrorBanner";
-import { useAuthSession } from "@/src/hooks/use-report-state";
-import { ReportStepFooter } from "@/src/components/ReportStepFooter";
-import { categoryDefFor } from "@/src/constants/report-categories";
-import { radius, shadows, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
-import { useReportsStore } from "@/src/store/useReportsStore";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { useAuthSession } from "@/hooks/useReportState";
+import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
+import { categoryDefFor } from "@/constants/report-categories";
+import { radius, shadows, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useDraftStore } from "@/store/useDraftStore";
+import { useReportsStore } from "@/store/useReportsStore";
 
 export default function RevisarScreen() {
   const { colors } = useAppTheme();

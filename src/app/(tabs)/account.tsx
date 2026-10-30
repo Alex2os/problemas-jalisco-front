@@ -5,10 +5,10 @@ import {
     Notice,
     Screen,
     TopBar,
-} from "@/components/app/ui";
-import { size, space } from "@/src/constants/design";
-import { useAppTheme, type ThemePreference } from "@/src/hooks/use-app-theme";
-import { setAuthSession } from "@/src/services/session";
+} from "@/components/ui/AppUi";
+import { size, space } from "@/constants/design";
+import { useAppTheme, type ThemePreference } from "@/hooks/useAppTheme";
+import { setAuthSession } from "@/services/session";
 import Feather from "@expo/vector-icons/Feather";
 import { useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";

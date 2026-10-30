@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Screen, Header, AppText, Button, Divider } from "@/components/app/ui";
+import { Screen, Header, AppText, Button, Divider } from "@/components/ui/AppUi";
 
 export default function ModalScreen() {
   return (

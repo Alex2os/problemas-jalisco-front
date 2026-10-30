@@ -13,14 +13,14 @@ import * as Location from "expo-location";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ErrorBanner } from "@/src/components/ErrorBanner";
-import { useBackendReports } from "@/src/hooks/use-backend-reports";
-import { useAuthSession } from "@/src/hooks/use-report-state";
-import { ReportMapMarker } from "@/src/components/ReportMapMarker";
-import { radius, shadows, space } from "@/src/constants/design";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useReportsStore } from "@/src/store/useReportsStore";
-import type { Report } from "@/src/services/types";
+import { ErrorBanner } from "@/components/ErrorBanner";
+import { useBackendReports } from "@/hooks/useBackendReports";
+import { useAuthSession } from "@/hooks/useReportState";
+import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
+import { radius, shadows, space } from "@/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useReportsStore } from "@/store/useReportsStore";
+import type { Report } from "@/services/types";
 
 export default function MapaScreen() {
   const insets = useSafeAreaInsets();

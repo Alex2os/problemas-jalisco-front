@@ -3,12 +3,12 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 
-import { ReportStepFooter } from "@/src/components/ReportStepFooter";
-import { LocationPicker } from "@/src/components/LocationPicker";
-import { space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
+import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
+import { LocationPicker } from "@/features/reports/components/LocationPicker";
+import { space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useDraftStore } from "@/store/useDraftStore";
 
 export default function UbicacionScreen() {
   const { colors } = useAppTheme();

@@ -6,10 +6,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ReportSuccessAnimation } from "@/src/components/ReportSuccessAnimation";
-import { radius, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { ReportSuccessAnimation } from "@/features/reports/components/ReportSuccessAnimation";
+import { radius, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function ExitoScreen() {
   const insets = useSafeAreaInsets();

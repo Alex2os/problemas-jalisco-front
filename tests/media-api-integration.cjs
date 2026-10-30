@@ -46,12 +46,12 @@ global.FormData = class extends NativeFormData {
   await load('ReportInteractions').DeleteComment(id, comment.comment.id);
   const otherStorage = new Map();
   const other = createServiceClient({storage: otherStorage});
-  await other.load('services/RegisterUser').RegisterUser('media_other', 'media-other@example.invalid', 'mobile-test-password');
-  const otherLogin = await other.load('services/UserLogIn').UserLogIn('media-other@example.invalid', 'mobile-test-password');
+  await other.load('services/register-user').RegisterUser('media_other', 'media-other@example.invalid', 'mobile-test-password');
+  const otherLogin = await other.load('services/user-login').UserLogIn('media-other@example.invalid', 'mobile-test-password');
   otherStorage.set('auth_token', otherLogin.token); other.load('services/session').setAuthSession(true);
-  const viewed = await other.load('services/GetReportById').GetReportById(id, true); assert.equal(viewed.can_manage, false);
-  await assert.rejects(other.load('services/ReportMedia').UpdateReportStatus(id, 'still_present', viewed.status_version), error => error.status === 403);
-  await assert.rejects(other.load('services/ReportMedia').AddReportPhotos(id, [photo]), error => error.status === 403);
-  await assert.rejects(other.load('services/ReportMedia').RemoveReportPhoto(id, viewed.photos[0].id), error => error.status === 403);
+  const viewed = await other.load('services/get-report-by-id').GetReportById(id, true); assert.equal(viewed.can_manage, false);
+  await assert.rejects(other.load('services/report-media').UpdateReportStatus(id, 'still_present', viewed.status_version), error => error.status === 403);
+  await assert.rejects(other.load('services/report-media').AddReportPhotos(id, [photo]), error => error.status === 403);
+  await assert.rejects(other.load('services/report-media').RemoveReportPhoto(id, viewed.photos[0].id), error => error.status === 403);
   console.log('Mobile photo/status services → real HTTP → PostgreSQL/disk: create-three-photos, reopen, status/history, photo management, ownership and interactions verified.');
 })().catch(error => {console.error('Mobile photo/status integration failed:', error.message); process.exitCode = 1;}).finally(() => {global.FormData = NativeFormData;});

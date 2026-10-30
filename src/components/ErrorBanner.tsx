@@ -8,8 +8,8 @@ import {
   type ViewStyle,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, space } from "@/src/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { radius, space } from "@/constants/design";
 
 export interface ErrorBannerProps {
   message: string;

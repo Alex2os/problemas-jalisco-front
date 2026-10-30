@@ -7,8 +7,8 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { radius, space } from "@/src/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { radius, space } from "@/constants/design";
 
 export interface SkeletonProps {
   width?: number | `${number}%` | "100%";

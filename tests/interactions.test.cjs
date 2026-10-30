@@ -14,7 +14,7 @@ function client(apiRequest) {
 test('rapid taps share a request; counts change only after server confirmation', async () => {
   let resolve, calls = 0;
   const c = client(() => {calls++; return new Promise(done => {resolve = done;});});
-  const {SetReportLike} = c.load('services/ReportInteractions');
+  const {SetReportLike} = c.load('services/report-interactions');
   const first = SetReportLike(12, true);
   const second = SetReportLike(12, true);
   assert.equal(first, second);
@@ -30,7 +30,7 @@ test('rapid taps share a request; counts change only after server confirmation',
 test('failed writes preserve confirmed values, clear pending state, and allow retry', async () => {
   let fail = true;
   const c = client(async () => {if (fail) throw new Error('offline'); return {interactions: stats};});
-  const {SetReportLike} = c.load('services/ReportInteractions');
+  const {SetReportLike} = c.load('services/report-interactions');
   await assert.rejects(SetReportLike(12, true), /offline/);
   assert.equal(c.cache.peek('entity:report:12').like_count, 4);
   assert.equal(c.cache.peek('like-pending:12'), false);
@@ -47,8 +47,8 @@ test('like/comment writes serialize per report and update the same feed/detail s
     assert.equal(JSON.parse(options.body).user_comment, 'new comment');
     return {comment: {id: 99}, interactions: {...stats, comment_count: 3}};
   });
-  const like = c.load('services/ReportInteractions').SetReportLike(12, true);
-  const comment = c.load('services/CreateNewComment').CreateComment('  new comment  ', 12);
+  const like = c.load('services/report-interactions').SetReportLike(12, true);
+  const comment = c.load('services/create-new-comment').CreateComment('  new comment  ', 12);
   await flush(); assert.deepEqual(methods, ['PUT']);
   finishLike({interactions: stats}); await Promise.all([like, comment]);
   assert.deepEqual(methods, ['PUT', 'POST']);
@@ -59,8 +59,8 @@ test('like/comment writes serialize per report and update the same feed/detail s
 test('queued actions do not execute as a different account and old responses do not restore its likes', async () => {
   let finishLike, calls = 0;
   const c = client(() => {calls++; return new Promise(resolve => {finishLike = resolve;});});
-  const like = c.load('services/ReportInteractions').SetReportLike(12, true);
-  const queued = c.load('services/CreateNewComment').CreateComment('old account', 12).catch(error => error);
+  const like = c.load('services/report-interactions').SetReportLike(12, true);
+  const queued = c.load('services/create-new-comment').CreateComment('old account', 12).catch(error => error);
   await flush();
   c.load('services/session').setAuthSession(false);
   c.load('services/session').setAuthSession(true);
@@ -73,9 +73,9 @@ test('queued actions do not execute as a different account and old responses do 
 test('an older feed response cannot overwrite the confirmed interaction state', async () => {
   let finishFeed;
   const c = client(async (url) => url === '/reports' ? new Promise(resolve => {finishFeed = resolve;}) : {interactions: stats});
-  const feed = c.load('services/GetAllReports').GetAllReports();
+  const feed = c.load('services/get-all-reports').GetAllReports();
   await flush();
-  await c.load('services/ReportInteractions').SetReportLike(12, true);
+  await c.load('services/report-interactions').SetReportLike(12, true);
   finishFeed({reports: [{...report}]}); await feed;
   assert.equal(c.cache.peek('entity:report:12').liked_by_me, true);
   assert.equal(c.cache.peek('entity:report:12').like_count, 5);
@@ -88,7 +88,7 @@ test('comment deletion invalidates only the target conversation and applies serv
   });
   c.cache.set('comments:12:50:first', {comments: []});
   c.cache.set('comments:123:50:first', {comments: ['unrelated']});
-  await c.load('services/ReportInteractions').DeleteComment(12, 99);
+  await c.load('services/report-interactions').DeleteComment(12, 99);
   assert.equal(c.cache.peek('comments:12:50:first'), undefined);
   assert.deepEqual(c.cache.peek('comments:123:50:first').comments, ['unrelated']);
   assert.equal(c.cache.peek('entity:report:12').comment_count, 1);
@@ -115,7 +115,7 @@ test('logged-out users cannot post comments and no unauthenticated request is se
   try {
     const c = createServiceClient();
     await assert.rejects(
-      c.load('services/CreateNewComment').CreateComment('Test comment', 12),
+      c.load('services/create-new-comment').CreateComment('Test comment', 12),
       error => error.status === 401 && /Inicia sesión/.test(error.message),
     );
     assert.equal(calls, 0);

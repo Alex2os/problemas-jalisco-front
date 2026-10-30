@@ -1,6 +1,6 @@
-import { AppText, Button, Divider, Screen, TopBar } from "@/components/app/ui";
-import { space } from "@/src/constants/design";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { AppText, Button, Divider, Screen, TopBar } from "@/components/ui/AppUi";
+import { space } from "@/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { Link, router } from "expo-router";
 import { View } from "react-native";
 

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import { radius, space } from "@/src/constants/design";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { radius, space } from "@/constants/design";
+import { useAppTheme } from "@/hooks/useAppTheme";
 
 export function OptionalBadge() {
   const { colors } = useAppTheme();

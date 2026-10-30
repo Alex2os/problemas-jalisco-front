@@ -1,4 +1,4 @@
-import type { SelectedPhoto } from "./ReportMedia";
+import type { SelectedPhoto } from "./report-media";
 
 export interface ReportInteractions {
   report_id: number;

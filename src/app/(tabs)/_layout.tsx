@@ -1,4 +1,4 @@
-import { useAppTheme } from "@/src/hooks/use-app-theme";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";

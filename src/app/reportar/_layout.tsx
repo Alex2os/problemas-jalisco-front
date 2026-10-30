@@ -4,9 +4,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Easing, KeyboardAvoidingView, Platform, View } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StepProgress } from "@/src/components/StepProgress";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
+import { StepProgress } from "@/components/StepProgress";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useDraftStore } from "@/store/useDraftStore";
 
 const steps = [
   { route: "categoria", title: "Categoría" },

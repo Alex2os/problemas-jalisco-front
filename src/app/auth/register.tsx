@@ -7,9 +7,9 @@ import {
     Notice,
     Screen,
     TopBar,
-} from "@/components/app/ui";
-import { space } from "@/src/constants/design";
-import { RegisterUser } from "@/src/services/RegisterUser";
+} from "@/components/ui/AppUi";
+import { space } from "@/constants/design";
+import { RegisterUser } from "@/services/register-user";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View, type TextInputInstance } from "react-native";

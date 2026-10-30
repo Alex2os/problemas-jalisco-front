@@ -4,13 +4,13 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { OptionalBadge } from "@/src/components/OptionalBadge";
-import { ReportStepFooter } from "@/src/components/ReportStepFooter";
-import { PhotoPicker } from "@/src/components/app/photo-picker";
-import { radius, space } from "@/src/constants/design";
-import { es } from "@/src/constants/es";
-import { useAppTheme } from "@/src/hooks/use-app-theme";
-import { useDraftStore } from "@/src/store/useDraftStore";
+import { OptionalBadge } from "@/components/OptionalBadge";
+import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
+import { PhotoPicker } from "@/features/reports/components/PhotoPicker";
+import { radius, space } from "@/constants/design";
+import { es } from "@/constants/es";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { useDraftStore } from "@/store/useDraftStore";
 
 const DESCRIPTION_LIMIT = 255;
 
