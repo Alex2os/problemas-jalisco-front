@@ -171,7 +171,7 @@ export default function ReporteDetailScreen() {
 
           {/* Description */}
           <Text style={[styles.description, { color: colors.text }]}>
-            {report.description}
+            {report.description?.trim() || "No hay descripción."}
           </Text>
 
           <ReportEditButton report={report} />

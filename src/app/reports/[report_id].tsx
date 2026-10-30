@@ -355,7 +355,7 @@ function ReportContent({
                 </View>
                 <Divider />
                 <AppText style={{ lineHeight: 27 }}>
-                  {live.description || "Sin descripción adicional."}
+                  {live.description?.trim() || "No hay descripción."}
                 </AppText>
                 <ReportStatusPanel report={live} />
                 <ReportEditButton report={live} />

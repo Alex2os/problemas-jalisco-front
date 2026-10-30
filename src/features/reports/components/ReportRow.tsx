@@ -52,11 +52,9 @@ export function ReportRow({ report: initial }: { report: Report }) {
           <AppText numberOfLines={2}>
             {report.ubication || "Ubicación en el mapa"}
           </AppText>
-          {!!report.description && (
-            <AppText tone="muted" variant="caption" numberOfLines={2}>
-              {report.description}
-            </AppText>
-          )}
+          <AppText tone="muted" variant="caption" numberOfLines={2}>
+            {report.description?.trim() || "No hay descripción."}
+          </AppText>
           <StatusIndicator report={report} />
           <AppText tone="muted" variant="caption">
             {reportDate(report.created_at)}
