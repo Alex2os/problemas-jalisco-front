@@ -1,10 +1,10 @@
 # Backend work deferred
 
-These features are planned for later. Their endpoints and frontend integrations are not implemented yet.
+This file records deferred backend work and the status of previously deferred features.
 
-## Street lookup without phone location access
+## Implemented: street lookup without phone location access
 
-Add an endpoint to the existing backend that resolves a street address from the coordinates selected on the map. Use it for the live street preview, so choosing a point manually does not require phone location permission or GPS. “Mi ubicación” will still require device location access. Reuse the backend geocoding service already used when creating reports. Final route, request shape, and caching behavior will be decided when implementing it.
+Authenticated `GET /locations/reverse?latitude=...&longitude=...` now supplies the address preview in `LocationPicker`. Manual map selection does not request device-location permission; only the explicit GPS action does. Lookups wait until map movement finishes, then use the existing debounce and stale-response protection. The API shares its geocoder/cache with report creation; see the API's `docs/location-preview.md` for contracts and provider limits. Device validation remains separate from automated tests.
 
 ## Report description suggestions
 

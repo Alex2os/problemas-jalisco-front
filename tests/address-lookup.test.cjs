@@ -75,3 +75,41 @@ test('navigation cancels scheduled work and ignores in-flight lookup results', a
   queued.controller.dispose();
   assert.equal(queued.queued.size, 0);
 });
+
+test('moving the map cancels pending lookup work and waits for a completed selection', async () => {
+  const calls = [];
+  const c = setup(async coordinates => {calls.push(coordinates); return [{street: 'Final'}];});
+  c.controller.select(point(20.67));
+  c.controller.move(point(20.68));
+  assert.equal(c.queued.size, 0);
+  c.controller.move(point(20.69));
+  assert.equal(c.states.at(-1).address, '');
+  assert.equal(calls.length, 0);
+  c.controller.select(point(20.69)); c.run(); await flush();
+  assert.deepEqual(calls, [point(20.69)]);
+  assert.equal(c.states.at(-1).address, 'Final');
+});
+
+test('moving invalidates an in-flight response before the next completed selection', async () => {
+  let resolve;
+  const c = setup(() => new Promise(done => {resolve = done;}));
+  c.controller.select(point(20.67)); c.run();
+  c.controller.move(point(20.68));
+  resolve([{street: 'Old location'}]); await flush();
+  assert.equal(c.states.at(-1).latitude, 20.68);
+  assert.equal(c.states.at(-1).address, '');
+});
+
+test('retry keeps the error visible while loading and clears it on recovery', async () => {
+  let result = new Error('Sin conexión');
+  const c = setup(async () => {if (result instanceof Error) throw result; return result;});
+  c.controller.select(point(20.67)); c.run(); await flush();
+  assert.equal(c.states.at(-1).error, 'Sin conexión');
+  result = [{street: 'Recuperada'}];
+  c.controller.select(point(20.67), true);
+  assert.equal(c.states.at(-1).status, 'loading');
+  assert.equal(c.states.at(-1).error, 'Sin conexión');
+  c.run(); await flush();
+  assert.equal(c.states.at(-1).status, 'ready');
+  assert.equal(c.states.at(-1).error, '');
+});

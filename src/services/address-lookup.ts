@@ -13,6 +13,7 @@ export interface AddressLookupState extends Coordinates {
   address: string;
   colonia: string;
   municipality: string;
+  error?: string;
 }
 
 export function createAddressLookup({
@@ -30,16 +31,19 @@ export function createAddressLookup({
   let version = 0;
   let disposed = false;
   let previous: AddressLookupState | undefined;
+  let selected: Coordinates | undefined;
   const publish = (state: AddressLookupState) => { previous = state; onChange(state); };
 
   function select(coordinates: Coordinates, force = false) {
     if (disposed) return;
-    if (!force && previous?.latitude === coordinates.latitude && previous.longitude === coordinates.longitude) return;
+    if (!force && selected?.latitude === coordinates.latitude && selected.longitude === coordinates.longitude) return;
+    selected = coordinates;
     const request = ++version;
     if (timer !== undefined) cancel(timer);
-    const empty = { ...coordinates, address: "", colonia: "", municipality: "" };
+    const empty = { ...coordinates, address: "", colonia: "", municipality: "", error: "" };
     // Clear the previous address immediately, rather than showing it for the new pin.
-    publish({ ...empty, status: "loading" });
+    const retryError = force && previous?.latitude === coordinates.latitude && previous.longitude === coordinates.longitude ? previous.error : "";
+    publish({ ...empty, status: "loading", error: retryError || "" });
     timer = schedule(() => {
       timer = undefined;
       void (async () => {
@@ -47,17 +51,18 @@ export function createAddressLookup({
           const results = await lookup(coordinates);
           if (disposed || request !== version) return;
           const address = results[0];
-          if (!address) { publish({ ...empty, status: "unavailable" }); return; }
+          if (!address) { publish({ ...empty, status: "unavailable", error: "No se encontró una dirección para este punto. Puedes ajustar el mapa o confirmar la ubicación seleccionada." }); return; }
           const street = [address.street, address.streetNumber].filter(Boolean).join(" ").trim();
           publish({
             ...coordinates,
             status: "ready",
+            error: "",
             address: street || address.name || "",
             colonia: address.district || "",
             municipality: address.city || address.subregion || address.region || "",
           });
-        } catch {
-          if (!disposed && request === version) publish({ ...empty, status: "error" });
+        } catch (failure) {
+          if (!disposed && request === version) publish({ ...empty, status: "error", error: failure instanceof Error ? failure.message : "No se pudo obtener la dirección. Intenta de nuevo." });
         }
       })();
     }, delay);
@@ -65,6 +70,14 @@ export function createAddressLookup({
 
   return {
     select,
+    move(coordinates: Coordinates) {
+      if (disposed || (previous?.latitude === coordinates.latitude && previous.longitude === coordinates.longitude)) return;
+      version++;
+      selected = undefined;
+      if (timer !== undefined) cancel(timer);
+      timer = undefined;
+      publish({ ...coordinates, address: "", colonia: "", municipality: "", error: "", status: "loading" });
+    },
     dispose() {
       disposed = true;
       version++;
