@@ -45,6 +45,7 @@ export const border = {
 };
 
 // Soft shadows with cross-platform support (elevation on Android)
+// Actualizado con tonos botánicos orgánicos (#141A16) y acento Warm Orange
 export const shadows = {
   none: {
     shadowColor: "transparent",
@@ -55,9 +56,9 @@ export const shadows = {
   },
   sm: Platform.select({
     ios: {
-      shadowColor: "#0F172A",
+      shadowColor: "#141A16",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
+      shadowOpacity: 0.06,
       shadowRadius: 3,
     },
     default: {
@@ -66,9 +67,9 @@ export const shadows = {
   }),
   md: Platform.select({
     ios: {
-      shadowColor: "#0F172A",
+      shadowColor: "#141A16",
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.08,
+      shadowOpacity: 0.1,
       shadowRadius: 6,
     },
     default: {
@@ -77,9 +78,9 @@ export const shadows = {
   }),
   lg: Platform.select({
     ios: {
-      shadowColor: "#0F172A",
+      shadowColor: "#141A16",
       shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.12,
+      shadowOpacity: 0.14,
       shadowRadius: 12,
     },
     default: {
@@ -88,9 +89,9 @@ export const shadows = {
   }),
   primaryGlow: Platform.select({
     ios: {
-      shadowColor: "#FF6B00",
+      shadowColor: "#687D31",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.35,
+      shadowOpacity: 0.3,
       shadowRadius: 10,
     },
     default: {
@@ -102,49 +103,58 @@ export const shadows = {
 // Accessible typography: body font 16px+, high contrast line heights
 export const type = StyleSheet.create({
   hero: {
+    fontFamily: "Nunito_800ExtraBold",
     fontSize: 30,
     lineHeight: 36,
     fontWeight: "800",
     letterSpacing: -0.8,
   },
   title: {
+    fontFamily: "Nunito_700Bold",
     fontSize: 24,
     lineHeight: 30,
     fontWeight: "700",
     letterSpacing: -0.5,
   },
   heading: {
+    fontFamily: "Nunito_700Bold",
     fontSize: 19,
     lineHeight: 26,
     fontWeight: "700",
     letterSpacing: -0.3,
   },
   subheading: {
+    fontFamily: "Nunito_600SemiBold",
     fontSize: 17,
     lineHeight: 24,
     fontWeight: "600",
   },
   body: {
+    fontFamily: "Inter_400Regular",
     fontSize: 16,
     lineHeight: 24,
     fontWeight: "400",
   },
   bodyBold: {
+    fontFamily: "Inter_600SemiBold",
     fontSize: 16,
     lineHeight: 24,
     fontWeight: "600",
   },
   label: {
+    fontFamily: "Inter_600SemiBold",
     fontSize: 15,
     lineHeight: 21,
     fontWeight: "600",
   },
   caption: {
+    fontFamily: "Inter_400Regular",
     fontSize: 13,
     lineHeight: 18,
     fontWeight: "400",
   },
   eyebrow: {
+    fontFamily: "Inter_700Bold",
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "700",

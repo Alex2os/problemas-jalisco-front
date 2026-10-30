@@ -1,6 +1,6 @@
 import { border, radius, shadows, size, space, type } from "./design";
-import { palette, type AppColors } from "./palette";
-import { Colors, Fonts } from "./theme";
+import { brandColors, palette, type AppColors } from "./palette";
+import { Colors, FontFamily, Fonts } from "./theme";
 
 export const tokens = {
   space,
@@ -9,17 +9,19 @@ export const tokens = {
   border,
   shadows,
   type,
+  brand: brandColors,
   palette,
   colors: Colors,
   fonts: Fonts,
+  fontFamily: FontFamily,
 } as const;
 
 export type DesignTokens = typeof tokens;
 export type { AppColors };
 
 export { border, radius, shadows, size, space, type } from "./design";
-export { palette } from "./palette";
-export { Colors, Fonts } from "./theme";
+export { palette, brandColors } from "./palette";
+export { Colors, Fonts, FontFamily } from "./theme";
 export { es } from "./es";
 export { darkMapStyle } from "./map-theme";
 export {

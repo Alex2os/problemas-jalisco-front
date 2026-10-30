@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { useReducedMotion } from "react-native-reanimated";
 
 import { AppThemeProvider, useAppTheme } from "@/hooks/useAppTheme";
+import { useAppFonts } from "@/hooks/useAppFonts";
 import { clearLegacyStorage } from "@/services/clear-legacy-storage";
 import { useReportsStore } from "@/store/useReportsStore";
 import "../../global.css";
@@ -28,6 +29,7 @@ export default function RootLayout() {
 function Navigation() {
   const reducedMotion = useReducedMotion();
   const { dark, colors, ready } = useAppTheme();
+  const { fontsLoaded } = useAppFonts();
   const initializeReports = useReportsStore((s) => s.initialize);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ function Navigation() {
     void clearLegacyStorage().catch(() => undefined);
   }, [initializeReports]);
 
-  if (!ready) return null;
+  if (!ready || !fontsLoaded) return null;
 
   return (
     <ThemeProvider

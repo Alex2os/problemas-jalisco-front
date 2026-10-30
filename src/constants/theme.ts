@@ -1,52 +1,64 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-import { palette } from "./palette";
+import { palette, brandColors } from "./palette";
 import { Platform } from "react-native";
 
 export const Colors = {
   light: {
     text: palette.light.text,
     background: palette.light.background,
-    tint: palette.light.accent,
+    tint: palette.light.primary,
     icon: palette.light.muted,
     tabIconDefault: palette.light.muted,
-    tabIconSelected: palette.light.accent,
+    tabIconSelected: palette.light.primary,
   },
   dark: {
     text: palette.dark.text,
     background: palette.dark.background,
-    tint: palette.dark.accent,
+    tint: palette.dark.primary,
     icon: palette.dark.muted,
     tabIconDefault: palette.dark.muted,
-    tabIconSelected: palette.dark.accent,
+    tabIconSelected: palette.dark.primary,
   },
 };
 
+export const FontFamily = {
+  nunito: {
+    semiBold: "Nunito_600SemiBold",
+    bold: "Nunito_700Bold",
+    extraBold: "Nunito_800ExtraBold",
+  },
+  inter: {
+    regular: "Inter_400Regular",
+    medium: "Inter_500Medium",
+    semiBold: "Inter_600SemiBold",
+    bold: "Inter_700Bold",
+  },
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
+    sans: "Inter_400Regular, system-ui",
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
+    rounded: "Nunito_700Bold, ui-rounded",
     mono: "ui-monospace",
+    heading: "Nunito_700Bold",
+    body: "Inter_400Regular",
   },
   default: {
-    sans: "normal",
+    sans: "Inter_400Regular, normal",
     serif: "serif",
-    rounded: "normal",
+    rounded: "Nunito_700Bold, normal",
     mono: "monospace",
+    heading: "Nunito_700Bold",
+    body: "Inter_400Regular",
   },
   web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     serif: "Georgia, 'Times New Roman', serif",
-    rounded:
-      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
+    rounded: "'Nunito', 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, sans-serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    heading: "'Nunito', sans-serif",
+    body: "'Inter', sans-serif",
   },
 });
+
+export { brandColors };
