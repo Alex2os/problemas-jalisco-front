@@ -81,7 +81,7 @@ export default function RevisarScreen() {
           ) : (
             <View style={[styles.noImageHero, { backgroundColor: categoryDef.bgLight }]}>
               <Ionicons
-                name={categoryDef.ionicon as any}
+                name={categoryDef.ionicon}
                 size={48}
                 color={categoryDef.color}
               />

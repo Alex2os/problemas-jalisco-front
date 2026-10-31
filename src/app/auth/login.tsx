@@ -1,20 +1,13 @@
-import { Button } from "@/components/Button";
 import {
-    AppText,
-    Field,
-    Header,
-    IconButton,
-    Notice,
-    Screen,
-    TopBar,
-} from "@/components/ui/AppUi";
-import { space } from "@/constants/design";
+  AuthCredentialsFields,
+  AuthFormScreen,
+} from "@/components/AuthFormScreen";
 import { setAuthSession } from "@/services/session";
 import { UserLogIn } from "@/services/user-login";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
-import { View, type TextInputInstance } from "react-native";
+import { type TextInputInstance } from "react-native";
 
 export default function Login() {
   const router = useRouter();
@@ -69,96 +62,40 @@ export default function Login() {
   };
   const passwordInput = useRef<TextInputInstance>(null);
   const emailInput = useRef<TextInputInstance>(null);
-  const [visiblePassword, setVisiblePassword] = useState(false);
   const { registered, returnTo } = useLocalSearchParams<{ registered?: string; returnTo?: string }>();
 
   return (
-    <Screen
-      bottom
-      header={
-        <TopBar
-          title="Cuenta"
-          back
-          backDisabled={submitting}
-          onBack={() => {
-            if (!submission.current) router.replace("/(tabs)/perfil");
-          }}
-        />
+    <AuthFormScreen
+      title="Iniciar sesión"
+      subtitle="Publica reportes y participa en los comentarios."
+      successMessage={
+        registered === "1" ? "Cuenta creada. Ya puedes iniciar sesión." : ""
+      }
+      errorMessage={error}
+      submitting={submitting}
+      submitLabel="Iniciar sesión"
+      loadingLabel="Ingresando…"
+      alternatePrompt="¿No tienes una cuenta?"
+      alternateLabel="Crear una cuenta"
+      onBack={() => {
+        if (!submission.current) router.replace("/(tabs)/perfil");
+      }}
+      onSubmit={ManageUserLogIn}
+      onAlternate={() =>
+        router.replace({ pathname: "/auth/register", params: { returnTo } })
       }
     >
-      <View style={{ paddingTop: space.lg }}>
-        <Header
-          title="Iniciar sesión"
-          subtitle="Publica reportes y participa en los comentarios."
-        />
-      </View>
-      <Notice
-        success
-        message={
-          registered === "1" ? "Cuenta creada. Ya puedes iniciar sesión." : ""
-        }
+      <AuthCredentialsFields
+        email={email}
+        onEmailChange={setEmail}
+        password={password}
+        onPasswordChange={setPassword}
+        passwordAutoComplete="current-password"
+        submitting={submitting}
+        onSubmit={ManageUserLogIn}
+        emailInputRef={emailInput}
+        passwordInputRef={passwordInput}
       />
-      <View style={{ gap: space.xl }}>
-        <Field
-          ref={emailInput}
-          label="Correo electrónico"
-          maxLength={100}
-          placeholder="nombre@correo.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="email"
-          value={email}
-          onChangeText={setEmail}
-          editable={!submitting}
-          returnKeyType="next"
-          submitBehavior="submit"
-          onSubmitEditing={() => passwordInput.current?.focus()}
-        />
-        <Field
-          ref={passwordInput}
-          label="Contraseña"
-          maxLength={100}
-          placeholder="Tu contraseña"
-          secureTextEntry={!visiblePassword}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="current-password"
-          value={password}
-          onChangeText={setPassword}
-          editable={!submitting}
-          onSubmitEditing={ManageUserLogIn}
-          returnKeyType="go"
-          trailing={
-            <IconButton
-              icon={visiblePassword ? "eye-off" : "eye"}
-              label={
-                visiblePassword ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
-              disabled={submitting}
-              onPress={() => setVisiblePassword((value) => !value)}
-            />
-          }
-        />
-        <Notice message={error} />
-        <Button
-          label="Iniciar sesión"
-          loading={submitting}
-          loadingLabel="Ingresando…"
-          onPress={ManageUserLogIn}
-        />
-      </View>
-      <View style={{ gap: space.xs }}>
-        <AppText variant="caption" tone="muted" style={{ textAlign: "center" }}>
-          ¿No tienes una cuenta?
-        </AppText>
-        <Button
-          variant="text"
-          label="Crear una cuenta"
-          disabled={submitting}
-          onPress={() => router.replace({ pathname: "/auth/register", params: { returnTo } })}
-        />
-      </View>
-    </Screen>
+    </AuthFormScreen>
   );
 }

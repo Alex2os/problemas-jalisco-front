@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ReportDraft } from "../services/types";
+import type { ReportDraft } from "@/services/types";
 
 interface DraftState extends ReportDraft {
   isSubmitting: boolean;

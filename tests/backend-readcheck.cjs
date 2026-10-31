@@ -8,7 +8,7 @@ if (!process.env.EXPO_PUBLIC_API_URL) throw new Error('Set EXPO_PUBLIC_API_URL t
   await store.getState().initialize();
   assert.equal(store.getState().error, '');
   const reports = store.getState().reports;
-  assert.deepEqual(store.getState().userReportIds, []);
+  assert.deepEqual(reports.filter(item => item.can_manage), []);
   for (const report of reports) {
     assert.ok(Number.isSafeInteger(report.id) && report.id > 0);
     assert.equal(report.folio, String(report.id));

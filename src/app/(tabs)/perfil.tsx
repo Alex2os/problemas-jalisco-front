@@ -31,9 +31,8 @@ export default function PerfilScreen() {
   const [sessionError, setSessionError] = useState("");
   const logoutPending = useRef(false);
   const error = useReportsStore((state) => state.error);
-  const userReportIds = useReportsStore((state) => state.userReportIds);
   const reports = useReportsStore((state) => state.reports);
-  const userReports = authenticated ? reports.filter((report) => userReportIds.includes(report.id)) : [];
+  const userReports = authenticated ? reports.filter((report) => report.can_manage) : [];
   const resolvedCount = userReports.filter((report) => report.status === "resuelto" || report.status === "resolved").length;
   const upvotedCount = reports.filter((report) => report.liked_by_me).length;
 

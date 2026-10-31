@@ -1,4 +1,4 @@
-import { categoryDefFor } from "../constants/report-categories";
+import { categoryDefFor } from "@/constants/report-categories";
 import type { Report } from "./types";
 
 function normalizeSearch(value: string) {

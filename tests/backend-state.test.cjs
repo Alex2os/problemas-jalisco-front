@@ -50,7 +50,7 @@ test('current report store publishes to the API and shows only server-confirmed 
   resolveCreate({ report_id: 42, report });
   await creation;
   assert.equal(store.getState().reports[0].id, 42);
-  assert.deepEqual(store.getState().userReportIds, [42]);
+  assert.equal(store.getState().reports[0].can_manage, true);
   const cache = c.load('services/cache').apiCache;
   cache.set('entity:report:42', { ...store.getState().reports[0], comment_count: 4, like_count: 3 });
   assert.equal(store.getState().reports[0].comment_count, 4);
@@ -58,7 +58,7 @@ test('current report store publishes to the API and shows only server-confirmed 
   c.load('services/session').setAuthSession(false);
   assert.equal(store.getState().reports.length, 0);
   await store.getState().refreshReports();
-  assert.deepEqual(store.getState().userReportIds, []);
+  assert.deepEqual(store.getState().reports.filter(item => item.can_manage), []);
   assert.ok(requests.includes('/reports/create'));
 });
 
@@ -117,7 +117,7 @@ test('account changes start a fresh feed and never reuse another account’s pen
   finishOld({ reports: [report] });
   await old;
   assert.deepEqual(store.getState().reports.map(item => item.id), [55]);
-  assert.deepEqual(store.getState().userReportIds, [55]);
+  assert.deepEqual(store.getState().reports.filter(item => item.can_manage).map(item => item.id), [55]);
 });
 
 test('a confirmed create remains successful if its follow-up detail request fails', async () => {

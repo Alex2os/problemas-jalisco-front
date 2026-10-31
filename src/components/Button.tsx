@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type GestureResponderEvent,
   type PressableProps,
   type StyleProp,
   type ViewStyle,
@@ -70,7 +71,7 @@ export function Button({
   const effectiveVariant: ButtonVariant =
     variant ?? (secondary ? "secondary" : "primary");
 
-  const handlePress = (e: any) => {
+  const handlePress = (e: GestureResponderEvent) => {
     if (disabled || loading) return;
     if (haptic && effectiveVariant !== "text") {
       void Haptics.impactAsync(

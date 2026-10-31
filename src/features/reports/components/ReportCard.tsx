@@ -26,12 +26,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
   const { colors, dark } = useAppTheme();
   const categoryDef = categoryDefFor(report.category || report.type);
 
-  const photoUrl =
-    report.photos && report.photos.length > 0
-      ? typeof report.photos[0] === "string"
-        ? (report.photos[0] as string)
-        : (report.photos[0] as any).url
-      : null;
+  const photoUrl = report.photos?.[0]?.url ?? null;
 
   const handlePress = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -81,7 +76,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
               ]}
             >
               <Ionicons
-                name={categoryDef.ionicon as any}
+                name={categoryDef.ionicon}
                 size={30}
                 color={categoryDef.color}
               />

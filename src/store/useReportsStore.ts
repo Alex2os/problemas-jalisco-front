@@ -1,17 +1,16 @@
 import { create } from "zustand";
-import { apiCache } from "../services/cache";
-import { CreateReport } from "../services/create-report";
-import { GetAllReports } from "../services/get-all-reports";
-import { GetReportById } from "../services/get-report-by-id";
-import { normalizeReport } from "../services/normalize-report";
-import { SetReportLike } from "../services/report-interactions";
-import { reportKey } from "../services/report-state";
-import { loadSession, sessionVersion } from "../services/session";
-import type { Report, ReportDraft } from "../services/types";
+import { apiCache } from "@/services/cache";
+import { CreateReport } from "@/services/create-report";
+import { GetAllReports } from "@/services/get-all-reports";
+import { GetReportById } from "@/services/get-report-by-id";
+import { normalizeReport } from "@/services/normalize-report";
+import { SetReportLike } from "@/services/report-interactions";
+import { reportKey } from "@/services/report-state";
+import { loadSession, sessionVersion } from "@/services/session";
+import type { Report, ReportDraft } from "@/services/types";
 
 interface ReportsState {
   reports: Report[];
-  userReportIds: number[];
   isLoading: boolean;
   error: string;
   initialize: () => Promise<void>;
@@ -36,21 +35,21 @@ function watchReports(reports: Report[]) {
       if (!updated) return;
       useReportsStore.setState((state) => {
         const reports = state.reports.map((report) => report.id === id ? updated : report);
-        return { reports, userReportIds: reports.filter((report) => report.can_manage).map((report) => report.id) };
+        return { reports };
       });
     }));
   }
 }
 
 export const useReportsStore = create<ReportsState>((set, get) => ({
-  reports: [], userReportIds: [], isLoading: true, error: "",
+  reports: [], isLoading: true, error: "",
   initialize: async () => {
     if (initialized) return;
     initialized = true;
     apiCache.subscribe("session:version", () => {
       readEpoch++;
       watchReports([]);
-      set({ reports: [], userReportIds: [], error: "" });
+      set({ reports: [], error: "" });
       void get().refreshReports();
     });
     try { await loadSession(); }
@@ -69,7 +68,7 @@ export const useReportsStore = create<ReportsState>((set, get) => ({
         if (version !== sessionVersion() || request !== readEpoch) return;
         const reports = fetched.map((report) => apiCache.peek<Report>(reportKey(report.id)) || report);
         watchReports(reports);
-        set({ reports, userReportIds: reports.filter((report) => report.can_manage).map((report) => report.id), error: "" });
+        set({ reports, error: "" });
       } catch (error) {
         if (version === sessionVersion() && request === readEpoch)
           set({ error: error instanceof Error ? error.message : "No se pudieron cargar los reportes." });
@@ -106,7 +105,7 @@ export const useReportsStore = create<ReportsState>((set, get) => ({
     set((state) => {
       const reports = [report, ...state.reports.filter((item) => item.id !== report.id)];
       watchReports(reports);
-      return { reports, userReportIds: reports.filter((item) => item.can_manage).map((item) => item.id) };
+      return { reports };
     });
     return report;
   },

@@ -31,6 +31,7 @@ function createServiceClient({storage = new Map(), api} = {}) {
       }};
       if (request === 'expo-secure-store') return secureStore;
       if (request === 'react-native') return {Platform: {OS: 'android'}};
+      if (request.startsWith('@/')) return load(request.slice(2));
       if (request.startsWith('.')) return load(path.resolve(path.dirname(full), request));
       return require(request);
     }, module, module.exports);

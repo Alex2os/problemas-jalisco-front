@@ -63,7 +63,7 @@ export function CategoryCard({
         ]}
       >
         <Ionicons
-          name={category.ionicon as any}
+          name={category.ionicon}
           size={32}
           allowFontScaling={false}
           style={styles.icon}

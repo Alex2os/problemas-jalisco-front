@@ -8,7 +8,6 @@ import {
   Text,
   View,
 } from "react-native";
-import MapView from "react-native-maps";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -16,8 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { ReportPhotos } from "@/features/reports/components/ReportPhotos";
-import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
-import { GoogleMapsButton } from "@/features/reports/components/GoogleMapsButton";
+import { ReportDetailHeader } from "@/features/reports/components/ReportDetailHeader";
+import { ReportLocationSection } from "@/features/reports/components/ReportLocationSection";
 import { ReportEditButton } from "@/features/reports/components/ReportEditButton";
 import { useBackendReport } from "@/hooks/useBackendReports";
 import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
@@ -71,36 +70,9 @@ export default function ReporteDetailScreen() {
     }
   };
 
-
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* Top Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: Math.max(insets.top, 12),
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Atrás"
-          hitSlop={12}
-          style={styles.navBtn}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </Pressable>
-
-        <Text style={[styles.folioTitle, { color: colors.text }]}>
-          #{report.folio}
-        </Text>
-
-        <View style={styles.navBtn} />
-      </View>
+      <ReportDetailHeader report={report} categoryLabel={categoryDef.label} />
 
       <ScrollView
         ref={scrollViewRef}
@@ -225,41 +197,7 @@ export default function ReporteDetailScreen() {
             </Pressable>
           </View>
 
-          {/* Location & Mini Map Section */}
-          <View
-            style={[
-              styles.sectionCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              {es.detail.locationTitle}
-            </Text>
-
-            <View style={styles.locationTextRow}>
-              <Ionicons name="location-sharp" size={16} color={colors.accent} />
-              <Text style={[styles.locationText, { color: colors.text }]}>
-                {report.ubication}
-              </Text>
-            </View>
-
-            <View style={styles.miniMapWrapper}>
-              <MapView
-                style={StyleSheet.absoluteFill}
-                initialRegion={{
-                  latitude: report.latitude,
-                  longitude: report.longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-              >
-                <ReportMapMarker report={report} />
-              </MapView>
-            </View>
-            <GoogleMapsButton report={report} />
-          </View>
+          <ReportLocationSection report={report} />
           <View
             onLayout={(event) => {
               commentsOffset.current = event.nativeEvent.layout.y;
@@ -283,24 +221,6 @@ export default function ReporteDetailScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: space.sm,
-    paddingBottom: space.xs,
-    borderBottomWidth: 1,
-  },
-  navBtn: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  folioTitle: {
-    fontSize: 16,
-    fontWeight: "800",
   },
   content: {
     paddingBottom: 40,
@@ -382,31 +302,5 @@ const styles = StyleSheet.create({
   upvoteBtnText: {
     fontSize: 13,
     fontWeight: "800",
-  },
-  sectionCard: {
-    borderRadius: radius.group,
-    borderWidth: 1,
-    padding: space.md,
-    gap: space.sm,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  locationTextRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  locationText: {
-    fontSize: 14,
-    fontWeight: "600",
-    flex: 1,
-  },
-  miniMapWrapper: {
-    height: 160,
-    borderRadius: radius.md,
-    overflow: "hidden",
-    marginTop: space.xs,
   },
 });
