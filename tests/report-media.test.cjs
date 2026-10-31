@@ -25,32 +25,35 @@ test('failed photo removal preserves confirmed photos and rejects the caller', a
   assert.deepEqual(cache.peek('entity:report:23').photos, report.photos);
 });
 
-test('photo payload validation rejects oversized batches and files before requesting the API', () => {
+test('photo payload validation rejects oversized batches and files before requesting the API', async () => {
   const c = createServiceClient();
   const {appendPhotos, MAX_PHOTO_BYTES} = c.load('services/report-media');
   const file = {uri: 'file:///test.jpg', name: 'test.jpg', type: 'image/jpeg', size: 100};
-  assert.throws(() => appendPhotos(new FormData(), [file,file,file,file]), /hasta 3/);
-  assert.throws(() => appendPhotos(new FormData(), [{...file, size: MAX_PHOTO_BYTES + 1}]), /5 MB/);
+  await assert.rejects(() => appendPhotos(new FormData(), [file,file,file,file]), /hasta 3/);
+  await assert.rejects(() => appendPhotos(new FormData(), [{...file, size: MAX_PHOTO_BYTES + 1}]), /5 MB/);
 });
 
-test('appendPhotos appends native file descriptor objects with photos field name and unique names', () => {
-  const c = createServiceClient();
-  const {appendPhotos} = c.load('services/report-media');
-  class MockFormData {
-    constructor() { this.parts = []; }
-    append(name, value) { this.parts.push({name, value}); }
-  }
-  const form = new MockFormData();
-  const photos = [
-    {uri: 'file:///photo1.jpg', name: 'photo1.jpg', type: 'image/jpeg', size: 1024},
-    {uri: 'file:///photo2.jpg', name: '', type: 'image/jpeg', size: 2048},
-  ];
-  appendPhotos(form, photos);
-  assert.equal(form.parts.length, 2);
-  assert.equal(form.parts[0].name, 'photos');
-  assert.deepEqual(form.parts[0].value, {uri: 'file:///photo1.jpg', name: 'photo1.jpg', type: 'image/jpeg'});
-  assert.equal(form.parts[1].name, 'photos');
-  assert.deepEqual(form.parts[1].value, {uri: 'file:///photo2.jpg', name: 'report-photo-2.jpg', type: 'image/jpeg'});
+test('appendPhotos sends actual JPEG bytes and filenames compatible with Expo fetch', async () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'report-upload-'));
+  try {
+    const uri = path.join(directory, 'photo.jpg');
+    const bytes = Buffer.from([255, 216, 255, 224, 1, 2]);
+    fs.writeFileSync(uri, bytes);
+    const {appendPhotos} = createServiceClient().load('services/report-media');
+    const form = new FormData();
+    await appendPhotos(form, [{uri, name: 'evidence.jpg', type: 'image/jpeg', size: bytes.length}]);
+    const file = form.get('photos');
+    assert.ok(file instanceof Blob);
+    assert.equal(file.name, 'evidence.jpg');
+    assert.equal(file.type, 'image/jpeg');
+    assert.deepEqual(Buffer.from(await file.arrayBuffer()), bytes);
+    const request = new Request('http://localhost/upload', {method: 'POST', body: form});
+    assert.match(request.headers.get('content-type'), /multipart\/form-data; boundary=/);
+    assert.ok(Buffer.from(await request.arrayBuffer()).includes(bytes));
+  } finally {fs.rmSync(directory, {recursive: true, force: true});}
 });
 
 test('actual API client leaves multipart boundary to native fetch and sends authentication', async () => {

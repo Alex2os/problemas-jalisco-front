@@ -7,7 +7,7 @@ const initial = {
   photos: [{ id: 7, url: '/reports/23/photos/7/content' }, { id: 8, url: '/reports/23/photos/8/content' }],
   status: 'reported', status_version: 0, can_manage: true, liked_by_me: true, like_count: 2, comment_count: 1,
 };
-const photo = { uri: 'file:///new.jpg', name: 'new.jpg', type: 'image/jpeg', size: 100 };
+const photo = { uri: require('node:url').pathToFileURL(__filename).href, name: 'new.jpg', type: 'image/jpeg', size: 100 };
 function client(request) {
   return createServiceClient({ api: { ApiError, apiRequest: request, apiUrl: path => `http://api.test${path}` } });
 }

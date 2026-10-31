@@ -17,7 +17,7 @@ export async function CreateReport(
     Object.entries(values).forEach(([key, value]) =>
       form.append(key, String(value)),
     );
-    appendPhotos(form, photos);
+    await appendPhotos(form, photos);
     body = form;
   }
   try {

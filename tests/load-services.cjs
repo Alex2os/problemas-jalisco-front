@@ -24,6 +24,11 @@ function createServiceClient({storage = new Map(), api} = {}) {
       compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
     }).outputText;
     new Function('require', 'module', 'exports', code)(request => {
+      if (request === 'expo-file-system') return {File: class extends require('node:buffer').File {
+        constructor(uri) {
+          super([fs.readFileSync(uri.startsWith('file:') ? require('node:url').fileURLToPath(uri) : uri)], path.basename(uri), {type: 'image/jpeg'});
+        }
+      }};
       if (request === 'expo-secure-store') return secureStore;
       if (request === 'react-native') return {Platform: {OS: 'android'}};
       if (request.startsWith('.')) return load(path.resolve(path.dirname(full), request));

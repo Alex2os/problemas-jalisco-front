@@ -1,3 +1,5 @@
+import { File } from "expo-file-system";
+import { Platform } from "react-native";
 import { apiRequest, apiUrl } from "./api";
 import { normalizeReport } from "./normalize-report";
 import { apiCache } from "./cache";
@@ -19,19 +21,20 @@ export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export function photoUrl(path: string) {
   return apiUrl(path);
 }
-export function appendPhotos(form: FormData, photos: SelectedPhoto[]) {
+export async function appendPhotos(form: FormData, photos: SelectedPhoto[]) {
   if (photos.length > 3) throw new Error("Puedes adjuntar hasta 3 fotos.");
-  photos.forEach((photo, index) => {
+  for (const [index, photo] of photos.entries()) {
     if (photo.size <= 0 || photo.size > MAX_PHOTO_BYTES)
       throw new Error("Cada foto debe ocupar como máximo 5 MB.");
     const filename = photo.name || `report-photo-${index + 1}.jpg`;
-    // React Native's FormData accepts a native file descriptor { uri, name, type }
-    form.append("photos", {
-      uri: photo.uri,
-      name: filename,
-      type: photo.type || "image/jpeg",
-    } as unknown as Blob);
-  });
+    // Expo 58 fetch requires Blob/File bytes rather than RN URI descriptors.
+    const file = Platform.OS === "web"
+      ? await (await fetch(photo.uri)).blob()
+      : new File(photo.uri);
+    if (file.size <= 0 || file.size > MAX_PHOTO_BYTES)
+      throw new Error("Cada foto debe ocupar entre 1 byte y 5 MB.");
+    form.append("photos", file, filename);
+  }
 }
 function confirm(report: Report) {
   invalidateInteractionQueries(report.id);
@@ -62,9 +65,9 @@ async function mutate(
     }
   });
 }
-export function AddReportPhotos(id: number, photos: SelectedPhoto[]) {
+export async function AddReportPhotos(id: number, photos: SelectedPhoto[]) {
   const form = new FormData();
-  appendPhotos(form, photos);
+  await appendPhotos(form, photos);
   return mutate(id, () =>
     apiRequest(`/reports/${id}/photos`, { method: "POST", body: form }, true),
   );
