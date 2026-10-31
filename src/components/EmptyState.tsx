@@ -7,12 +7,18 @@ import {
   type ViewStyle,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { space } from "@/constants/design";
 import { Button } from "./Button";
 
+export type EmptyStateIcon =
+  | React.ComponentProps<typeof Ionicons>["name"]
+  | React.ComponentProps<typeof Feather>["name"];
+
 export interface EmptyStateProps {
-  icon?: React.ComponentProps<typeof Ionicons>["name"];
+  icon?: EmptyStateIcon;
+  iconFamily?: "ionicons" | "feather";
   title: string;
   description: string;
   actionTitle?: string;
@@ -22,6 +28,7 @@ export interface EmptyStateProps {
 
 export function EmptyState({
   icon = "folder-open-outline",
+  iconFamily = "ionicons",
   title,
   description,
   actionTitle,
@@ -38,7 +45,19 @@ export function EmptyState({
           { backgroundColor: dark ? "#1E2B3A" : "#FFF7ED" },
         ]}
       >
-        <Ionicons name={icon} size={48} color={colors.accent} />
+        {iconFamily === "feather" ? (
+          <Feather
+            name={icon as React.ComponentProps<typeof Feather>["name"]}
+            size={40}
+            color={colors.accent}
+          />
+        ) : (
+          <Ionicons
+            name={icon as React.ComponentProps<typeof Ionicons>["name"]}
+            size={48}
+            color={colors.accent}
+          />
+        )}
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>

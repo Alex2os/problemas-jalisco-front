@@ -8,7 +8,8 @@ import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, View } from "react-native";
-import { AppText, Button, Notice } from "@/components/ui/AppUi";
+import { Button } from "@/components/Button";
+import { AppText, Notice } from "@/components/ui/AppUi";
 
 export function PhotoPicker({
   photos,

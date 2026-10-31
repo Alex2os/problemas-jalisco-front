@@ -1,6 +1,6 @@
+import { Button } from "@/components/Button";
 import {
     AppText,
-    Button,
     Field,
     Header,
     IconButton,

@@ -204,85 +204,6 @@ export function IconButton({
   );
 }
 
-export function Button({
-  label,
-  icon,
-  onPress,
-  secondary = false,
-  variant,
-  loading = false,
-  loadingLabel,
-  disabled = false,
-}: {
-  label: string;
-  icon?: Icon;
-  onPress: () => void;
-  secondary?: boolean;
-  variant?: "primary" | "secondary" | "text";
-  loading?: boolean;
-  loadingLabel?: string;
-  disabled?: boolean;
-}) {
-  const { colors } = useAppTheme();
-  const mode = variant || (secondary ? "secondary" : "primary");
-  const inactive = disabled || loading;
-  const foreground =
-    disabled && !loading
-      ? colors.muted
-      : mode === "primary"
-        ? colors.onAccent
-        : mode === "text"
-          ? colors.accent
-          : colors.text;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ disabled: inactive, busy: loading }}
-      disabled={inactive}
-      onPress={onPress}
-      style={({ pressed }) => [
-        ui.button,
-        {
-          backgroundColor:
-            disabled && !loading
-              ? colors.raised
-              : mode === "primary"
-                ? colors.accent
-                : mode === "secondary"
-                  ? colors.surface
-                  : "transparent",
-          borderColor: mode === "secondary" ? colors.border : "transparent",
-          opacity: pressed ? 0.75 : 1,
-        },
-      ]}
-    >
-      {(loading || icon) && (
-        <View style={ui.buttonIcon} pointerEvents="none">
-          {loading ? (
-            <ActivityIndicator size="small" color={foreground} />
-          ) : (
-            <Feather name={icon} size={size.smallIcon} color={foreground} />
-          )}
-        </View>
-      )}
-      <Text
-        style={[
-          type.label,
-          {
-            color: foreground,
-            flexShrink: 1,
-            textAlign: "center",
-            includeFontPadding: false,
-          },
-        ]}
-      >
-        {loading ? loadingLabel || label : label}
-      </Text>
-    </Pressable>
-  );
-}
-
 export function Field({
   label,
   style,
@@ -361,35 +282,6 @@ export function Notice({
     >
       <AppText variant="caption" tone={success ? "success" : "danger"}>
         {message}
-      </AppText>
-    </View>
-  );
-}
-
-export function EmptyState({
-  icon = "inbox",
-  title,
-  description,
-}: {
-  icon?: Icon;
-  title: string;
-  description: string;
-}) {
-  const { colors } = useAppTheme();
-  return (
-    <View
-      style={{
-        paddingVertical: space.section,
-        alignItems: "center",
-        gap: space.md,
-      }}
-    >
-      <Feather name={icon} size={24} color={colors.muted} />
-      <AppText variant="heading" style={{ textAlign: "center" }}>
-        {title}
-      </AppText>
-      <AppText tone="muted" style={{ textAlign: "center", maxWidth: 320 }}>
-        {description}
       </AppText>
     </View>
   );

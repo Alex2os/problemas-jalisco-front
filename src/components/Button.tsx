@@ -11,19 +11,30 @@ import {
   type TextStyle,
 } from "react-native";
 import * as Haptics from "expo-haptics";
+import Feather from "@expo/vector-icons/Feather";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, size, space } from "@/constants/design";
 
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "agave";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "agave"
+  | "text";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends Omit<PressableProps, "style"> {
-  title: string;
+  title?: string;
+  label?: string;
   variant?: ButtonVariant;
+  secondary?: boolean;
   size?: ButtonSize;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | React.ComponentProps<typeof Feather>["name"];
   iconPosition?: "left" | "right";
   loading?: boolean;
+  loadingLabel?: string;
   disabled?: boolean;
   fullWidth?: boolean;
   haptic?: boolean;
@@ -33,11 +44,14 @@ export interface ButtonProps extends Omit<PressableProps, "style"> {
 
 export function Button({
   title,
-  variant = "primary",
+  label,
+  variant,
+  secondary = false,
   size: buttonSize = "md",
   icon,
   iconPosition = "left",
   loading = false,
+  loadingLabel,
   disabled = false,
   fullWidth = false,
   haptic = true,
@@ -52,11 +66,15 @@ export function Button({
   const { colors } = useAppTheme();
   const [pressed, setPressed] = useState(false);
 
+  const displayTitle = label ?? title ?? "";
+  const effectiveVariant: ButtonVariant =
+    variant ?? (secondary ? "secondary" : "primary");
+
   const handlePress = (e: any) => {
     if (disabled || loading) return;
-    if (haptic) {
+    if (haptic && effectiveVariant !== "text") {
       void Haptics.impactAsync(
-        variant === "primary"
+        effectiveVariant === "primary"
           ? Haptics.ImpactFeedbackStyle.Medium
           : Haptics.ImpactFeedbackStyle.Light
       );
@@ -75,14 +93,15 @@ export function Button({
   let textColor: string;
   let borderColor: string | undefined;
 
-  switch (variant) {
+  switch (effectiveVariant) {
     case "primary":
       backgroundColor = colors.accent;
       textColor = colors.onAccent;
       break;
     case "secondary":
-      backgroundColor = colors.primary;
-      textColor = colors.onPrimary;
+      backgroundColor = secondary ? colors.surface : colors.primary;
+      textColor = secondary ? colors.text : colors.onPrimary;
+      borderColor = secondary ? colors.border : undefined;
       break;
     case "agave":
       backgroundColor = colors.agave;
@@ -101,17 +120,38 @@ export function Button({
       backgroundColor = colors.danger;
       textColor = "#FFFFFF";
       break;
+    case "text":
+      backgroundColor = "transparent";
+      textColor = colors.accent;
+      break;
     default:
       backgroundColor = colors.accent;
       textColor = colors.onAccent;
   }
+
+  const renderIcon = () => {
+    if (!icon) return null;
+    if (React.isValidElement(icon)) return icon;
+    if (typeof icon === "string") {
+      return (
+        <Feather
+          name={icon as React.ComponentProps<typeof Feather>["name"]}
+          size={size.smallIcon}
+          color={disabled && !loading ? colors.muted : textColor}
+        />
+      );
+    }
+    return null;
+  };
+
+  const renderedIcon = renderIcon();
 
   return (
     <Pressable
       onPress={handlePress}
       disabled={disabled || loading}
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel || title}
+      accessibilityLabel={accessibilityLabel || displayTitle}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       onPressIn={(event) => { setPressed(true); onPressIn?.(event); }}
       onPressOut={(event) => { setPressed(false); onPressOut?.(event); }}
@@ -121,11 +161,15 @@ export function Button({
           height,
           paddingHorizontal,
           backgroundColor: disabled && !loading ? colors.raised : backgroundColor,
-          borderColor: disabled && !loading ? colors.borderStrong : borderColor,
+          borderColor: disabled && !loading ? (secondary ? colors.border : colors.borderStrong) : borderColor,
           borderWidth: disabled && !loading ? 1 : borderColor ? 1.5 : 0,
           borderRadius: radius.control,
-          opacity: pressed && !disabled && !loading ? 0.85 : 1,
-          transform: [{ scale: pressed && !disabled && !loading ? 0.98 : 1 }],
+          opacity: pressed && !disabled && !loading ? (effectiveVariant === "text" ? 0.75 : 0.85) : 1,
+          transform: [
+            {
+              scale: pressed && !disabled && !loading && effectiveVariant !== "text" ? 0.98 : 1,
+            },
+          ],
           width: fullWidth ? "100%" : undefined,
         },
         style,
@@ -133,10 +177,26 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} size="small" />
+        <View style={styles.loadingRow}>
+          <ActivityIndicator color={textColor} size="small" />
+          {loadingLabel ? (
+            <Text
+              style={[
+                styles.text,
+                {
+                  color: disabled ? colors.muted : textColor,
+                  fontSize,
+                },
+                textStyle,
+              ]}
+            >
+              {loadingLabel}
+            </Text>
+          ) : null}
+        </View>
       ) : (
         <View style={[styles.contentRow, fullWidth && styles.fullWidthContent]}>
-          {icon && iconPosition === "left" && <View style={styles.iconLeft}>{icon}</View>}
+          {renderedIcon && iconPosition === "left" && <View style={styles.iconLeft}>{renderedIcon}</View>}
           <Text
             style={[
               styles.text,
@@ -147,9 +207,9 @@ export function Button({
               textStyle,
             ]}
           >
-            {title}
+            {displayTitle}
           </Text>
-          {icon && iconPosition === "right" && <View style={styles.iconRight}>{icon}</View>}
+          {renderedIcon && iconPosition === "right" && <View style={styles.iconRight}>{renderedIcon}</View>}
         </View>
       )}
     </Pressable>
@@ -165,6 +225,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   contentRow: {
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.sm,
+  },
+  loadingRow: {
     minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
