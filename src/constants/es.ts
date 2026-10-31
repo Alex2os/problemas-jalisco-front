@@ -95,7 +95,7 @@ export const es = {
 
   evidence: {
     title: "Fotos y detalles",
-    hint: "Agrega fotos y los detalles que quieras compartir.",
+    hint: "Escribe un título para el reporte. Las fotos y la descripción son opcionales.",
     photoHero: "Tomar foto",
     gallery: "Elegir de la galería",
     photosCount: "{count} de 3 fotos",

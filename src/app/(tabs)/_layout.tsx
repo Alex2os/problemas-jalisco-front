@@ -95,7 +95,7 @@ function FloatingTabBar({
 
     const isFocused = state.routes[state.index]?.key === route.key;
     const options = descriptors[route.key]?.options;
-    const color = isFocused ? colors.primaryText : colors.textSecondary;
+    const color = isFocused ? colors.secondary : colors.textSecondary;
 
     const onPress = () => {
       const event = emitter.emit({
@@ -155,7 +155,7 @@ function FloatingTabBar({
       style={[
         styles.outerWrap,
         {
-          bottom: Math.max(insets.bottom, space.sm),
+          bottom: Math.max(insets.bottom, space.sm) + space.md,
           paddingLeft: Math.max(insets.left, space.md),
           paddingRight: Math.max(insets.right, space.md),
         },

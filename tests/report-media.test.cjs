@@ -69,3 +69,20 @@ test('actual API client leaves multipart boundary to native fetch and sends auth
     await c.load('services/api').apiRequest('/reports/create-with-photos', {method: 'POST', body: form}, true);
   } finally {global.fetch = originalFetch;}
 });
+
+test('upload checks actual file size even when selected-photo metadata understates it', async () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'oversized-report-photo-'));
+  try {
+    const {appendPhotos, MAX_PHOTO_BYTES} = createServiceClient().load('services/report-media');
+    const uri = path.join(directory, 'large.jpg');
+    fs.writeFileSync(uri, Buffer.alloc(MAX_PHOTO_BYTES + 1));
+    const form = new FormData();
+    await assert.rejects(appendPhotos(form, [{uri, name: 'large.jpg', type: 'image/jpeg', size: 100}]), /5 MB/);
+    assert.equal(form.getAll('photos').length, 0);
+  } finally {
+    fs.rmSync(directory, {recursive: true, force: true});
+  }
+});

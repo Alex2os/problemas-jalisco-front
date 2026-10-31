@@ -5,7 +5,7 @@ const report = { id: 42, type: 'agua', description: 'Fuga', latitude: 20.67, lon
   ubication: 'Guadalajara', status: 'reported', status_version: 0, can_manage: true,
   created_at: '2026-10-29T12:00:00Z', user_id: 7, username: 'Alex',
   photos: [], like_count: 0, comment_count: 0, liked_by_me: false };
-const draft = { category: 'agua', description: '  Fuga  ', latitude: 20.67, longitude: -103.35, photos: [] };
+const draft = { title: '  Fuga en la calle  ', category: 'agua', description: '  Fuga  ', latitude: 20.67, longitude: -103.35, photos: [] };
 function client(apiRequest) {
   return createServiceClient({ api: { apiRequest, apiUrl: path => `http://api.test${path}` } });
 }
@@ -37,7 +37,7 @@ test('current report store publishes to the API and shows only server-confirmed 
     if (path === '/reports') return { reports: [] };
     if (path === '/reports/create') {
       assert.equal(authenticated, true);
-      assert.deepEqual(JSON.parse(options.body), { type: 'agua', description: 'Fuga', latitude: 20.67, longitude: -103.35 });
+      assert.deepEqual(JSON.parse(options.body), { type: 'agua', title: 'Fuga en la calle', description: 'Fuga', latitude: 20.67, longitude: -103.35 });
       return new Promise(resolve => { resolveCreate = resolve; });
     }
     throw new Error(`Unexpected request: ${path}`);

@@ -20,3 +20,20 @@ test('search includes structured locations, display titles and legacy category l
   const titled = {type: 'agua', title: '¡Otra vez sin agua!', ubication: 'Guadalajara'};
   assert.equal(matchesReportSearch(titled, 'otra vez'), true);
 });
+
+test('search includes description words and combines them with type and location', () => {
+  const described = {...report, description: 'Una RÁMA caída bloquea la banqueta'};
+  for (const query of ['rama', 'caida', 'BLOQUEA BANQUETA', 'arboles rama juarez']) {
+    assert.equal(matchesReportSearch(described, query), true, query);
+  }
+  assert.equal(matchesReportSearch(described, 'rama zapopan'), false);
+  assert.equal(matchesReportSearch(described, 'fuga'), false);
+});
+
+test('missing, empty and null descriptions preserve type and location matching', () => {
+  for (const description of [undefined, null, '', '  ']) {
+    const legacy = {...report, description};
+    assert.equal(matchesReportSearch(legacy, 'arboles juarez'), true);
+    assert.equal(matchesReportSearch(legacy, 'banqueta'), false);
+  }
+});

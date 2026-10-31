@@ -1,16 +1,12 @@
-import React, { useRef, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import * as Constants from "expo-constants";
-import * as SecureStore from "expo-secure-store";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ErrorBanner } from "@/components/ErrorBanner";
 import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme, type ThemePreference } from "@/hooks/useAppTheme";
-import { useAuthSession } from "@/hooks/useReportState";
-import { setAuthSession } from "@/services/session";
 
 const contacts = [
   { label: "Emergencias 911", phone: "911", description: "Policía y Protección Civil" },
@@ -32,30 +28,8 @@ const THEME_OPTIONS: {
 export default function MasScreen() {
   const insets = useSafeAreaInsets();
   const { colors, preference, setPreference } = useAppTheme();
-  const authenticated = useAuthSession();
-  const [loggingOut, setLoggingOut] = useState(false);
-  const [logoutPressed, setLogoutPressed] = useState(false);
-  const [sessionError, setSessionError] = useState("");
-  const logoutPending = useRef(false);
-
   const appVersion = Constants.default?.expoConfig?.version || "1.0.0";
   const cardColors = { backgroundColor: colors.surface, borderColor: colors.border };
-
-  async function logOut() {
-    if (logoutPending.current) return;
-    logoutPending.current = true;
-    setLoggingOut(true);
-    setSessionError("");
-    try {
-      await SecureStore.deleteItemAsync("auth_token");
-      setAuthSession(false);
-    } catch {
-      setSessionError("No se pudo cerrar la sesión. Intenta de nuevo.");
-    } finally {
-      logoutPending.current = false;
-      setLoggingOut(false);
-    }
-  }
 
   function handleCall(phone: string) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -169,49 +143,6 @@ export default function MasScreen() {
         </View>
       </View>
 
-      {/* Acceso a cerrar sesión */}
-      {authenticated && (
-        <View style={[styles.card, cardColors]}>
-          <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
-            {es.more.accountTitle}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={loggingOut ? "Cerrando sesión" : "Cerrar sesión"}
-            accessibilityState={{ disabled: loggingOut, busy: loggingOut }}
-            disabled={loggingOut}
-            onPress={() => {
-              if (!loggingOut) {
-                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                void logOut();
-              }
-            }}
-            onPressIn={() => setLogoutPressed(true)}
-            onPressOut={() => setLogoutPressed(false)}
-            style={[
-              styles.logoutButton,
-              {
-                backgroundColor: colors.dangerSoft,
-                borderColor: colors.dangerSoft,
-                opacity: loggingOut ? 0.7 : logoutPressed ? 0.8 : 1,
-                transform: [{ scale: logoutPressed && !loggingOut ? 0.99 : 1 }],
-              },
-            ]}
-          >
-            <View pointerEvents="none" style={styles.logoutButtonIcon}>
-              {loggingOut ? (
-                <ActivityIndicator color={colors.danger} />
-              ) : (
-                <Ionicons name="log-out-outline" size={21} color={colors.danger} />
-              )}
-            </View>
-            <Text style={[styles.interactiveLabel, styles.logoutButtonLabel, { color: colors.danger }]}>
-              {loggingOut ? "Cerrando sesión…" : "Cerrar sesión"}
-            </Text>
-          </Pressable>
-          {!!sessionError && <ErrorBanner message={sessionError} />}
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -355,30 +286,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
-  logoutButton: {
-    width: "100%",
-    minHeight: size.buttonLg,
-    alignSelf: "center",
-    borderWidth: 1,
-    borderRadius: radius.group,
-    paddingHorizontal: 48,
-    paddingVertical: space.lg,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoutButtonLabel: {
-    alignSelf: "center",
-    textAlign: "center",
-    includeFontPadding: false,
-  },
-  logoutButtonIcon: {
-    position: "absolute",
-    left: space.lg,
-    top: 0,
-    bottom: 0,
-    width: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
 });
-

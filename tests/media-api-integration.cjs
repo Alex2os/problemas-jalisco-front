@@ -18,7 +18,7 @@ global.FormData = class extends NativeFormData {
   await load('register-user').RegisterUser('media_mobile', 'media-mobile@example.invalid', 'mobile-test-password');
   const login = await load('user-login').UserLogIn('media-mobile@example.invalid', 'mobile-test-password');
   storage.set('auth_token', login.token); load('session').setAuthSession(true);
-  const created = await load('create-report').CreateReport('otros', 'Created with mobile photos', 20.6597, -103.3496, [photo,photo,photo]);
+  const created = await load('create-report').CreateReport('otros', 'Título con fotos del cliente', 'Created with mobile photos', 20.6597, -103.3496, [photo,photo,photo]);
   const id = created.report_id;
   assert.ok(id); assert.equal(created.report.photos.length, 3);
   let report = await load('get-report-by-id').GetReportById(id, true);

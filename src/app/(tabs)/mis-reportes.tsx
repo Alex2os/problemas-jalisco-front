@@ -158,7 +158,7 @@ export default function MisReportesScreen() {
             <EmptyState
               icon="document-text-outline"
               title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay reportes cerca de ti" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
-              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : forYou ? "Cuando haya reportes cercanos disponibles, aparecerán aquí." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
+              description={searchQuery.trim() ? "Prueba con otro tipo, ubicación o palabras de la descripción, o cambia el filtro de estado." : forYou ? "Cuando haya reportes cercanos disponibles, aparecerán aquí." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
               actionTitle={searchQuery.trim() || forYou || activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
               onAction={() => router.push("/reportar/categoria")}
             />

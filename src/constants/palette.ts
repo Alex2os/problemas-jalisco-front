@@ -23,7 +23,7 @@ export const palette = {
     primaryDark: "#D97500",
     primarySoft: "#FFF4E5", // Surface accent
     primaryText: "#AA5800", // Naranja con contraste AA sobre superficies claras
-    onPrimary: "#202938", // Texto oscuro legible sobre botón naranja
+    onPrimary: "#FFFFFF", // Texto e iconos blancos sobre botón naranja en modo claro
 
     // Secondary & Accent
     secondary: "#E00B50", // Rosa secundario

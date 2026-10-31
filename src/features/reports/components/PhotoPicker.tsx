@@ -151,8 +151,7 @@ export function PhotoPicker({
         Fotos · {photos.length}/{capacity}
       </AppText>
       <AppText variant="caption" tone="muted">
-        Hasta 3 por reporte. Evita rostros, placas y datos personales. Cada foto
-        se prepara como JPEG de hasta 5 MB.
+        Hasta 3 por reporte. Evita rostros, placas y datos personales.
       </AppText>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
         {photos.map((photo, index) => (

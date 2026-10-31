@@ -85,7 +85,7 @@ export const useReportsStore = create<ReportsState>((set, get) => ({
     if (draft.latitude === null || draft.longitude === null) throw new Error("Selecciona la ubicación del problema.");
     if (draft.description.trim().length > 255) throw new Error("La descripción debe tener hasta 255 caracteres.");
     const version = sessionVersion();
-    const response = await CreateReport(draft.category, draft.description, draft.latitude, draft.longitude, draft.photos);
+    const response = await CreateReport(draft.category, draft.title, draft.description, draft.latitude, draft.longitude, draft.photos);
     if (!Number.isSafeInteger(response?.report_id) || response.report_id <= 0)
       throw new Error("No se pudo confirmar el reporte. Consulta Mis reportes antes de volver a enviarlo.");
     let report: Report;

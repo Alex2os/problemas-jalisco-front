@@ -89,6 +89,9 @@ export default function RevisarScreen() {
           )}
 
           <View style={styles.cardDetails}>
+            <Text accessibilityRole="header" style={[styles.reportTitle, { color: colors.text }]}>
+              {draft.title.trim()}
+            </Text>
             {/* Category */}
             <View style={styles.catRow}>
               <View
@@ -171,6 +174,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
   },
+  reportTitle: { fontSize: 20, lineHeight: 28, fontWeight: "700" },
   colorDot: {
     width: 10,
     height: 10,

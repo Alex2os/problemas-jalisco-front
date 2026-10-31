@@ -6,7 +6,7 @@ Expo / React Native app backed by the separate `jalisco-problems-api` service.
 
 Use Node 22.13 or later, install with `npm ci`, and set `EXPO_PUBLIC_API_URL` in `.env`. The API client uses this value directly, with no platform fallback; the current value is `http://localhost:5140`. Android emulators normally use `http://10.0.2.2:5140`; iOS simulators use `http://localhost:5140`; physical phones need a reachable LAN/server address. Run `npm start` and open an Android or iOS target. The map requires a native target.
 
-The API must have its database migrations and durable photo storage configured. No backend schema changes are needed for these frontend changes.
+The API must have its database migrations and durable photo storage configured. Required report titles need backend migration `002_report_titles.sql` before running the updated API.
 
 ## Data and authentication
 
@@ -24,7 +24,9 @@ The existing four-step form submits to `POST /reports/create` or `/reports/creat
 
 Successful submissions show the server-confirmed report number. Failed writes retain form entries. If creation succeeds but loading its details fails, the confirmed report number still appears so the user is not prompted to submit a duplicate.
 
-The API stores category (`type`), description, coordinates, author, photos, and status, and resolves the address from the coordinates. It currently has no custom address, anonymous author, or contact-information fields. The form does not offer unsupported persistence controls.
+The API stores title, category (`type`), description, coordinates, author, photos, and status, and resolves the address from the coordinates. It currently has no custom address, anonymous author, or contact-information fields. The form does not offer unsupported persistence controls.
+
+The Evidencia step requires a nonblank, single-line title of up to 80 UTF-16 code units, with a character counter and inline validation before continuing. Photos and the description remain optional. The review screen shows the title before publishing, and both JSON/multipart submissions validate and send it. Existing reports may return a null title and retain their category-based display fallback. Titles are never generated from descriptions.
 
 The owner-only Editar reporte screen stages photo additions/removals and status changes behind one Guardar cambios button. Public details keep the photo gallery at the top and contain no upload or status-management controls. The backend currently supports editing photos and status, not category, description, or coordinates. Ownership and photo capacity are rechecked before saving; status changes use the original server version. The API exposes separate operations, so an interrupted save requires reloading the confirmed server state before retrying to avoid duplicate uploads. Unsaved changes are held only in memory and leaving the editor prompts to discard them.
 

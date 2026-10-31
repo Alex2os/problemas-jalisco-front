@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -7,25 +7,39 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { OptionalBadge } from "@/components/OptionalBadge";
 import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
 import { PhotoPicker } from "@/features/reports/components/PhotoPicker";
-import { radius, space } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
+import { getReportTitleError, REPORT_TITLE_LIMIT } from "@/services/create-report";
 
 const DESCRIPTION_LIMIT = 255;
 
 export default function EvidenciaScreen() {
   const { colors } = useAppTheme();
   const photos = useDraftStore((state) => state.photos);
+  const title = useDraftStore((state) => state.title);
+  const setTitle = useDraftStore((state) => state.setTitle);
   const description = useDraftStore((state) => state.description);
   const setPhotos = useDraftStore((state) => state.setPhotos);
   const setDescription = useDraftStore((state) => state.setDescription);
   const setStep = useDraftStore((state) => state.setStep);
   const [picking, setPicking] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [titleFocused, setTitleFocused] = useState(false);
+  const [titleTouched, setTitleTouched] = useState(false);
+  const titleInput = useRef<React.ComponentRef<typeof TextInput>>(null);
+  const scroll = useRef<React.ComponentRef<typeof ScrollView>>(null);
+  const titleError = titleTouched ? getReportTitleError(title) : "";
 
   const handleNext = () => {
     if (picking) return;
+    setTitleTouched(true);
+    if (getReportTitleError(title)) {
+      scroll.current?.scrollTo({ y: 0, animated: true });
+      titleInput.current?.focus();
+      return;
+    }
     Keyboard.dismiss();
     setStep(4);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -35,6 +49,7 @@ export default function EvidenciaScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <ScrollView
+        ref={scroll}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -44,6 +59,43 @@ export default function EvidenciaScreen() {
         <View style={styles.intro}>
           <Text accessibilityRole="header" style={[styles.heading, { color: colors.text }]}>{es.evidence.title}</Text>
           <Text style={[styles.hint, { color: colors.muted }]}>{es.evidence.hint}</Text>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.titleLabelRow}>
+            <View style={styles.headingGroup}>
+              <Text nativeID="report-title-label" style={[styles.sectionTitle, { color: colors.text }]}>
+                Título del reporte <Text style={{ color: colors.danger }}>*</Text>
+              </Text>
+            </View>
+            <Text style={[styles.charCount, { color: colors.muted }]}>{title.length}/{REPORT_TITLE_LIMIT}</Text>
+          </View>
+          <TextInput
+            ref={titleInput}
+            accessibilityLabel="Título del reporte, obligatorio"
+            accessibilityLabelledBy="report-title-label"
+            accessibilityHint="Escribe un título de hasta 80 caracteres para continuar."
+            value={title}
+            onChangeText={setTitle}
+            onFocus={() => setTitleFocused(true)}
+            onBlur={() => { setTitleFocused(false); setTitleTouched(true); }}
+            placeholder="Ej. Bache profundo frente a la escuela"
+            placeholderTextColor={colors.muted}
+            maxLength={REPORT_TITLE_LIMIT}
+            autoCapitalize="sentences"
+            returnKeyType="done"
+            onSubmitEditing={handleNext}
+            style={[styles.titleInput, {
+              backgroundColor: colors.background,
+              borderColor: titleError ? colors.danger : titleFocused ? colors.primary : colors.border,
+              color: colors.text,
+            }]}
+          />
+          {!!titleError && (
+            <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.validationMessage, { color: colors.danger }]}>
+              {titleError}
+            </Text>
+          )}
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -60,7 +112,6 @@ export default function EvidenciaScreen() {
                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Descripción</Text>
                 <OptionalBadge />
               </View>
-              <Text style={[styles.caption, { color: colors.muted }]}>¿Qué pasa y desde cuándo?</Text>
             </View>
           </View>
 
@@ -111,8 +162,10 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.sm },
   headingGroup: { flex: 1, gap: 3 },
   sectionTitle: { fontSize: 17, lineHeight: 23, fontWeight: "700" },
-  caption: { fontSize: 12, lineHeight: 18 },
   textarea: { borderRadius: radius.md, borderWidth: 1, padding: 14, fontSize: 16, lineHeight: 24, minHeight: 152, textAlignVertical: "top" },
   descriptionFooter: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: space.sm },
   charCount: { fontSize: 12, lineHeight: 18, fontWeight: "600", textAlign: "right" },
+  titleLabelRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
+  titleInput: { minHeight: size.control, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: 16, lineHeight: 24 },
+  validationMessage: { fontSize: 14, lineHeight: 20 },
 });

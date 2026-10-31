@@ -95,13 +95,13 @@ export const LOCAL_FALLBACK_CATEGORIES: CategoryDefinition[] = [
   {
     id: "alumbrado",
     label: "Alumbrado público",
-    description: "Luces que no funcionan",
+    description: "Luces apagadas",
     ...CATEGORY_VISUALS.alumbrado,
   },
   {
     id: "agua",
     label: "Agua y drenaje",
-    description: "Fugas o drenaje tapado",
+    description: "Fugas y drenaje",
     ...CATEGORY_VISUALS.agua,
   },
   {
@@ -119,7 +119,7 @@ export const LOCAL_FALLBACK_CATEGORIES: CategoryDefinition[] = [
   {
     id: "arboles",
     label: "Árboles y parques",
-    description: "Ramas o árboles caídos",
+    description: "Ramas caídas",
     ...CATEGORY_VISUALS.arboles,
   },
   {
@@ -141,10 +141,11 @@ export function mergeBackendCategories(backendList: BackendCategory[]): Category
   }
   return backendList.map((cat) => {
     const visual = CATEGORY_VISUALS[cat.id] || CATEGORY_VISUALS.otro;
+    const localCategory = LOCAL_FALLBACK_CATEGORIES.find((category) => category.id === cat.id);
     return {
       id: cat.id,
       label: cat.name || cat.id,
-      description: cat.description || "",
+      description: localCategory?.description || cat.description || "",
       ...visual,
     };
   });

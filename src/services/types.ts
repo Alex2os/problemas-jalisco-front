@@ -47,7 +47,7 @@ export interface Report {
   folio: string;
   category: string;
   type: string; // alias for category
-  title?: string;
+  title?: string | null;
   description: string;
   latitude: number;
   longitude: number;
@@ -71,6 +71,7 @@ export interface Report {
 
 export interface ReportDraft {
   step: number;
+  title: string;
   category: string | null;
   latitude: number | null;
   longitude: number | null;

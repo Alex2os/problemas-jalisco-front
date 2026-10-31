@@ -81,6 +81,7 @@ test('Creation draft sends only canonical category id as type', async () => {
 
   const { useReportsStore } = client.load('store/useReportsStore');
   await useReportsStore.getState().submitReport({
+    title: 'Poste caído',
     category: 'alumbrado',
     description: 'Poste caído',
     latitude: 20.67,
@@ -91,3 +92,13 @@ test('Creation draft sends only canonical category id as type', async () => {
   assert.equal(submittedType, 'alumbrado');
 });
 
+
+test('category cards retain compact subtitles when the API supplies longer explanations', () => {
+  const {mergeBackendCategories, LOCAL_FALLBACK_CATEGORIES} = createServiceClient().load('constants/report-categories');
+  const remote = LOCAL_FALLBACK_CATEGORIES.map(category => ({
+    id: category.id, name: category.label, description: 'Una explicación larga del catálogo remoto con muchos ejemplos.',
+  }));
+  const merged = mergeBackendCategories(remote);
+  assert.deepEqual(merged.map(category => category.description), LOCAL_FALLBACK_CATEGORIES.map(category => category.description));
+  assert.equal(mergeBackendCategories([{id: 'future', name: 'Nueva categoría', description: 'Descripción nueva'}])[0].description, 'Descripción nueva');
+});

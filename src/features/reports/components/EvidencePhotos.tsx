@@ -81,9 +81,9 @@ export function EvidencePhotos({ photos, capacity, busy, disabled, onChoose, onR
           ))}
         </View>
       )}
-      <Text style={[styles.caption, { color: colors.muted }]}>
-        {busy && photos.length ? "Preparando fotos…" : "Hasta 5 MB por foto."}
-      </Text>
+      {!!(busy && photos.length) && (
+        <Text style={[styles.caption, { color: colors.muted }]}>Preparando fotos…</Text>
+      )}
     </View>
   );
 }

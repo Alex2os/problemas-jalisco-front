@@ -60,13 +60,15 @@ const reportId = Number(process.env.JALISCO_TEST_REPORT_ID);
   const store = client.load('store/useReportsStore').useReportsStore;
   await store.getState().initialize();
   const submitted = await store.getState().submitReport({
-    category: 'agua', description: 'Created by the current report form store',
+    title: 'Título enviado por el cliente', category: 'agua', description: 'Created by the current report form store',
     latitude: 20.6597, longitude: -103.3496, photos: [],
   });
   const persisted = await load('get-report-by-id').GetReportById(submitted.id, true);
   assert.equal(persisted.user_id, login.user.id);
   assert.equal(persisted.username, login.user.username);
   assert.equal(persisted.folio, String(persisted.id));
+  assert.equal(persisted.title, 'Título enviado por el cliente');
+  assert.equal(load('report-format').getReportDisplayTitle(persisted), persisted.title);
   assert.equal(store.getState().reports.find(item => item.id === persisted.id).can_manage, true);
   await store.getState().toggleUpvote(persisted.id);
   assert.equal(store.getState().reports.find(item => item.id === persisted.id).liked_by_me, true);

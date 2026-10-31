@@ -10,6 +10,7 @@ export function matchesReportSearch(report: Report, query: string): boolean {
   const words = normalizeSearch(query).trim().split(/\s+/).filter(Boolean);
   const searchable = normalizeSearch([
     report.title,
+    report.description,
     getReportDisplayTitle(report),
     report.type,
     report.category,

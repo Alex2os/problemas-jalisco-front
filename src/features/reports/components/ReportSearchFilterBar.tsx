@@ -40,8 +40,8 @@ export function ReportSearchFilterBar({
         ]}
       >
         <TextInput
-          accessibilityLabel="Buscar reportes por tipo o ubicación"
-          placeholder="Buscar por tipo o ubicación"
+          accessibilityLabel="Buscar reportes por tipo, ubicación o descripción"
+          placeholder="Tipo, ubicación o descripción"
           placeholderTextColor={colors.muted}
           selectionColor={colors.primary}
           style={[styles.searchInput, { color: colors.text }]}

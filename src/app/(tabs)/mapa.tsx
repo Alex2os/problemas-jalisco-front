@@ -120,7 +120,7 @@ export default function MapaScreen() {
             {
               backgroundColor: colors.surface,
               borderColor: colors.border,
-              bottom: Math.max(insets.bottom, space.sm) + size.tabBarHeight + space.md,
+              bottom: Math.max(insets.bottom, space.sm) + space.md + size.tabBarHeight + space.md,
             },
           ]}
         >
