@@ -7,9 +7,8 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 
 const FILTER_TABS = [
   { id: "todos", label: "Todos" },
-  { id: "para-ti", label: "Para ti" },
-  { id: "reportado", label: "Reportado" },
-  { id: "resuelto", label: "Resuelto" },
+  { id: "para-ti", label: "Cerca de ti" },
+  { id: "resuelto", label: "Resueltos" },
 ] as const;
 
 export interface ReportSearchFilterBarProps {

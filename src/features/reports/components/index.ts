@@ -4,6 +4,7 @@ export * from "./LocationPicker";
 export * from "./PhotoPicker";
 export * from "./RecommendationLocationBanner";
 export * from "./ReportCard";
+export * from "./ReportFeedItem";
 export * from "./ReportComments";
 export * from "./ReportDetailHeader";
 export * from "./ReportEditButton";

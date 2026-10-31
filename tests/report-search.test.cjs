@@ -12,8 +12,11 @@ test('search matches displayed types and locations regardless of case or accents
   assert.equal(matchesReportSearch(report, 'arboles zapopan'), false);
 });
 
-test('search includes structured locations and legacy category labels', () => {
+test('search includes structured locations, display titles and legacy category labels', () => {
   const legacy = {type: 'corte-de-servicios', municipality: 'Zapopan', colonia: 'Las Águilas'};
   assert.equal(matchesReportSearch(legacy, 'alumbrado aguilas'), true);
   assert.equal(matchesReportSearch(legacy, 'zapopan'), true);
+
+  const titled = {type: 'agua', title: '¡Otra vez sin agua!', ubication: 'Guadalajara'};
+  assert.equal(matchesReportSearch(titled, 'otra vez'), true);
 });

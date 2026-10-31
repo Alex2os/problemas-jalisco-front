@@ -31,6 +31,8 @@ export const size = {
   touch: 48,
   control: 52,
   buttonLg: 56,
+  tabBarHeight: 68,
+  tabBarClearance: 96,
   smallIcon: 16,
   iconSmall: 18,
   icon: 24,

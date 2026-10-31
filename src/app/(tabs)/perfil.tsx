@@ -1,11 +1,12 @@
 import React, { useRef, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { ReportCard } from "@/features/reports/components/ReportCard";
 import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -14,16 +15,9 @@ import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
 import { setAuthSession, sessionUserKey, type SessionUser } from "@/services/session";
 import { useReportsStore } from "@/store/useReportsStore";
 
-const contacts = [
-  { label: "Emergencias 911", phone: "911", description: "Policía y Protección Civil" },
-  { label: "SIAPA (Fugas de agua)", phone: "3336682482", description: "Reportes de agua y alcantarillado" },
-  { label: "Servicios Guadalajara 070", phone: "070", description: "Alumbrado, aseo y pavimentos" },
-  { label: "Atención Zapopan", phone: "3338182200", description: "Ciudapp y obras públicas" },
-];
-
 export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
-  const { colors, dark, setPreference } = useAppTheme();
+  const { colors } = useAppTheme();
   useBackendReports();
   const authenticated = useAuthSession();
   const user = useCacheValue<SessionUser>(sessionUserKey);
@@ -47,19 +41,17 @@ export default function PerfilScreen() {
     } catch { setSessionError("No se pudo cerrar la sesión. Intenta de nuevo."); }
     finally { logoutPending.current = false; setLoggingOut(false); }
   }
-  function handleCall(phone: string) {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    void Linking.openURL(`tel:${phone}`);
-  }
-  function toggleTheme() {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    void setPreference(dark ? "light" : "dark");
-  }
   const cardColors = { backgroundColor: colors.surface, borderColor: colors.border };
 
   return (
     <ScrollView style={[styles.screen, { backgroundColor: colors.background }]}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.xxl }]}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + space.lg,
+          paddingBottom: insets.bottom + size.tabBarClearance + space.lg,
+        },
+      ]}
       showsVerticalScrollIndicator={false}>
       <Text accessibilityRole="header" style={[styles.pageTitle, { color: colors.text }]}>{es.profile.title}</Text>
 
@@ -103,52 +95,30 @@ export default function PerfilScreen() {
         {!!sessionError && <ErrorBanner message={sessionError} />}
       </View>
 
-      <View style={[styles.card, cardColors]}>
-        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>{es.profile.emergencyTitle}</Text>
-        <View>
-          {contacts.map((contact, index) => <React.Fragment key={contact.phone}>
-            {index > 0 && <View style={[styles.rowDivider, { backgroundColor: colors.border }]} />}
-            <SettingRow icon="call-outline" title={contact.label} subtitle={contact.description}
-              accessibilityLabel={`Llamar a ${contact.label}`} padded onPress={() => handleCall(contact.phone)} />
-          </React.Fragment>)}
+      {authenticated && (
+        <View style={[styles.card, cardColors]}>
+          <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
+            Mis reportes realizados
+          </Text>
+          {userReports.length ? (
+            <View style={styles.reportsList}>
+              {userReports.map((report) => (
+                <ReportCard
+                  key={report.id}
+                  report={report}
+                  onPress={(item) => router.push(`/reporte/${item.id}`)}
+                />
+              ))}
+            </View>
+          ) : (
+            <Text style={[styles.caption, { color: colors.muted }]}>
+              Aún no has publicado reportes.
+            </Text>
+          )}
         </View>
-      </View>
-
-      <View style={[styles.card, cardColors]}>
-        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>{es.profile.themeTitle}</Text>
-        <SettingRow icon={dark ? "moon-outline" : "sunny-outline"} title={dark ? es.profile.themeDark : es.profile.themeLight}
-          accessibilityLabel="Cambiar apariencia de la app" padded onPress={toggleTheme} />
-      </View>
+      )}
     </ScrollView>
   );
-}
-
-function SettingRow({ title, subtitle, icon, accessibilityLabel, onPress, padded = false }: {
-  title: string;
-  subtitle?: string;
-  icon: React.ComponentProps<typeof Ionicons>["name"];
-  accessibilityLabel: string;
-  onPress: () => void;
-  padded?: boolean;
-}) {
-  const { colors } = useAppTheme();
-  const [pressed, setPressed] = useState(false);
-  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}
-    onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)}
-    style={[styles.settingContainer, {
-      backgroundColor: pressed ? colors.raised : "transparent",
-    }]}>
-    <View style={[styles.settingRow, padded && styles.paddedSettingRow]}>
-    <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft }]}>
-      <Ionicons name={icon} size={21} color={colors.accentText} />
-    </View>
-    <View style={styles.settingInfo}>
-      <Text style={[styles.interactiveLabel, { color: colors.text }]}>{title}</Text>
-      {!!subtitle && <Text style={[styles.caption, { color: colors.muted }]}>{subtitle}</Text>}
-    </View>
-    <Ionicons name="chevron-forward" size={18} color={colors.muted} />
-    </View>
-  </Pressable>;
 }
 
 function AccountAction({ title, icon, tone, loading = false, onPress }: {
@@ -208,10 +178,5 @@ const styles = StyleSheet.create({
   accountButtonLabel: { alignSelf: "center", textAlign: "center", includeFontPadding: false },
   accountButtonIcon: { position: "absolute", left: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
   accountButtonArrow: { position: "absolute", right: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
-  settingContainer: { borderRadius: radius.md, overflow: "hidden" },
-  settingRow: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md },
-  paddedSettingRow: { padding: space.md },
-  settingIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: "center", justifyContent: "center" },
-  settingInfo: { flex: 1, minWidth: 0, gap: space.xs },
-  rowDivider: { height: StyleSheet.hairlineWidth, marginLeft: 40 + space.md * 2, marginRight: space.md },
+  reportsList: { gap: space.xs },
 });

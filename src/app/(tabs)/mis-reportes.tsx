@@ -17,9 +17,9 @@ import { useRecommendedReports } from "@/hooks/useRecommendedReports";
 import type { RecommendationLocation } from "@/services/get-recommended-reports";
 import { EmptyState } from "@/components/EmptyState";
 import { RecommendationLocationBanner } from "@/features/reports/components/RecommendationLocationBanner";
-import { ReportCard } from "@/features/reports/components/ReportCard";
+import { ReportFeedItem } from "@/features/reports/components/ReportFeedItem";
 import { ReportSearchFilterBar } from "@/features/reports/components/ReportSearchFilterBar";
-import { space } from "@/constants/design";
+import { size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useReportsStore } from "@/store/useReportsStore";
@@ -72,30 +72,37 @@ export default function MisReportesScreen() {
           {
             backgroundColor: dark ? colors.background : colors.surface,
             borderBottomColor: colors.border,
-            paddingTop: Math.max(insets.top, 16),
+            paddingTop: insets.top + space.lg,
           },
         ]}
       >
-        <Text style={[styles.title, { color: colors.text }]}>
-          {es.myReports.title}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>
-          {es.myReports.subtitle}
-        </Text>
+        <View style={styles.headerInner}>
+          <Text
+            accessibilityRole="header"
+            style={[styles.pageTitle, { color: colors.text }]}
+          >
+            {es.myReports.title}
+          </Text>
 
-        <ReportSearchFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
+          <View>
+            <ReportSearchFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+            />
+          </View>
+        </View>
       </View>
 
       {/* List of Reports */}
       <FlatList
         data={filteredReports}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { paddingBottom: insets.bottom + size.tabBarClearance + space.lg },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -108,14 +115,25 @@ export default function MisReportesScreen() {
         }
         renderItem={({ item }) => {
           const recommendation = forYou ? reasons.get(item.id) : undefined;
-          return <View style={{ gap: space.xs }}>
-            {recommendation && <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
-              {reasonLabels[recommendation.reason] || "Recomendado para ti"}
-              {recommendation.distance_km !== null ? ` · ${recommendation.distance_km.toLocaleString("es-MX", { maximumFractionDigits: 1 })} km` : ""}
-            </Text>}
-            <ReportCard report={item} onPress={handlePress} />
-          </View>;
+          const recommendationNote = recommendation
+            ? `${reasonLabels[recommendation.reason] || "Cerca de ti"}${recommendation.distance_km !== null ? ` · ${recommendation.distance_km.toLocaleString("es-MX", { maximumFractionDigits: 1 })} km` : ""}`
+            : undefined;
+          return (
+            <ReportFeedItem
+              report={item}
+              onPress={handlePress}
+              recommendationNote={recommendationNote}
+            />
+          );
         }}
+        ItemSeparatorComponent={() => (
+          <View
+            style={[
+              styles.separator,
+              { backgroundColor: colors.border },
+            ]}
+          />
+        )}
         ListHeaderComponent={forYou || listError ? (
           <View style={{ gap: space.sm }}>
             {forYou && (
@@ -139,8 +157,8 @@ export default function MisReportesScreen() {
           listError ? <View /> : listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.primary} /> : (
             <EmptyState
               icon="document-text-outline"
-              title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay recomendaciones" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
-              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : forYou ? "Cuando haya reportes disponibles, verás aquí los más relevantes para ti." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
+              title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay reportes cerca de ti" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}
+              description={searchQuery.trim() ? "Prueba con otro tipo, calle, colonia o municipio, o cambia el filtro de estado." : forYou ? "Cuando haya reportes cercanos disponibles, aparecerán aquí." : activeFilter === "resuelto" ? es.myReports.emptyResolvedSubtitle : es.myReports.emptySubtitle}
               actionTitle={searchQuery.trim() || forYou || activeFilter === "resuelto" ? undefined : es.myReports.emptyAction}
               onAction={() => router.push("/reportar/categoria")}
             />
@@ -160,18 +178,27 @@ const styles = StyleSheet.create({
     paddingBottom: space.md,
     borderBottomWidth: 1,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    letterSpacing: -0.3,
+  headerInner: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
+    gap: space.md,
   },
-  subtitle: {
-    fontSize: 13,
-    marginTop: 2,
-    marginBottom: space.sm,
+  pageTitle: {
+    fontSize: 26,
+    lineHeight: 34,
+    fontWeight: "800",
+    letterSpacing: -0.6,
   },
   list: {
-    padding: space.lg,
-    gap: space.md,
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
+    paddingHorizontal: space.lg,
+    paddingTop: space.xs,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginVertical: space.xs,
   },
 });

@@ -1,4 +1,5 @@
 import { categoryDefFor } from "@/constants/report-categories";
+import { getReportDisplayTitle } from "./report-format";
 import type { Report } from "./types";
 
 function normalizeSearch(value: string) {
@@ -8,6 +9,8 @@ function normalizeSearch(value: string) {
 export function matchesReportSearch(report: Report, query: string): boolean {
   const words = normalizeSearch(query).trim().split(/\s+/).filter(Boolean);
   const searchable = normalizeSearch([
+    report.title,
+    getReportDisplayTitle(report),
     report.type,
     report.category,
     categoryDefFor(report.type).label,

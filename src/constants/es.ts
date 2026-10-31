@@ -26,6 +26,7 @@ export const es = {
     map: "Mapa",
     myReports: "Reportes",
     profile: "Perfil",
+    more: "Más",
   },
 
   home: {
@@ -155,5 +156,18 @@ export const es = {
     themeSystem: "Automático",
     themeLight: "Modo Claro",
     themeDark: "Modo Oscuro",
+  },
+
+  more: {
+    title: "Más",
+    themeTitle: "Apariencia",
+    themeSystem: "Automático",
+    themeLight: "Modo Claro",
+    themeDark: "Modo Oscuro",
+    emergencyTitle: "Teléfonos de atención Jalisco",
+    aboutTitle: "Acerca de la aplicación",
+    aboutDescription: "Herramienta ciudadana para reportar, consultar y dar seguimiento a problemas urbanos en Jalisco.",
+    versionLabel: "Versión",
+    accountTitle: "Sesión",
   },
 };
