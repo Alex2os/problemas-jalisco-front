@@ -18,7 +18,7 @@ export function ReportEditButton({ report }: { report: Report }) {
       onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)}
       style={[styles.button, { backgroundColor: pressed ? colors.raised : colors.surface, borderColor: colors.border }]}>
       <View style={[styles.icon, { backgroundColor: colors.accentSoft }]}>
-        <Ionicons name="create-outline" size={22} color={colors.accent} />
+        <Ionicons name="create-outline" size={22} color={colors.accentText} />
       </View>
       <View style={styles.label}>
         <Text style={[styles.title, { color: colors.text }]}>Editar reporte</Text>

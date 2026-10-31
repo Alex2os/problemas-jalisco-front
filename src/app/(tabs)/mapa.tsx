@@ -18,13 +18,14 @@ import { useBackendReports } from "@/hooks/useBackendReports";
 import { useAuthSession } from "@/hooks/useReportState";
 import { ReportMapMarker } from "@/features/reports/components/ReportMapMarker";
 import { radius, space } from "@/constants/design";
+import { darkMapStyle } from "@/constants/map-theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useReportsStore } from "@/store/useReportsStore";
 import type { Report } from "@/services/types";
 
 export default function MapaScreen() {
   const insets = useSafeAreaInsets();
-  const { colors } = useAppTheme();
+  const { colors, dark } = useAppTheme();
   const mapRef = useRef<MapView>(null);
   const [reportPressed, setReportPressed] = useState(false);
 
@@ -77,6 +78,8 @@ export default function MapaScreen() {
         <MapView
           ref={mapRef}
           style={StyleSheet.absoluteFill}
+          userInterfaceStyle={dark ? "dark" : "light"}
+          customMapStyle={dark ? darkMapStyle : []}
           initialRegion={{
             latitude: 20.6767,
             longitude: -103.3472,
@@ -103,7 +106,7 @@ export default function MapaScreen() {
               { backgroundColor: colors.surface, borderColor: colors.border },
             ]}
           >
-            <Ionicons name="location" size={16} color={colors.accent} />
+            <Ionicons name="location" size={16} color={colors.accentText} />
             <Text style={[styles.locationPillText, { color: colors.text }]}>
               Jalisco
             </Text>
@@ -112,7 +115,7 @@ export default function MapaScreen() {
               {loading ? "Cargando…" : `${reports.length} reportes`}
             </Text>
           </View>
-          {loading && !error && <ActivityIndicator color={colors.accent} style={{ marginTop: space.sm }} />}
+          {loading && !error && <ActivityIndicator color={colors.primary} style={{ marginTop: space.sm }} />}
           {!!error && <ErrorBanner message={error} retrying={loading} onRetry={() => { void refreshReports(); }} />}
         </View>
 
@@ -128,7 +131,7 @@ export default function MapaScreen() {
             },
           ]}
         >
-          <Ionicons name="locate" size={22} color={colors.accent} />
+          <Ionicons name="locate" size={22} color={colors.accentText} />
         </Pressable>
 
       </View>
@@ -143,17 +146,17 @@ export default function MapaScreen() {
           style={[
             styles.reportButton,
             {
-              backgroundColor: reportPressed ? colors.accentDark : colors.accent,
+              backgroundColor: reportPressed ? colors.primaryDark : colors.primary,
               transform: [{ scale: reportPressed ? 0.99 : 1 }],
             },
           ]}
         >
           <View pointerEvents="none" style={styles.reportButtonContent}>
             <View style={styles.reportIconWrap}>
-              <Ionicons name="add-circle-outline" size={24} color={colors.onAccent}
+              <Ionicons name="add-circle-outline" size={24} color={colors.onPrimary}
                 allowFontScaling={false} style={styles.reportIcon} />
             </View>
-            <Text style={[styles.reportButtonText, { color: colors.onAccent }]}>
+            <Text style={[styles.reportButtonText, { color: colors.onPrimary }]}>
               Reportar un problema
             </Text>
           </View>

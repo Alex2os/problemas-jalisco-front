@@ -15,7 +15,7 @@ import { useDraftStore } from "@/store/useDraftStore";
 import { useReportsStore } from "@/store/useReportsStore";
 
 export default function RevisarScreen() {
-  const { colors } = useAppTheme();
+  const { colors, dark } = useAppTheme();
 
   const draft = useDraftStore();
   const resetDraft = useDraftStore((s) => s.resetDraft);
@@ -79,7 +79,7 @@ export default function RevisarScreen() {
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.noImageHero, { backgroundColor: categoryDef.bgLight }]}>
+            <View style={[styles.noImageHero, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
               <Ionicons
                 name={categoryDef.ionicon}
                 size={48}
@@ -101,7 +101,7 @@ export default function RevisarScreen() {
 
             {/* Location */}
             <View style={styles.locationRow}>
-              <Ionicons name="location-sharp" size={16} color={colors.accent} />
+              <Ionicons name="location-sharp" size={16} color={colors.accentText} />
               <Text style={[styles.locationText, { color: colors.text }]}>
                 {draft.address || "Ubicación en Jalisco"}
                 {draft.colonia ? `, Col. ${draft.colonia}` : ""}

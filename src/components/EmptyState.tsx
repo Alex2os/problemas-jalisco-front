@@ -35,27 +35,27 @@ export function EmptyState({
   onAction,
   style,
 }: EmptyStateProps) {
-  const { colors, dark } = useAppTheme();
+  const { colors } = useAppTheme();
 
   return (
     <View style={[styles.container, style]}>
       <View
         style={[
           styles.iconCircle,
-          { backgroundColor: dark ? "#1E2B3A" : "#FFF7ED" },
+          { backgroundColor: colors.accentSoft },
         ]}
       >
         {iconFamily === "feather" ? (
           <Feather
             name={icon as React.ComponentProps<typeof Feather>["name"]}
             size={40}
-            color={colors.accent}
+            color={colors.accentText}
           />
         ) : (
           <Ionicons
             name={icon as React.ComponentProps<typeof Ionicons>["name"]}
             size={48}
-            color={colors.accent}
+            color={colors.accentText}
           />
         )}
       </View>

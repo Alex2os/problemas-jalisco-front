@@ -86,7 +86,7 @@ export function StepProgress({
             styles.fill,
             fillStyle,
             {
-              backgroundColor: colors.accent,
+              backgroundColor: colors.primary,
             },
           ]}
         />

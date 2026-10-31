@@ -96,17 +96,17 @@ export function Button({
 
   switch (effectiveVariant) {
     case "primary":
-      backgroundColor = colors.accent;
-      textColor = colors.onAccent;
+      backgroundColor = colors.primary;
+      textColor = colors.onPrimary;
       break;
     case "secondary":
-      backgroundColor = secondary ? colors.surface : colors.primary;
-      textColor = secondary ? colors.text : colors.onPrimary;
-      borderColor = secondary ? colors.border : undefined;
+      backgroundColor = secondary ? colors.surface : colors.raised;
+      textColor = colors.text;
+      borderColor = colors.border;
       break;
     case "agave":
-      backgroundColor = colors.agave;
-      textColor = colors.onAgave;
+      backgroundColor = colors.accent;
+      textColor = colors.onAccent;
       break;
     case "outline":
       backgroundColor = "transparent";
@@ -115,7 +115,7 @@ export function Button({
       break;
     case "ghost":
       backgroundColor = "transparent";
-      textColor = colors.accent;
+      textColor = colors.primaryText;
       break;
     case "danger":
       backgroundColor = colors.danger;
@@ -123,11 +123,11 @@ export function Button({
       break;
     case "text":
       backgroundColor = "transparent";
-      textColor = colors.accent;
+      textColor = colors.primaryText;
       break;
     default:
-      backgroundColor = colors.accent;
-      textColor = colors.onAccent;
+      backgroundColor = colors.primary;
+      textColor = colors.onPrimary;
   }
 
   const renderIcon = () => {

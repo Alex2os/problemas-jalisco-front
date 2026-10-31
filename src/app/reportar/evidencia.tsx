@@ -53,7 +53,7 @@ export default function EvidenciaScreen() {
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.sectionHeader}>
             <View style={[styles.sectionIcon, { backgroundColor: colors.accentSoft }]}>
-              <Ionicons name="create-outline" size={20} color={colors.accent} />
+              <Ionicons name="create-outline" size={20} color={colors.accentText} />
             </View>
             <View style={styles.headingGroup}>
               <View style={styles.titleRow}>
@@ -77,12 +77,12 @@ export default function EvidenciaScreen() {
             scrollEnabled={false}
             style={[styles.textarea, {
               backgroundColor: colors.background,
-              borderColor: focused ? colors.accent : colors.border,
+              borderColor: focused ? colors.primary : colors.border,
               color: colors.text,
             }]}
           />
           <View style={styles.descriptionFooter}>
-            <Text style={[styles.charCount, { color: description.length === DESCRIPTION_LIMIT ? colors.accent : colors.muted }]}>
+            <Text style={[styles.charCount, { color: description.length === DESCRIPTION_LIMIT ? colors.primaryText : colors.muted }]}>
               {description.length}/{DESCRIPTION_LIMIT}
             </Text>
           </View>

@@ -35,8 +35,9 @@ export function AppText({
   variant?: keyof typeof type;
 }) {
   const { colors } = useAppTheme();
+  const color = tone === "accent" ? colors.accentText : colors[tone];
   return (
-    <Text {...props} style={[type[variant], { color: colors[tone] }, style]} />
+    <Text {...props} style={[type[variant], { color }, style]} />
   );
 }
 
@@ -196,7 +197,7 @@ export function IconButton({
       }}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={colors.accent} />
+        <ActivityIndicator size="small" color={colors.primary} />
       ) : (
         <Feather name={icon} size={size.icon} color={colors.text} />
       )}
@@ -226,7 +227,7 @@ export function Field({
           alignItems: "center",
           borderWidth: border.normal,
           borderRadius: radius.control,
-          borderColor: focused ? colors.accent : colors.border,
+          borderColor: focused ? colors.primary : colors.border,
           backgroundColor: colors.surface,
         }}
       >
@@ -236,7 +237,7 @@ export function Field({
             props.accessibilityLabel || label || props.placeholder
           }
           placeholderTextColor={colors.muted}
-          selectionColor={colors.accent}
+          selectionColor={colors.primary}
           keyboardAppearance={dark ? "dark" : "light"}
           onFocus={(event) => {
             setFocused(true);

@@ -44,7 +44,7 @@ export function CategoryCard({
         {
           backgroundColor: selected
             ? dark
-              ? "#1E2C3D"
+              ? category.bgDark || colors.raised
               : category.bgLight
             : colors.surface,
           borderColor: selected ? category.color : colors.border,
@@ -59,7 +59,7 @@ export function CategoryCard({
       <View
         style={[
           styles.iconWrap,
-          { backgroundColor: selected ? category.color : dark ? "#2A3649" : category.bgLight },
+          { backgroundColor: selected ? category.color : dark ? colors.raised : category.bgLight },
         ]}
       >
         <Ionicons

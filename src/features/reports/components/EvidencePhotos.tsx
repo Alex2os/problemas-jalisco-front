@@ -28,7 +28,7 @@ export function EvidencePhotos({ photos, capacity, busy, disabled, onChoose, onR
     <View style={styles.section}>
       <View style={styles.header}>
         <View style={[styles.sectionIcon, { backgroundColor: colors.accentSoft }]}>
-          <Ionicons name="images-outline" size={20} color={colors.accent} />
+          <Ionicons name="images-outline" size={20} color={colors.accentText} />
         </View>
         <View style={styles.headingGroup}>
           <View style={styles.titleRow}>
@@ -61,7 +61,7 @@ export function EvidencePhotos({ photos, capacity, busy, disabled, onChoose, onR
           disabled={inactive} accessibilityState={{ disabled: inactive, busy }} onPress={() => onChoose(false)}
           style={[styles.emptyArea, { borderColor: colors.borderStrong, backgroundColor: colors.background }]}>
           <View style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}>
-            {busy ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="camera-outline" size={28} color={colors.accent} />}
+            {busy ? <ActivityIndicator color={colors.accentText} /> : <Ionicons name="camera-outline" size={28} color={colors.accentText} />}
           </View>
           <Text style={[styles.emptyTitle, { color: colors.muted }]}>{busy ? "Preparando fotos…" : "Toca para agregar imágenes"}</Text>
         </Pressable>

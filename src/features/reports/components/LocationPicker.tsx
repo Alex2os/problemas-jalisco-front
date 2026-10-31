@@ -18,6 +18,7 @@ import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, size, space } from "@/constants/design";
+import { darkMapStyle } from "@/constants/map-theme";
 
 export interface LocationPickerProps {
   initialLatitude?: number;
@@ -44,7 +45,7 @@ export function LocationPicker({
   onLocationChange,
   style,
 }: LocationPickerProps) {
-  const { colors } = useAppTheme();
+  const { colors, dark } = useAppTheme();
 
   const map = useRef<MapView>(null);
   const position = useRef<Region>({
@@ -133,6 +134,8 @@ export function LocationPicker({
         <MapView
           style={StyleSheet.absoluteFill}
           ref={map}
+          userInterfaceStyle={dark ? "dark" : "light"}
+          customMapStyle={dark ? darkMapStyle : []}
           initialRegion={{ latitude: initialLatitude, longitude: initialLongitude, latitudeDelta: 0.005, longitudeDelta: 0.005 }}
           onRegionChange={handleRegionChange}
           onRegionChangeComplete={(region) => { handleRegionChange(region); lookup.current?.select(region); }}
@@ -140,7 +143,7 @@ export function LocationPicker({
 
         {/* Center Target Pin */}
         <View pointerEvents="none" style={styles.centerPinWrap}>
-          <Ionicons name="location" size={42} color={colors.accent} />
+          <Ionicons name="location" size={42} color={colors.primary} />
         </View>
 
         {/* GPS Locate Button */}
@@ -156,9 +159,9 @@ export function LocationPicker({
           style={[styles.gpsBtn, { backgroundColor: colors.surface }]}
         >
           {locating ? (
-            <ActivityIndicator size="small" color={colors.accent} />
+            <ActivityIndicator size="small" color={colors.accentText} />
           ) : (
-            <Ionicons name="locate" size={22} color={colors.accent} />
+            <Ionicons name="locate" size={22} color={colors.accentText} />
           )}
         </Pressable>
       </View>
@@ -171,7 +174,7 @@ export function LocationPicker({
         ]}
       >
         <View style={styles.addressHeader}>
-          {findingAddress && !locating ? <ActivityIndicator color={colors.accent} accessibilityLabel="Buscando calle" /> : <Ionicons name="location-sharp" size={20} color={colors.accent} />}
+          {findingAddress && !locating ? <ActivityIndicator color={colors.accentText} accessibilityLabel="Buscando calle" /> : <Ionicons name="location-sharp" size={20} color={colors.accentText} />}
           <View style={{ flex: 1 }}>
             <Text style={[styles.addressText, { color: colors.text }]}>
               {addressTitle}

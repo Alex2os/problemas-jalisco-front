@@ -103,7 +103,7 @@ export default function MisReportesScreen() {
           <RefreshControl
             refreshing={listLoading && !listError}
             onRefresh={() => { if (forYou) recommended.refresh(); else void refreshReports(); }}
-            tintColor={colors.accent}
+            tintColor={colors.primary}
           />
         }
         renderItem={({ item }) => {
@@ -136,7 +136,7 @@ export default function MisReportesScreen() {
             disabled={recommended.loading} onPress={recommended.loadMore} />
         ) : undefined}
         ListEmptyComponent={
-          listError ? <View /> : listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.accent} /> : (
+          listError ? <View /> : listLoading || (forYou && recommended.loadingMore) ? <ActivityIndicator color={colors.primary} /> : (
             <EmptyState
               icon="document-text-outline"
               title={searchQuery.trim() ? "Sin resultados" : forYou ? "Aún no hay recomendaciones" : activeFilter === "resuelto" ? es.myReports.emptyResolvedTitle : es.myReports.emptyTitle}

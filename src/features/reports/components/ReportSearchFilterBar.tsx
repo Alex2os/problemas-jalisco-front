@@ -36,7 +36,7 @@ export function ReportSearchFilterBar({
           styles.searchField,
           {
             backgroundColor: colors.surface,
-            borderColor: searchFocused ? colors.accent : colors.border,
+            borderColor: searchFocused ? colors.primary : colors.border,
           },
         ]}
       >
@@ -44,7 +44,7 @@ export function ReportSearchFilterBar({
           accessibilityLabel="Buscar reportes por tipo o ubicación"
           placeholder="Buscar por tipo o ubicación"
           placeholderTextColor={colors.muted}
-          selectionColor={colors.accent}
+          selectionColor={colors.primary}
           style={[styles.searchInput, { color: colors.text }]}
           value={searchQuery}
           onChangeText={onSearchChange}

@@ -5,18 +5,18 @@ export const Colors = {
   light: {
     text: palette.light.text,
     background: palette.light.background,
-    tint: palette.light.primary,
+    tint: palette.light.primaryText,
     icon: palette.light.muted,
     tabIconDefault: palette.light.muted,
-    tabIconSelected: palette.light.primary,
+    tabIconSelected: palette.light.primaryText,
   },
   dark: {
     text: palette.dark.text,
     background: palette.dark.background,
-    tint: palette.dark.primary,
+    tint: palette.dark.primaryText,
     icon: palette.dark.muted,
     tabIconDefault: palette.dark.muted,
-    tabIconSelected: palette.dark.primary,
+    tabIconSelected: palette.dark.primaryText,
   },
 };
 

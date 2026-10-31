@@ -66,7 +66,7 @@ export default function PerfilScreen() {
       <View style={[styles.card, cardColors]}>
         <View style={styles.userRow}>
           <View style={[styles.avatar, { backgroundColor: colors.accentSoft }]}>
-            <Ionicons name="person-outline" size={26} color={colors.accent} />
+            <Ionicons name="person-outline" size={26} color={colors.accentText} />
           </View>
           <View style={styles.userInfo}>
             <Text style={[styles.userName, { color: colors.text }]}>{authenticated ? user?.username || "Mi cuenta" : "Invitado"}</Text>
@@ -80,9 +80,9 @@ export default function PerfilScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{es.profile.statsTitle}</Text>
           {!!error && <ErrorBanner message={error} />}
           <View style={styles.statsRow}>
-            {[{ value: userReports.length, label: es.profile.statsReported, color: colors.accent },
-              { value: resolvedCount, label: es.profile.statsResolved, color: colors.agave },
-              { value: upvotedCount, label: es.profile.statsSupported, color: colors.primary }].map((stat) => (
+            {[{ value: userReports.length, label: es.profile.statsReported, color: colors.primaryText },
+              { value: resolvedCount, label: es.profile.statsResolved, color: colors.success },
+              { value: upvotedCount, label: es.profile.statsSupported, color: colors.secondary }].map((stat) => (
               <View key={stat.label} style={[styles.stat, { backgroundColor: colors.background, borderColor: colors.border }]}
                 accessible accessibilityLabel={`${stat.value} ${stat.label}`}>
                 <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
@@ -140,7 +140,7 @@ function SettingRow({ title, subtitle, icon, accessibilityLabel, onPress, padded
     }]}>
     <View style={[styles.settingRow, padded && styles.paddedSettingRow]}>
     <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft }]}>
-      <Ionicons name={icon} size={21} color={colors.accent} />
+      <Ionicons name={icon} size={21} color={colors.accentText} />
     </View>
     <View style={styles.settingInfo}>
       <Text style={[styles.interactiveLabel, { color: colors.text }]}>{title}</Text>
@@ -162,16 +162,16 @@ function AccountAction({ title, icon, tone, loading = false, onPress }: {
   const [pressed, setPressed] = useState(false);
   const primary = tone === "primary";
   const logout = tone === "logout";
-  const background = primary ? pressed ? colors.accentDark : colors.accent
+  const background = primary ? pressed ? colors.primaryDark : colors.primary
     : logout ? colors.dangerSoft : pressed ? colors.raised : colors.surface;
-  const foreground = primary ? colors.onAccent : logout ? colors.danger : colors.textSecondary;
+  const foreground = primary ? colors.onPrimary : logout ? colors.danger : colors.textSecondary;
   return <Pressable accessibilityRole="button" accessibilityLabel={loading ? "Cerrando sesión" : title}
     accessibilityState={{ disabled: loading, busy: loading }} disabled={loading}
     onPress={() => { if (!loading) { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress(); } }}
     onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)}
     style={[styles.accountButton, {
       backgroundColor: background,
-      borderColor: primary ? colors.accent : logout ? colors.dangerSoft : colors.border,
+      borderColor: primary ? colors.primary : logout ? colors.dangerSoft : colors.border,
       opacity: loading ? 0.7 : pressed && logout ? 0.8 : 1,
       transform: [{ scale: pressed && !loading ? 0.99 : 1 }],
     }]}>

@@ -114,7 +114,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
             <Ionicons
               name="location-sharp"
               size={13}
-              color={colors.accent}
+              color={colors.accentText}
               style={{ marginRight: 3 }}
             />
             <Text
@@ -133,12 +133,12 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
               <Ionicons
                 name={report.liked_by_me ? "hand-right" : "hand-right-outline"}
                 size={13}
-                color={report.liked_by_me ? colors.accent : colors.muted}
+                color={report.liked_by_me ? colors.secondary : colors.muted}
               />
               <Text
                 style={[
                   styles.upvoteText,
-                  { color: report.liked_by_me ? colors.accent : colors.muted },
+                  { color: report.liked_by_me ? colors.secondary : colors.muted },
                 ]}
               >
                 {report.like_count} apoyos

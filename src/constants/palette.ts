@@ -22,13 +22,17 @@ export const palette = {
     primary: "#FE8B01", // Naranja principal
     primaryDark: "#D97500",
     primarySoft: "#FFF4E5", // Surface accent
+    primaryText: "#AA5800", // Naranja con contraste AA sobre superficies claras
     onPrimary: "#202938", // Texto oscuro legible sobre botón naranja
 
     // Secondary & Accent
     secondary: "#E00B50", // Rosa secundario
+    secondarySoft: "#FDE8EF",
+    onSecondary: "#FFFFFF",
     accent: "#58C3E3", // Azul cielo de acento
     accentDark: "#39A6C8",
     accentSoft: "#EAF8FC",
+    accentText: "#0F6E8C", // Azul contextual con contraste AA sobre superficies claras
     onAccent: "#202938", // Texto oscuro legible sobre acento azul cielo
 
     // Agave & Water (compatibilidad semántica)
@@ -70,13 +74,17 @@ export const palette = {
     primary: "#FE8B01", // Naranja principal
     primaryDark: "#D97500",
     primarySoft: "#2E2010", // Surface accent
+    primaryText: "#FE8B01",
     onPrimary: "#0D0E10", // Texto oscuro legible sobre botón naranja
 
     // Secondary & Accent (variantes visuales dark)
     secondary: "#FF4D83", // Rosa secundario (uso visual dark)
+    secondarySoft: "#2D1520",
+    onSecondary: "#0D0E10",
     accent: "#7DDAF2", // Azul cielo de acento (uso visual dark)
     accentDark: "#58C3E3",
     accentSoft: "#162930",
+    accentText: "#7DDAF2",
     onAccent: "#0D0E10", // Texto oscuro legible sobre acento azul cielo dark
 
     // Agave & Water (compatibilidad semántica)

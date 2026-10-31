@@ -33,15 +33,15 @@ export function ReportStepFooter({
         onPressIn={() => setPressed(true)}
         onPressOut={() => setPressed(false)}
         style={[styles.button, {
-          backgroundColor: pressed && !inactive ? colors.accentDark : colors.accent,
+          backgroundColor: pressed && !inactive ? colors.primaryDark : colors.primary,
           opacity: disabled ? 0.5 : 1,
           transform: [{ scale: pressed && !inactive ? 0.99 : 1 }],
         }]}
       >
-        <Text style={[styles.label, { color: colors.onAccent }]}>{title}</Text>
+        <Text style={[styles.label, { color: colors.onPrimary }]}>{title}</Text>
         <View pointerEvents="none" style={styles.icon}>
-          {loading ? <ActivityIndicator color={colors.onAccent} />
-            : <Ionicons name={icon} size={22} color={colors.onAccent} />}
+          {loading ? <ActivityIndicator color={colors.onPrimary} />
+            : <Ionicons name={icon} size={22} color={colors.onPrimary} />}
         </View>
       </Pressable>
     </View>

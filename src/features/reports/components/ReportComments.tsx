@@ -130,7 +130,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
             editable={!busy}
             style={[styles.input, { color: colors.text, backgroundColor: colors.background, borderColor: colors.border }]}
           />
-          <Button title="Publicar comentario" variant="secondary"
+          <Button title="Publicar comentario" variant="primary"
             icon={<Ionicons name="send-outline" size={18} color={!text.trim() || loading || busy ? colors.muted : colors.onPrimary} />}
             loading={busy} disabled={!text.trim() || loading || busy}
             onPress={() => { void save(); }} fullWidth />
@@ -151,7 +151,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
           )}
         </View>
       ))}
-      {loading && !loadError && <ActivityIndicator color={colors.accent} accessibilityLabel="Cargando comentarios" />}
+      {loading && !loadError && <ActivityIndicator color={colors.primary} accessibilityLabel="Cargando comentarios" />}
       {loaded && !loading && !comments.length && !loadError && <Text style={{ color: colors.muted }}>Aún no hay comentarios.</Text>}
       {!!loadError && <ErrorBanner message={loadError} retrying={loading} onRetry={() => { void load(); }} />}
     </View>

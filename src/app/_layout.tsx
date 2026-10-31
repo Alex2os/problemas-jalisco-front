@@ -49,7 +49,7 @@ function Navigation() {
           card: colors.surface,
           text: colors.text,
           border: colors.border,
-          primary: colors.accent,
+          primary: colors.primary,
         },
       }}
     >

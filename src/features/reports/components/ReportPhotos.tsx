@@ -71,7 +71,7 @@ export function ReportImage({
       )}
       {loading && !failed && (
         <ActivityIndicator
-          color={colors.accent}
+          color={colors.primary}
           style={{ position: "absolute", alignSelf: "center" }}
         />
       )}

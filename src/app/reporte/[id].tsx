@@ -53,7 +53,7 @@ export default function ReporteDetailScreen() {
         <Pressable onPress={() => router.back()} style={{ padding: space.md }}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
-        {loading ? <ActivityIndicator color={colors.accent} /> : <ErrorBanner message={error || "No se encontró el reporte."} />}
+        {loading ? <ActivityIndicator color={colors.primary} /> : <ErrorBanner message={error || "No se encontró el reporte."} />}
       </View>
     );
   }
@@ -148,11 +148,9 @@ export default function ReporteDetailScreen() {
               styles.upvoteCard,
               {
                 backgroundColor: report.liked_by_me
-                  ? dark
-                    ? "#2C1E14"
-                    : "#FFF5ED"
+                  ? colors.secondarySoft
                   : colors.surface,
-                borderColor: report.liked_by_me ? colors.accent : colors.border,
+                borderColor: report.liked_by_me ? colors.secondary : colors.border,
               },
             ]}
           >
@@ -175,21 +173,21 @@ export default function ReporteDetailScreen() {
                 styles.upvoteBtn,
                 {
                   backgroundColor: report.liked_by_me
-                    ? colors.accent
+                    ? colors.secondary
                     : colors.surface,
-                  borderColor: colors.accent,
+                  borderColor: colors.secondary,
                 },
               ]}
             >
               <Ionicons
                 name={report.liked_by_me ? "hand-right" : "hand-right-outline"}
                 size={18}
-                color={report.liked_by_me ? "#FFFFFF" : colors.accent}
+                color={report.liked_by_me ? colors.onSecondary : colors.secondary}
               />
               <Text
                 style={[
                   styles.upvoteBtnText,
-                  { color: report.liked_by_me ? "#FFFFFF" : colors.accent },
+                  { color: report.liked_by_me ? colors.onSecondary : colors.secondary },
                 ]}
               >
                 {report.liked_by_me ? es.detail.upvoted : es.detail.upvote}

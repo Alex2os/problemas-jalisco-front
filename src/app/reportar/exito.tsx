@@ -56,14 +56,14 @@ export default function ExitoScreen() {
               onPressIn={() => setPressed("report")}
               onPressOut={() => setPressed(null)}
               style={[styles.button, {
-                backgroundColor: pressed === "report" ? colors.accentDark : colors.accent,
+                backgroundColor: pressed === "report" ? colors.primaryDark : colors.primary,
                 opacity: hasReport ? 1 : 0.5,
                 transform: [{ scale: pressed === "report" ? 0.99 : 1 }],
               }]}
             >
-              <Text style={[styles.buttonText, { color: colors.onAccent }]}>{es.success.viewReport}</Text>
+              <Text style={[styles.buttonText, { color: colors.onPrimary }]}>{es.success.viewReport}</Text>
               <View pointerEvents="none" style={styles.trailingIcon}>
-                <Ionicons name="arrow-forward" size={22} color={colors.onAccent} />
+                <Ionicons name="arrow-forward" size={22} color={colors.onPrimary} />
               </View>
             </Pressable>
             <Pressable

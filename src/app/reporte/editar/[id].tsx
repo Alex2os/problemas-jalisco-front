@@ -48,7 +48,7 @@ export default function EditReportScreen() {
   return <View style={[styles.screen, { backgroundColor: colors.background }]}>
     <EditorHeader id={id} />
     <View style={styles.empty}>
-      {loading && !report ? <ActivityIndicator color={colors.accent} /> : !authenticated ? (
+      {loading && !report ? <ActivityIndicator color={colors.primary} /> : !authenticated ? (
         <EmptyState title="Inicia sesión para editar" description="Solo el autor puede modificar este reporte."
           actionTitle="Iniciar sesión" onAction={() => router.push({ pathname: "/auth/login", params: { returnTo: `/reporte/editar/${id}` } })} />
       ) : error && !report ? <ErrorBanner message={error} /> : (
@@ -134,7 +134,7 @@ function EditorContent({ initialReport }: { initialReport: Report }) {
         <Text style={[styles.subtitle, { color: colors.muted }]}>Cambia las fotos o el estado y guarda los cambios.</Text>
       </View>
       <View style={[styles.summary, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={[styles.summaryIcon, { backgroundColor: colors.accentSoft }]}><Ionicons name={category.ionicon} size={24} color={colors.accent} /></View>
+        <View style={[styles.summaryIcon, { backgroundColor: colors.accentSoft }]}><Ionicons name={category.ionicon} size={24} color={colors.accentText} /></View>
         <View style={{ flex: 1, gap: space.xs }}>
           <Text style={[styles.summaryTitle, { color: colors.text }]}>{category.label}</Text>
           <Text numberOfLines={2} style={[styles.caption, { color: colors.muted }]}>{baseline.ubication}</Text>
@@ -149,10 +149,10 @@ function EditorContent({ initialReport }: { initialReport: Report }) {
           {([{ value: "reportado", label: "Reportado", icon: "document-text-outline" },
             { value: "resuelto", label: "Resuelto", icon: "checkmark-circle-outline" }] as const).map((option) => {
             const selected = status === option.value;
-            const color = option.value === "resuelto" ? colors.success : colors.accent;
+            const color = option.value === "resuelto" ? colors.success : colors.primaryText;
             return <Pressable key={option.value} accessibilityRole="radio" accessibilityLabel={option.label}
               accessibilityState={{ checked: selected, disabled: inactive }} disabled={inactive} onPress={() => setStatus(option.value)}
-              style={[styles.option, { borderColor: selected ? color : colors.border, backgroundColor: selected ? option.value === "resuelto" ? colors.successSoft : colors.accentSoft : colors.background, opacity: inactive ? 0.6 : 1 }]}>
+              style={[styles.option, { borderColor: selected ? color : colors.border, backgroundColor: selected ? option.value === "resuelto" ? colors.successSoft : colors.primarySoft : colors.background, opacity: inactive ? 0.6 : 1 }]}>
               <Ionicons name={option.icon} size={20} color={selected ? color : colors.muted} />
               <Text style={[styles.optionText, { color: selected ? color : colors.text }]}>{option.label}</Text>
             </Pressable>;
@@ -167,7 +167,7 @@ function EditorContent({ initialReport }: { initialReport: Report }) {
           <Text style={[styles.caption, { color: colors.muted, flex: 1 }]}>{removed.length === 1 ? "1 foto se eliminará al guardar." : `${removed.length} fotos se eliminarán al guardar.`}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="Deshacer eliminación de fotos" disabled={inactive || baseline.photos.length + photos.length > 3}
             onPress={() => setRemoved([])} style={styles.undo}>
-            <Text style={{ color: inactive || baseline.photos.length + photos.length > 3 ? colors.muted : colors.accent, fontWeight: "600" }}>Deshacer</Text>
+            <Text style={{ color: inactive || baseline.photos.length + photos.length > 3 ? colors.muted : colors.primaryText, fontWeight: "600" }}>Deshacer</Text>
           </Pressable>
         </View>}
       </View>

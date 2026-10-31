@@ -4,13 +4,14 @@ import MapView from "react-native-maps";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { radius, space } from "@/constants/design";
 import { es } from "@/constants/es";
+import { darkMapStyle } from "@/constants/map-theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import type { Report } from "@/services/types";
 import { GoogleMapsButton } from "./GoogleMapsButton";
 import { ReportMapMarker } from "./ReportMapMarker";
 
 export function ReportLocationSection({ report }: { report: Report }) {
-  const { colors } = useAppTheme();
+  const { colors, dark } = useAppTheme();
 
   return (
     <View
@@ -24,7 +25,7 @@ export function ReportLocationSection({ report }: { report: Report }) {
       </Text>
 
       <View style={styles.locationTextRow}>
-        <Ionicons name="location-sharp" size={16} color={colors.accent} />
+        <Ionicons name="location-sharp" size={16} color={colors.accentText} />
         <Text style={[styles.locationText, { color: colors.text }]}>
           {report.ubication}
         </Text>
@@ -33,6 +34,8 @@ export function ReportLocationSection({ report }: { report: Report }) {
       <View style={styles.miniMapWrapper}>
         <MapView
           style={StyleSheet.absoluteFill}
+          userInterfaceStyle={dark ? "dark" : "light"}
+          customMapStyle={dark ? darkMapStyle : []}
           initialRegion={{
             latitude: report.latitude,
             longitude: report.longitude,
