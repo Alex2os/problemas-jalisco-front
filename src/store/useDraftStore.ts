@@ -12,8 +12,8 @@ interface DraftState extends ReportDraft {
   resetDraft: () => Promise<void>;
 }
 const emptyDraft = (): ReportDraft => ({
-  step: 1, category: null, latitude: 20.6767, longitude: -103.3472,
-  address: "", colonia: "", municipality: "Guadalajara", reference: "",
+  step: 1, category: null, latitude: null, longitude: null,
+  address: "", colonia: "", municipality: "", reference: "",
   photos: [], description: "", lastUpdated: Date.now(),
 });
 

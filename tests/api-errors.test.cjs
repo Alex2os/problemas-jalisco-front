@@ -72,3 +72,32 @@ test('failed report writes are not retried or treated as logout and warn about u
     assert.equal(requests, 1);
   });
 });
+
+test('HTTP 413 and 415 return informative domain-specific errors without losing status', async () => {
+  await withFetch(async () => new Response('Payload Too Large', {status: 413}), async c => {
+    const api = c.load('services/api');
+    await assert.rejects(api.apiRequest('/reports/create-with-photos', {method: 'POST'}), error =>
+      error instanceof api.ApiError && error.status === 413 && /excede el tamaño máximo/.test(error.message));
+  });
+
+  await withFetch(async () => new Response('Unsupported Media Type', {status: 415}), async c => {
+    const api = c.load('services/api');
+    await assert.rejects(api.apiRequest('/reports/create-with-photos', {method: 'POST'}), error =>
+      error instanceof api.ApiError && error.status === 415 && /formato de los archivos/.test(error.message));
+  });
+});
+
+test('HTTP 400 with ASP.NET Core validation dictionary extracts first field message', async () => {
+  const aspNetError = {
+    title: 'One or more validation errors occurred.',
+    status: 400,
+    errors: {
+      photos: ['El archivo no es una imagen válida.'],
+    },
+  };
+  await withFetch(async () => new Response(JSON.stringify(aspNetError), {status: 400}), async c => {
+    const api = c.load('services/api');
+    await assert.rejects(api.apiRequest('/reports/create-with-photos', {method: 'POST'}), error =>
+      error instanceof api.ApiError && error.status === 400 && error.message === 'El archivo no es una imagen válida.');
+  });
+});

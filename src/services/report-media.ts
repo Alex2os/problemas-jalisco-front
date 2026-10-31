@@ -21,16 +21,17 @@ export function photoUrl(path: string) {
 }
 export function appendPhotos(form: FormData, photos: SelectedPhoto[]) {
   if (photos.length > 3) throw new Error("Puedes adjuntar hasta 3 fotos.");
-  for (const photo of photos) {
+  photos.forEach((photo, index) => {
     if (photo.size <= 0 || photo.size > MAX_PHOTO_BYTES)
       throw new Error("Cada foto debe ocupar como máximo 5 MB.");
-    // React Native's FormData accepts a native file descriptor, not a DOM Blob.
+    const filename = photo.name || `report-photo-${index + 1}.jpg`;
+    // React Native's FormData accepts a native file descriptor { uri, name, type }
     form.append("photos", {
       uri: photo.uri,
-      name: photo.name,
-      type: photo.type,
+      name: filename,
+      type: photo.type || "image/jpeg",
     } as unknown as Blob);
-  }
+  });
 }
 function confirm(report: Report) {
   invalidateInteractionQueries(report.id);

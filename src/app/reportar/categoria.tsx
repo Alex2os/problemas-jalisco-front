@@ -4,15 +4,16 @@ import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CategoryCard } from "@/features/reports/components/CategoryCard";
-import { CATEGORIES_LIST } from "@/constants/report-categories";
 import { space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useReportCategories } from "@/hooks/useReportCategories";
 import { useDraftStore } from "@/store/useDraftStore";
 
 export default function CategoriaScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
+  const { categories } = useReportCategories();
 
   const selectedCategory = useDraftStore((s) => s.category);
   const setCategory = useDraftStore((s) => s.setCategory);
@@ -43,7 +44,7 @@ export default function CategoriaScreen() {
 
         {/* Waze style big tiles */}
         <View style={styles.grid}>
-          {CATEGORIES_LIST.map((cat) => (
+          {categories.map((cat) => (
             <View key={cat.id} style={styles.gridItem}>
               <CategoryCard
                 category={cat}

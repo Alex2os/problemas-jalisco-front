@@ -11,8 +11,34 @@ interface LocationAddress extends Coordinates {
   municipality: string | null;
 }
 
+export const DEFAULT_JALISCO_COORDINATES = {
+  latitude: 20.6767,
+  longitude: -103.3472,
+};
+
+export const JALISCO_BOUNDS = {
+  minLatitude: 18.92,
+  maxLatitude: 22.75,
+  minLongitude: -105.7,
+  maxLongitude: -101.47,
+};
+
+export function isInJaliscoBounds(latitude: number, longitude: number): boolean {
+  return (
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    latitude >= JALISCO_BOUNDS.minLatitude &&
+    latitude <= JALISCO_BOUNDS.maxLatitude &&
+    longitude >= JALISCO_BOUNDS.minLongitude &&
+    longitude <= JALISCO_BOUNDS.maxLongitude
+  );
+}
+
 export async function GetLocationAddress(coordinates: Coordinates): Promise<StreetAddress[]> {
   const { latitude, longitude } = coordinates;
+  if (!isInJaliscoBounds(latitude, longitude)) {
+    return [];
+  }
   const response = await apiRequest<{ location: LocationAddress }>(
     `/locations/reverse?latitude=${latitude}&longitude=${longitude}`, {}, true,
   );

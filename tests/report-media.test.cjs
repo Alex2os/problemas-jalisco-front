@@ -33,6 +33,26 @@ test('photo payload validation rejects oversized batches and files before reques
   assert.throws(() => appendPhotos(new FormData(), [{...file, size: MAX_PHOTO_BYTES + 1}]), /5 MB/);
 });
 
+test('appendPhotos appends native file descriptor objects with photos field name and unique names', () => {
+  const c = createServiceClient();
+  const {appendPhotos} = c.load('services/report-media');
+  class MockFormData {
+    constructor() { this.parts = []; }
+    append(name, value) { this.parts.push({name, value}); }
+  }
+  const form = new MockFormData();
+  const photos = [
+    {uri: 'file:///photo1.jpg', name: 'photo1.jpg', type: 'image/jpeg', size: 1024},
+    {uri: 'file:///photo2.jpg', name: '', type: 'image/jpeg', size: 2048},
+  ];
+  appendPhotos(form, photos);
+  assert.equal(form.parts.length, 2);
+  assert.equal(form.parts[0].name, 'photos');
+  assert.deepEqual(form.parts[0].value, {uri: 'file:///photo1.jpg', name: 'photo1.jpg', type: 'image/jpeg'});
+  assert.equal(form.parts[1].name, 'photos');
+  assert.deepEqual(form.parts[1].value, {uri: 'file:///photo2.jpg', name: 'report-photo-2.jpg', type: 'image/jpeg'});
+});
+
 test('actual API client leaves multipart boundary to native fetch and sends authentication', async () => {
   const originalFetch = global.fetch;
   const c = createServiceClient({storage: new Map([['auth_token', 'test-token']])});

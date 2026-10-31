@@ -51,7 +51,14 @@ export function createAddressLookup({
           const results = await lookup(coordinates);
           if (disposed || request !== version) return;
           const address = results[0];
-          if (!address) { publish({ ...empty, status: "unavailable", error: "No se encontró una dirección para este punto. Puedes ajustar el mapa o confirmar la ubicación seleccionada." }); return; }
+          if (!address) {
+            publish({
+              ...empty,
+              status: "unavailable",
+              error: "No se encontró una dirección para este punto o está fuera de Jalisco. Puedes ajustar el mapa o confirmar la ubicación seleccionada.",
+            });
+            return;
+          }
           const street = [address.street, address.streetNumber].filter(Boolean).join(" ").trim();
           publish({
             ...coordinates,

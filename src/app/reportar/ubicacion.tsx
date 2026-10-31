@@ -9,12 +9,15 @@ import { space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
+import { DEFAULT_JALISCO_COORDINATES, isInJaliscoBounds } from "@/services/get-location-address";
 
 export default function UbicacionScreen() {
   const { colors } = useAppTheme();
 
-  const latitude = useDraftStore((s) => s.latitude) || 20.6767;
-  const longitude = useDraftStore((s) => s.longitude) || -103.3472;
+  const draftLatitude = useDraftStore((s) => s.latitude);
+  const draftLongitude = useDraftStore((s) => s.longitude);
+  const latitude = draftLatitude ?? DEFAULT_JALISCO_COORDINATES.latitude;
+  const longitude = draftLongitude ?? DEFAULT_JALISCO_COORDINATES.longitude;
   const address = useDraftStore((s) => s.address);
   const colonia = useDraftStore((s) => s.colonia);
   const municipality = useDraftStore((s) => s.municipality);
@@ -22,7 +25,12 @@ export default function UbicacionScreen() {
   const setLocation = useDraftStore((s) => s.setLocation);
   const setStep = useDraftStore((s) => s.setStep);
 
+  const isLocationValid = draftLatitude !== null && draftLongitude !== null && isInJaliscoBounds(draftLatitude, draftLongitude);
+
   const handleConfirm = () => {
+    if (!isLocationValid) {
+      return;
+    }
     setStep(3);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/reportar/evidencia");
@@ -52,7 +60,11 @@ export default function UbicacionScreen() {
         />
       </ScrollView>
 
-      <ReportStepFooter title={es.location.confirm} onPress={handleConfirm} />
+      <ReportStepFooter
+        title={es.location.confirm}
+        disabled={!isLocationValid}
+        onPress={handleConfirm}
+      />
     </View>
   );
 }

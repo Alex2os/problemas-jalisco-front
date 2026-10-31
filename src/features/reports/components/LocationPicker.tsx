@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { createAddressLookup, type AddressLookupState } from "@/services/address-lookup";
-import { GetLocationAddress } from "@/services/get-location-address";
+import { GetLocationAddress, DEFAULT_JALISCO_COORDINATES } from "@/services/get-location-address";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
@@ -36,8 +36,8 @@ export interface LocationPickerProps {
 }
 
 export function LocationPicker({
-  initialLatitude = 20.6767,
-  initialLongitude = -103.3472,
+  initialLatitude = DEFAULT_JALISCO_COORDINATES.latitude,
+  initialLongitude = DEFAULT_JALISCO_COORDINATES.longitude,
   address,
   colonia = "",
   municipality = "",

@@ -35,3 +35,21 @@ test('connection and authentication messages reach the lookup unchanged', async 
     await assert.rejects(service(async () => {throw new Error(message);})(coordinates), error => error.message === message);
   }
 });
+
+test('coordinates outside Jalisco bounds return empty results without sending network requests', async () => {
+  let called = false;
+  const lookup = service(async () => {
+    called = true;
+    return {location};
+  });
+  // Apple Maps Mexico center fallback coordinate that previously failed
+  const outside1 = {latitude: 23.240472999999966, longitude: -101.957886};
+  const res1 = await lookup(outside1);
+  assert.deepEqual(res1, []);
+  assert.equal(called, false);
+
+  const outside2 = {latitude: 18.0, longitude: -103.35};
+  const res2 = await lookup(outside2);
+  assert.deepEqual(res2, []);
+  assert.equal(called, false);
+});

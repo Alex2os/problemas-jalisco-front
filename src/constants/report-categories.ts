@@ -1,91 +1,170 @@
 import type { ComponentProps } from "react";
 import type Feather from "@expo/vector-icons/Feather";
 import type Ionicons from "@expo/vector-icons/Ionicons";
+import type { BackendCategory } from "@/services/get-categories";
 
-export interface CategoryDefinition {
-  id: string;
-  label: string;
+export interface CategoryVisual {
   shortLabel: string;
-  description: string;
   featherIcon: ComponentProps<typeof Feather>["name"];
   ionicon: ComponentProps<typeof Ionicons>["name"];
   color: string;
   bgLight: string;
+  bgDark?: string;
 }
 
-export const CATEGORIES_LIST: CategoryDefinition[] = [
-  {
-    id: "baches",
-    label: "Baches y vialidad",
+export interface CategoryDefinition extends CategoryVisual {
+  id: string;
+  label: string;
+  description: string;
+}
+
+/**
+ * Presentación visual centralizada por categoría (iconos y colores).
+ * Mantiene la armonía visual de los temas Light y Dark.
+ */
+export const CATEGORY_VISUALS: Record<string, CategoryVisual> = {
+  baches: {
     shortLabel: "Baches",
-    description: "Pavimento dañado",
     featherIcon: "alert-triangle",
     ionicon: "car-outline",
     color: "#EA580C",
     bgLight: "#FFF7ED",
+    bgDark: "#351C0A",
   },
-  {
-    id: "alumbrado",
-    label: "Alumbrado público",
+  alumbrado: {
     shortLabel: "Alumbrado",
-    description: "Luces que no funcionan",
     featherIcon: "zap",
     ionicon: "bulb-outline",
     color: "#EAB308",
     bgLight: "#FEFCE8",
+    bgDark: "#332A08",
   },
-  {
-    id: "agua",
-    label: "Agua y drenaje",
+  agua: {
     shortLabel: "Agua",
-    description: "Fugas o drenaje tapado",
     featherIcon: "droplet",
     ionicon: "water-outline",
     color: "#0284C7",
     bgLight: "#F0F9FF",
+    bgDark: "#0A2538",
   },
-  {
-    id: "basura",
-    label: "Basura acumulada",
+  basura: {
     shortLabel: "Basura",
-    description: "Desechos y escombros",
     featherIcon: "trash-2",
     ionicon: "trash-outline",
     color: "#16A34A",
     bgLight: "#F0FDF4",
+    bgDark: "#0D2C15",
   },
-  {
-    id: "seguridad",
-    label: "Seguridad urbana",
+  seguridad: {
     shortLabel: "Seguridad",
-    description: "Vandalismo y riesgos",
     featherIcon: "shield",
     ionicon: "shield-checkmark-outline",
     color: "#DC2626",
     bgLight: "#FEF2F2",
+    bgDark: "#371313",
   },
-  {
-    id: "arboles",
-    label: "Árboles y parques",
+  arboles: {
     shortLabel: "Árboles",
-    description: "Ramas o árboles caídos",
     featherIcon: "feather",
     ionicon: "leaf-outline",
     color: "#0D9488",
     bgLight: "#F0FDFA",
+    bgDark: "#0A2825",
   },
-  {
-    id: "otro",
-    label: "Otro problema",
+  otro: {
     shortLabel: "Otro",
-    description: "Señales o semáforos",
     featherIcon: "help-circle",
     ionicon: "grid-outline",
     color: "#64748B",
     bgLight: "#F8FAFC",
+    bgDark: "#1E2733",
+  },
+};
+
+/**
+ * Catálogo local oficial de respaldo (exactamente los 7 identificadores del backend).
+ * Permite que la app funcione offline o si la consulta al backend falla.
+ */
+export const LOCAL_FALLBACK_CATEGORIES: CategoryDefinition[] = [
+  {
+    id: "baches",
+    label: "Baches y vialidad",
+    description: "Pavimento dañado",
+    ...CATEGORY_VISUALS.baches,
+  },
+  {
+    id: "alumbrado",
+    label: "Alumbrado público",
+    description: "Luces que no funcionan",
+    ...CATEGORY_VISUALS.alumbrado,
+  },
+  {
+    id: "agua",
+    label: "Agua y drenaje",
+    description: "Fugas o drenaje tapado",
+    ...CATEGORY_VISUALS.agua,
+  },
+  {
+    id: "basura",
+    label: "Basura acumulada",
+    description: "Desechos y escombros",
+    ...CATEGORY_VISUALS.basura,
+  },
+  {
+    id: "seguridad",
+    label: "Seguridad urbana",
+    description: "Vandalismo y riesgos",
+    ...CATEGORY_VISUALS.seguridad,
+  },
+  {
+    id: "arboles",
+    label: "Árboles y parques",
+    description: "Ramas o árboles caídos",
+    ...CATEGORY_VISUALS.arboles,
+  },
+  {
+    id: "otro",
+    label: "Otro problema",
+    description: "Señales o semáforos",
+    ...CATEGORY_VISUALS.otro,
   },
 ];
 
+export const CATEGORIES_LIST: CategoryDefinition[] = LOCAL_FALLBACK_CATEGORIES;
+
+/**
+ * Combina las categorías devueltas por el backend con los activos visuales del frontend.
+ */
+export function mergeBackendCategories(backendList: BackendCategory[]): CategoryDefinition[] {
+  if (!Array.isArray(backendList) || backendList.length === 0) {
+    return LOCAL_FALLBACK_CATEGORIES;
+  }
+  return backendList.map((cat) => {
+    const visual = CATEGORY_VISUALS[cat.id] || CATEGORY_VISUALS.otro;
+    return {
+      id: cat.id,
+      label: cat.name || cat.id,
+      description: cat.description || "",
+      ...visual,
+    };
+  });
+}
+
+/**
+ * Mapeo de identificadores legacy hacia el identificador canónico activo.
+ */
+export const legacyCategoryIds: Record<string, string> = {
+  accidente: "baches",
+  bloqueo: "otro",
+  "corte-de-servicios": "alumbrado",
+  "transporte-publico": "otro",
+  "robo-asalto": "seguridad",
+  otros: "otro",
+};
+
+/**
+ * Mapeo histórico para lectura y visualización compatible.
+ */
 export const categories: Record<
   string,
   { label: string; icon: ComponentProps<typeof Feather>["name"]; color: string }
@@ -108,17 +187,8 @@ export const categories: Record<
 export const categoryFor = (type: string) =>
   categories[type] || categories.otro || categories.otros;
 
-const legacyCategoryIds: Record<string, string> = {
-  accidente: "baches",
-  bloqueo: "otro",
-  "corte-de-servicios": "alumbrado",
-  "transporte-publico": "otro",
-  "robo-asalto": "seguridad",
-  otros: "otro",
-};
-
 export const categoryDefFor = (type: string): CategoryDefinition => {
-  const normalized = type.trim().toLowerCase();
+  const normalized = (type || "").trim().toLowerCase();
   const id = legacyCategoryIds[normalized] || normalized;
-  return CATEGORIES_LIST.find((category) => category.id === id) || CATEGORIES_LIST[CATEGORIES_LIST.length - 1];
+  return LOCAL_FALLBACK_CATEGORIES.find((category) => category.id === id) || LOCAL_FALLBACK_CATEGORIES[LOCAL_FALLBACK_CATEGORIES.length - 1];
 };

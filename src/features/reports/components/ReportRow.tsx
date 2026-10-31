@@ -23,7 +23,7 @@ export function ReportRow({ report: initial }: { report: Report }) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${category.label}. ${report.ubication || "Ver ubicación"}. Ver detalles`}
-        onPress={() => router.push(`/reports/${report.id}`)}
+        onPress={() => router.push(`/reporte/${report.id}`)}
         style={({ pressed }) => [
           styles.row,
           { backgroundColor: pressed ? colors.raised : "transparent" },

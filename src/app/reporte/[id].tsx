@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, type ComponentRef } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -35,7 +35,10 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 export default function ReporteDetailScreen() {
   const insets = useSafeAreaInsets();
   const { colors, dark } = useAppTheme();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, comments } = useLocalSearchParams<{ id: string; comments?: string }>();
+  const scrollViewRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const commentsOffset = useRef(0);
+  const didAutoScroll = useRef(false);
 
   const { report, loading, error } = useBackendReport(id || "");
   const authenticated = useAuthSession();
@@ -120,6 +123,7 @@ export default function ReporteDetailScreen() {
       </View>
 
       <ScrollView
+        ref={scrollViewRef}
         contentContainerStyle={[
           styles.content,
           { paddingBottom: Math.max(insets.bottom, 24) + 20 },
@@ -128,6 +132,15 @@ export default function ReporteDetailScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         automaticallyAdjustKeyboardInsets
+        onContentSizeChange={() => {
+          if (comments === "1" && commentsOffset.current > 0 && !didAutoScroll.current) {
+            didAutoScroll.current = true;
+            scrollViewRef.current?.scrollTo({
+              y: commentsOffset.current,
+              animated: true,
+            });
+          }
+        }}
       >
         {!report.photos.length && (
           <View style={[styles.noPhotoBanner, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
@@ -267,7 +280,20 @@ export default function ReporteDetailScreen() {
             </View>
             <GoogleMapsButton report={report} />
           </View>
-          <ReportComments key={report.id} reportId={report.id} />
+          <View
+            onLayout={(event) => {
+              commentsOffset.current = event.nativeEvent.layout.y;
+              if (comments === "1" && !didAutoScroll.current) {
+                didAutoScroll.current = true;
+                scrollViewRef.current?.scrollTo({
+                  y: event.nativeEvent.layout.y,
+                  animated: true,
+                });
+              }
+            }}
+          >
+            <ReportComments key={report.id} reportId={report.id} />
+          </View>
         </View>
       </ScrollView>
     </View>

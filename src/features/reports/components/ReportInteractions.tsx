@@ -107,8 +107,8 @@ export function ReportInteractions({
           onCommentsPress ||
           (() =>
             router.push({
-              pathname: "/reports/[report_id]",
-              params: { report_id: String(report.id), comments: "1" },
+              pathname: "/reporte/[id]",
+              params: { id: String(report.id), comments: "1" },
             }))
         }
         style={({ pressed }) => ({
