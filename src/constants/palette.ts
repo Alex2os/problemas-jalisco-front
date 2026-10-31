@@ -61,14 +61,14 @@ export const palette = {
     // Brand Colors (Dark — Obsidiana Botánica)
     primary: "#9DBA78", // Primary action
     primaryDark: "#85A35F",
-    primarySoft: "#344333", // Surface accent
+    primarySoft: "#2C3928", // Surface accent
     onPrimary: "#172015", // Primary action text
 
     // Secondary & Accent
     secondary: "#687D31",
     accent: "#E9A23B", // Warm Orange
     accentDark: "#C98523",
-    accentSoft: "#382914",
+    accentSoft: "#30281C",
     onAccent: "#172015",
 
     // Agave & Water
@@ -79,18 +79,18 @@ export const palette = {
 
     // Neutral Surfaces & Text
     background: "#141A16", // Obsidiana Botánica
-    surface: "#232B25", // Surface
-    surfaceAccent: "#344333", // Surface accent
-    raised: "#252F27", // Surface elevada
+    surface: "#1B221D", // Surface
+    surfaceAccent: "#2C3928", // Surface accent
+    raised: "#252D27", // Surface elevada
     text: "#F3F1E9", // Text principal
-    textSecondary: "#AEB7AD", // Text secundario
-    muted: "#7E887D",
-    border: "#333E36",
-    borderStrong: "#455348",
+    textSecondary: "#BDC5BA", // Text secundario
+    muted: "#9BA598",
+    border: "#303A32",
+    borderStrong: "#4A584C",
 
     // Functional & Feedback
     danger: "#E57373",
-    dangerSoft: "#371A1A",
+    dangerSoft: "#2E1E1E",
     warning: "#FBBF24",
     warningSoft: "#35280E",
     success: "#81C784",
@@ -100,7 +100,7 @@ export const palette = {
 
     // Status Colors
     status: {
-      reportado: { text: "#FBBF24", bg: "#35280E", border: "#785210" },
+      reportado: { text: "#E9B66A", bg: "#30271A", border: "#67502C" },
       resuelto: { text: "#9DBA78", bg: "#1E2C1B", border: "#3E5C36" },
     },
   },

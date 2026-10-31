@@ -33,7 +33,7 @@ import type { Report } from "@/services/types";
 
 export default function MisReportesScreen() {
   const insets = useSafeAreaInsets();
-  const { colors } = useAppTheme();
+  const { colors, dark } = useAppTheme();
 
   useBackendReports();
   const error = useReportsStore((s) => s.error);
@@ -111,7 +111,7 @@ export default function MisReportesScreen() {
         style={[
           styles.header,
           {
-            backgroundColor: colors.surface,
+            backgroundColor: dark ? colors.background : colors.surface,
             borderBottomColor: colors.border,
             paddingTop: Math.max(insets.top, 16),
           },

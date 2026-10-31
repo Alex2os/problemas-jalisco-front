@@ -1,10 +1,13 @@
-import { space } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
+import { palette } from "@/constants/palette";
+import { FontFamily } from "@/constants/theme";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { photoUrl } from "@/services/report-media";
 import type { Report } from "@/services/types";
 import { Image } from "expo-image";
-import { useState } from "react";
-import { ActivityIndicator, Modal, Pressable, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AppText, Notice } from "@/components/ui/AppUi";
 
@@ -97,32 +100,103 @@ function ReportPhotosContent({ report, hero }: { report: Report; hero: boolean }
       <Notice message={error} />
       <Modal visible={viewing !== null && index >= 0} animationType="none" onRequestClose={() => setViewing(null)}>
         <SafeAreaProvider>
-          <SafeAreaView style={{ flex: 1, backgroundColor: "#101310" }}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Cerrar foto" onPress={() => setViewing(null)}
-              style={{ minHeight: 48, padding: space.lg }}>
-              <AppText style={{ color: "white" }}>Cerrar</AppText>
-            </Pressable>
-            {photos[index] && (
-              <Image source={{ uri: photoUrl(photos[index].url) }} contentFit="contain" style={{ flex: 1 }}
-                accessibilityLabel={`Foto ${index + 1} de ${photos.length}`}
-                onError={() => { setViewing(null); setError("No se pudo abrir la foto. Intenta de nuevo."); }} />
-            )}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", padding: space.lg }}>
-              <Pressable accessibilityRole="button" disabled={index <= 0}
-                onPress={() => { if (photos[index - 1]) setViewing(photos[index - 1].id); }}
-                style={{ minHeight: 44, justifyContent: "center", opacity: index <= 0 ? 0.4 : 1 }}>
-                <AppText style={{ color: "white" }}>Anterior</AppText>
-              </Pressable>
-              <AppText style={{ color: "white" }}>{index + 1}/{photos.length}</AppText>
-              <Pressable accessibilityRole="button" disabled={index >= photos.length - 1}
-                onPress={() => { if (photos[index + 1]) setViewing(photos[index + 1].id); }}
-                style={{ minHeight: 44, justifyContent: "center", opacity: index >= photos.length - 1 ? 0.4 : 1 }}>
-                <AppText style={{ color: "white" }}>Siguiente</AppText>
-              </Pressable>
-            </View>
-          </SafeAreaView>
+          {viewing !== null && index >= 0 && (
+            <PhotoViewer photos={photos} initialIndex={index} onClose={() => setViewing(null)}
+              onError={() => { setViewing(null); setError("No se pudo abrir la foto. Intenta de nuevo."); }} />
+          )}
         </SafeAreaProvider>
       </Modal>
     </View>
   );
 }
+
+
+// The fullscreen photo canvas stays dark in either app theme.
+const VIEWER_COLORS = palette.dark;
+
+function PhotoViewer({ photos, initialIndex, onClose, onError }: {
+  photos: NonNullable<Report["photos"]>;
+  initialIndex: number;
+  onClose: () => void;
+  onError: () => void;
+}) {
+  const [currentId, setCurrentId] = useState(photos[initialIndex].id);
+  const [width, setWidth] = useState(0);
+  const [closePressed, setClosePressed] = useState(false);
+  const [failedIds, setFailedIds] = useState<number[]>([]);
+  const index = Math.max(0, photos.findIndex((photo) => photo.id === currentId));
+  const visibleId = photos[index]?.id;
+  useEffect(() => {
+    // A failed prefetched page must not dismiss the photo currently being viewed.
+    if (failedIds.includes(visibleId)) onError();
+  }, [failedIds, visibleId, onError]);
+
+  return (
+    <SafeAreaView style={styles.viewer}>
+      <View style={styles.photoArea} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
+        {width > 0 && <FlatList
+          key={`${width}:${photos.map((photo) => photo.id).join(",")}`}
+          data={photos}
+          keyExtractor={(photo) => String(photo.id)}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={index}
+          getItemLayout={(_, itemIndex) => ({ length: width, offset: width * itemIndex, index: itemIndex })}
+          onMomentumScrollEnd={(event) => {
+            const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+            if (photos[nextIndex]) setCurrentId(photos[nextIndex].id);
+          }}
+          renderItem={({ item, index: photoIndex }) => (
+            <Image source={{ uri: photoUrl(item.url) }} contentFit="contain"
+              style={{ width, height: "100%" }}
+              accessibilityLabel={`Foto ${photoIndex + 1} de ${photos.length}`}
+              onError={() => setFailedIds((ids) => ids.includes(item.id) ? ids : [...ids, item.id])} />
+          )}
+        />}
+      </View>
+      <View style={styles.viewerFooter}>
+        <View style={styles.photoInfo}>
+          <Text accessibilityLiveRegion="polite" style={styles.photoCounter}>
+            Foto {index + 1} de {photos.length}
+          </Text>
+          {photos.length > 1 && <Text style={styles.swipeHint}>Desliza para ver más</Text>}
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Cerrar fotos" onPress={onClose}
+          onPressIn={() => setClosePressed(true)} onPressOut={() => setClosePressed(false)}
+          style={[styles.closeButton, { backgroundColor: closePressed ? VIEWER_COLORS.surfaceAccent : VIEWER_COLORS.raised }]}>
+          <Ionicons name="close" size={20} color={VIEWER_COLORS.text} />
+          <Text style={styles.closeLabel}>Cerrar</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  viewer: { flex: 1, backgroundColor: VIEWER_COLORS.background },
+  photoArea: { flex: 1 },
+  viewerFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.md,
+    padding: space.lg,
+  },
+  photoInfo: { flex: 1, gap: space.xs },
+  photoCounter: { fontFamily: FontFamily.inter.semiBold, color: VIEWER_COLORS.text, fontSize: 14, lineHeight: 20 },
+  swipeHint: { fontFamily: FontFamily.inter.regular, color: VIEWER_COLORS.textSecondary, fontSize: 12, lineHeight: 18 },
+  closeButton: {
+    minHeight: size.touch,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.sm,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.md,
+    borderRadius: radius.control,
+    borderWidth: 1,
+    borderColor: VIEWER_COLORS.borderStrong,
+  },
+  closeLabel: { fontFamily: FontFamily.inter.semiBold, color: VIEWER_COLORS.text, fontSize: 14, lineHeight: 20 },
+});

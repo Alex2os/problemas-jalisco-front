@@ -77,7 +77,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
             <View
               style={[
                 styles.iconPlaceholder,
-                { backgroundColor: dark ? "#243242" : categoryDef.bgLight },
+                { backgroundColor: dark ? colors.raised : categoryDef.bgLight },
               ]}
             >
               <Ionicons

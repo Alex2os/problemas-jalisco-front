@@ -4,7 +4,6 @@ import {
   Alert,
   Pressable,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   View,
@@ -72,17 +71,6 @@ export default function ReporteDetailScreen() {
     }
   };
 
-  const handleShare = async () => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      await Share.share({
-        title: `Reporte #${report.folio}`,
-        message: `${categoryDef.label} en ${report.ubication}. Reporte #${report.id} en ProblemasJalisco.`,
-      });
-    } catch {
-      // Ignored
-    }
-  };
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -111,15 +99,7 @@ export default function ReporteDetailScreen() {
           #{report.folio}
         </Text>
 
-        <Pressable
-          onPress={handleShare}
-          accessibilityRole="button"
-          accessibilityLabel="Compartir reporte"
-          hitSlop={12}
-          style={styles.navBtn}
-        >
-          <Ionicons name="share-social-outline" size={22} color={colors.text} />
-        </Pressable>
+        <View style={styles.navBtn} />
       </View>
 
       <ScrollView

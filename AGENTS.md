@@ -53,12 +53,14 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Prefer semantic colors and shared spacing, typography and radius scales over hardcoded values.
 - Do not introduce competing palettes or theme systems.
 - Preserve existing light/dark behavior where implemented.
+- Dark-mode styling uses the shared dark palette: subdued surfaces, softer borders/status fills and readable secondary text. Keep the Reportar flow's dark background as the visual reference; styling requests do not authorize removing cards, changing icon shapes or rearranging layouts. Keep light-mode styling unchanged unless explicitly requested.
+- The Reportes header uses `colors.background` in dark mode and `colors.surface` in light mode. Preserve its existing search/filter spacing; the attempted light-mode header adjustment was reverted.
 - NativeWind/Tailwind may be used where appropriate, but do not migrate working StyleSheet components solely for stylistic consistency.
 - Do not change visual identity, typography or component appearance during unrelated refactors.
 - Do not add shadows, glow, decorative elevation or simulated shadows. Use flat fills, borders and spacing for separation.
 - Support both light and dark themes using semantic colors, including contrasting foreground colors for filled buttons.
 - Keep touch targets at least `size.touch` (48 logical pixels). Allow labels to grow with accessibility text settings.
-- Reportes filters use one grouped control with equal-width rectangular tabs and a clear selected state. Preserve this design; do not turn them back into pills.
+- Reportes filters use one grouped control with equal-width rectangular tabs and a clear selected state. Preserve this design; do not turn them back into pills. Selection changes immediately; the sliding highlight animation was removed at the user's request.
 - Put padding inside pressed/highlighted containers so icons, labels and chevrons do not touch the background edges. Preserve this in both themes.
 - Shared buttons use direct style arrays with explicit press state. Preserve the existing rendering fix; verify native rendering before switching back to callback-only Pressable styles.
 - Full-width button content must center the icon and label together. Apply full-width inner content only to full-width buttons to avoid intrinsic sizing regressions.
@@ -74,6 +76,16 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - During an error retry, show only the retry control's spinner for that request. Suppress duplicate refresh-control, header, empty-list and pagination loaders across all relevant screens, not just the map.
 - Keep the error visible until recovery, and keep previously loaded reports visible if refresh fails. Clear the error on success instead of replacing the banner with a separate loading screen.
 
+## Report photos and fullscreen viewer
+
+- `appendPhotos` in `src/services/report-media.ts` is asynchronous. Both report creation and adding photos must await it before sending the multipart request.
+- Expo 58 fetch rejects the old React Native `{ uri, name, type }` multipart descriptors with `Unsupported FormDataPart implementation`. Use `File` from `expo-file-system` on native and a fetched Blob on web. Preserve the repeated `photos` field, filenames, three-photo limit and 5 MiB per-file checks, including actual file size. Let fetch set the multipart boundary.
+- The backend photo implementation was checked with its disposable integration suite, including creation, retrieval, persistence across API restart, limits and ownership. This does not establish that an application's database migration or deployment storage is configured; do not alter those without authorization.
+- `src/features/reports/components/ReportPhotos.tsx` provides the shared fullscreen viewer. Keep horizontal, paged swiping instead of Anterior/Siguiente buttons. Open at the tapped photo, update the counter after swiping, and preserve the current photo when the viewport width or photo list changes where possible.
+- The viewer intentionally stays dark in either app theme, using `palette.dark`. Keep explicit light text/icon colors, the photo counter, the swipe hint for multiple photos, and the compact bottom Cerrar control with a 48px minimum touch target. Preserve Android Back dismissal and safe-area handling.
+- A failed prefetched/offscreen photo must not dismiss the photo currently being viewed. Report an opening failure when the failed photo becomes the visible page.
+- Native swipe, layout and dismissal behavior still requires device checks; tests and exports alone do not validate those interactions.
+
 ## Report location address preview
 
 - `LocationPicker` uses `GetLocationAddress` in `src/services/get-location-address.ts`, calling authenticated `GET /locations/reverse?latitude=...&longitude=...`.
@@ -88,6 +100,7 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 
 - The visible Reportes tab is `src/app/(tabs)/mis-reportes.tsx`; `reports.tsx` is a hidden legacy route. Inspect navigation before choosing which screen to edit.
 - There are two report detail paths: `/reporte/[id]` and `/reports/[report_id]`. Keep shared behavior consistent where both paths expose it; do not remove or rename routes as part of styling work.
+- Report sharing is currently removed, including the detail screen's share button and handler. The app-link experiment and its helper/tests/docs were reverted. Do not restore text-only sharing, custom-scheme report links or a share button unless requested; HTTPS app-link/domain configuration remains future work.
 - Keep the comment form above existing comments. The character counter belongs beside the input label, not between the input and publish button.
 - Empty or whitespace-only descriptions show plain `No hay descripción.` text. Do not add a bordered description section or extra heading unless requested.
 - Para ti consumes `/reports/recommended`; preserve server ranking and recommendation reasons. It is currently rule-based, not an AI feature.
@@ -113,6 +126,8 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - A successful bundle does not replace manual testing on devices.
 
 ## Testing and validation
+
+Use Node 22.13 or later as documented in README.md; Expo 58 reports Node 20 as unsupported even when some commands complete.
 
 After meaningful changes, run:
 
