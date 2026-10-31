@@ -1,44 +1,52 @@
 // Paleta central de marca aprobada — ProblemasJalisco
+// Identidad cromática: Jalisco Claro & Jalisco Carbón
 export const brandColors = {
-  forest: "#19350C",
-  olive: "#687D31",
-  neutral: "#D5D3CC",
-  petroleum: "#406768",
-  water: "#6FA9BB",
-  warmOrange: "#E9A23B",
+  // Colores primitivos de marca aprobados
+  orange: "#FE8B01",
+  pink: "#E00B50",
+  sky: "#58C3E3",
+  gray: "#7C848A",
+
+  // Alias de compatibilidad heredada
+  forest: "#202938",
+  olive: "#E00B50",
+  neutral: "#7C848A",
+  petroleum: "#58C3E3",
+  water: "#58C3E3",
+  warmOrange: "#FE8B01",
 } as const;
 
 export const palette = {
   light: {
-    // Brand Colors (Light — Agave Cream)
-    primary: "#19350C", // Forest
-    primaryDark: "#0F2107",
-    primarySoft: "#E8EEDC", // Surface accent
-    onPrimary: "#FFFFFF",
+    // Brand Colors (Light — Jalisco Claro)
+    primary: "#FE8B01", // Naranja principal
+    primaryDark: "#D97500",
+    primarySoft: "#FFF4E5", // Surface accent
+    onPrimary: "#202938", // Texto oscuro legible sobre botón naranja
 
     // Secondary & Accent
-    secondary: "#687D31", // Olive
-    accent: "#E9A23B", // Warm Orange
-    accentDark: "#C98523",
-    accentSoft: "#FDF5E8",
-    onAccent: "#FFFFFF",
+    secondary: "#E00B50", // Rosa secundario
+    accent: "#58C3E3", // Azul cielo de acento
+    accentDark: "#39A6C8",
+    accentSoft: "#EAF8FC",
+    onAccent: "#202938", // Texto oscuro legible sobre acento azul cielo
 
-    // Agave & Water
-    agave: "#406768", // Petroleum
-    agaveSoft: "#E4ECEC",
-    onAgave: "#FFFFFF",
-    water: "#6FA9BB",
+    // Agave & Water (compatibilidad semántica)
+    agave: "#58C3E3",
+    agaveSoft: "#EAF8FC",
+    onAgave: "#202938",
+    water: "#58C3E3",
 
     // Neutral Surfaces & Text
-    background: "#F5F1E8", // Agave Cream
-    surface: "#FFFCF6", // Surface
-    surfaceAccent: "#E8EEDC", // Surface accent
-    raised: "#EDE7DA",
-    text: "#19350C", // Text principal
-    textSecondary: "#405525", // Text secundario
-    muted: "#76866E",
-    border: "#E2DDD2",
-    borderStrong: "#C8C2B4",
+    background: "#F7F8FA",
+    surface: "#FFFFFF",
+    surfaceAccent: "#FFF4E5",
+    raised: "#F0F2F5",
+    text: "#202938", // Text primary
+    textSecondary: "#657083", // Text secondary
+    muted: "#7C848A", // Gris institucional de referencia
+    border: "#E1E5EA",
+    borderStrong: "#C5CDD6",
 
     // Functional & Feedback (accesibilidad WCAG AA contrastada)
     danger: "#C53030",
@@ -47,8 +55,8 @@ export const palette = {
     warningSoft: "#FEF3C7",
     success: "#2F7C20",
     successSoft: "#EAF5E7",
-    info: "#2A6E82",
-    infoSoft: "#E5F4F8",
+    info: "#1E7898",
+    infoSoft: "#EAF8FC",
 
     // Status Colors (Never convey status by color alone)
     status: {
@@ -58,35 +66,35 @@ export const palette = {
   },
 
   dark: {
-    // Brand Colors (Dark — Obsidiana Botánica)
-    primary: "#9DBA78", // Primary action
-    primaryDark: "#85A35F",
-    primarySoft: "#2C3928", // Surface accent
-    onPrimary: "#172015", // Primary action text
+    // Brand Colors (Dark — Jalisco Carbón)
+    primary: "#FE8B01", // Naranja principal
+    primaryDark: "#D97500",
+    primarySoft: "#2E2010", // Surface accent
+    onPrimary: "#0D0E10", // Texto oscuro legible sobre botón naranja
 
-    // Secondary & Accent
-    secondary: "#687D31",
-    accent: "#E9A23B", // Warm Orange
-    accentDark: "#C98523",
-    accentSoft: "#30281C",
-    onAccent: "#172015",
+    // Secondary & Accent (variantes visuales dark)
+    secondary: "#FF4D83", // Rosa secundario (uso visual dark)
+    accent: "#7DDAF2", // Azul cielo de acento (uso visual dark)
+    accentDark: "#58C3E3",
+    accentSoft: "#162930",
+    onAccent: "#0D0E10", // Texto oscuro legible sobre acento azul cielo dark
 
-    // Agave & Water
-    agave: "#6FA9BB",
-    agaveSoft: "#1B3037",
-    onAgave: "#141A16",
-    water: "#6FA9BB",
+    // Agave & Water (compatibilidad semántica)
+    agave: "#7DDAF2",
+    agaveSoft: "#162930",
+    onAgave: "#0D0E10",
+    water: "#7DDAF2",
 
     // Neutral Surfaces & Text
-    background: "#141A16", // Obsidiana Botánica
-    surface: "#1B221D", // Surface
-    surfaceAccent: "#2C3928", // Surface accent
-    raised: "#252D27", // Surface elevada
-    text: "#F3F1E9", // Text principal
-    textSecondary: "#BDC5BA", // Text secundario
-    muted: "#9BA598",
-    border: "#303A32",
-    borderStrong: "#4A584C",
+    background: "#0D0E10",
+    surface: "#1A1B1F",
+    surfaceAccent: "#2E2010",
+    raised: "#292A2E",
+    text: "#F6F5F3", // Text primary
+    textSecondary: "#B0B0B4", // Text secondary
+    muted: "#8E9399",
+    border: "#35363B",
+    borderStrong: "#4C4E55",
 
     // Functional & Feedback
     danger: "#E57373",
@@ -95,8 +103,8 @@ export const palette = {
     warningSoft: "#35280E",
     success: "#81C784",
     successSoft: "#182C19",
-    info: "#6FA9BB",
-    infoSoft: "#182B30",
+    info: "#7DDAF2",
+    infoSoft: "#162930",
 
     // Status Colors
     status: {
