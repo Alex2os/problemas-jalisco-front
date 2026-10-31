@@ -47,6 +47,8 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   authenticated: boolean | "optional" = false,
 ): Promise<T> {
+  // Location searches can contain personal address text; keep it out of diagnostics.
+  const logRequest = isDev && !path.startsWith("/locations/search?");
   const headers = new Headers(options.headers);
   const multipart =
     typeof FormData !== "undefined" && options.body instanceof FormData;
@@ -82,7 +84,7 @@ export async function apiRequest<T>(
     } catch (networkError) {
       const isTimeout = controller.signal.aborted;
       const errorReason = isTimeout ? "timeout" : "network";
-      if (isDev) {
+      if (logRequest) {
         console.warn(
           `[API Transport Error] ${method} ${path} -> ${errorReason}:`,
           networkError instanceof Error ? networkError.message : String(networkError),
@@ -95,7 +97,7 @@ export async function apiRequest<T>(
     try {
       body = await response.text();
     } catch (readError) {
-      if (isDev) {
+      if (logRequest) {
         console.warn(
           `[API Read Error] ${method} ${path} [HTTP ${response.status}] -> Failed to read response stream:`,
           readError instanceof Error ? readError.message : String(readError),
@@ -119,7 +121,7 @@ export async function apiRequest<T>(
     }
 
     if (!response.ok) {
-      if (isDev) {
+      if (logRequest) {
         console.warn(
           `[API HTTP Error] ${method} ${path} -> HTTP ${response.status}`,
           data ? data : body ? body.slice(0, 300) : "(empty response body)",
@@ -153,7 +155,7 @@ export async function apiRequest<T>(
     }
 
     if (parseError && body) {
-      if (isDev) {
+      if (logRequest) {
         console.warn(
           `[API Parse Error] ${method} ${path} [HTTP ${response.status}] -> Expected JSON but got:`,
           body.slice(0, 150),

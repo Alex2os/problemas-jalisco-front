@@ -64,6 +64,21 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Put padding inside pressed/highlighted containers so icons, labels and chevrons do not touch the background edges. Preserve this in both themes.
 - Shared buttons use direct style arrays with explicit press state. Preserve the existing rendering fix; verify native rendering before switching back to callback-only Pressable styles.
 - Full-width button content must center the icon and label together. Apply full-width inner content only to full-width buttons to avoid intrinsic sizing regressions.
+- Character counters use `src/components/CharacterCount.tsx`, on the right of the field-label row above the input. Keep title, description and comment counters consistent; do not put counters below inputs or between an input and its action button.
+- The floating bottom navigation uses `colors.secondary` (raspberry pink) for active icons and labels. Preserve its extra `space.md` bottom offset above the safe-area calculation and the map error overlay's matching clearance.
+- Orange primary buttons use white text/icons in light mode through `colors.onPrimary`; preserve the existing dark-mode foreground.
+- The Más page no longer contains the Sesión section or Cerrar sesión button. Do not restore them as part of unrelated work.
+
+## Report titles and category selection
+
+- New reports require a user-written, nonblank, single-line title of up to 80 UTF-16 code units. Titles are stored separately from descriptions. The description-excerpt title experiment was reverted; do not restore it or generate titles from descriptions.
+- The required title input belongs on `src/app/reportar/evidencia.tsx`, above the photos. Keep the red asterisk, character counter beside the label, inline Spanish validation, and focus/scroll to the title when continuing with invalid input. Empty or whitespace-only titles must block navigation to review.
+- Keep the title and description labels free of helper subtitles. Photos and descriptions remain optional. Show the entered title on the review screen before publishing.
+- Reuse `REPORT_TITLE_LIMIT` and `getReportTitleError` in `src/services/create-report.ts` for validation. Preserve the draft's title setter/reset and the title in both JSON and multipart submissions.
+- API responses may contain a null title for legacy reports. Keep the existing category-based display fallback; prefer a nonblank stored title where a report title is displayed.
+- Required-title support depends on API migration `002_report_titles.sql`. Disposable integration results do not establish that the application's database has been migrated.
+- Category cards use compact local descriptions from `src/constants/report-categories.ts`, even when `/reports/categories` returns longer explanations. Preserve backend category IDs/names and the remote-description fallback for unknown future categories.
+- The active catalog has eight categories, including `semaforos` (Semáforos), with the compact subtitle “Apagados o dañados”, a purple accent and the outline traffic-light glyph rendered by `CategoryIcon` (preserve the outline style used by the other categories). Keep category icons consistent across selection, map, feed, review and detail screens; preload `CATEGORY_ICON_FONTS` before capturing map markers. Keep its visual/legacy lookup and search/display-title support consistent. Existing `otro` reports are not reclassified. Banquetas y accesibilidad and a broader Señales category remain suggestions only; do not add other categories or subcategories without a separate request.
 
 ## Connection errors and retries
 
@@ -80,6 +95,7 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 
 - `appendPhotos` in `src/services/report-media.ts` is asynchronous. Both report creation and adding photos must await it before sending the multipart request.
 - Expo 58 fetch rejects the old React Native `{ uri, name, type }` multipart descriptors with `Unsupported FormDataPart implementation`. Use `File` from `expo-file-system` on native and a fetched Blob on web. Preserve the repeated `photos` field, filenames, three-photo limit and 5 MiB per-file checks, including actual file size. Let fetch set the multipart boundary.
+- The static “Hasta 5 MB por foto” helper was removed. Keep visible Spanish errors for oversized prepared uploads and the actual-file-size check before sending. Preserve photo preparation/compression; the upload limit applies to the prepared file, not an automatic rejection of every original above 5 MiB.
 - The backend photo implementation was checked with its disposable integration suite, including creation, retrieval, persistence across API restart, limits and ownership. This does not establish that an application's database migration or deployment storage is configured; do not alter those without authorization.
 - `src/features/reports/components/ReportPhotos.tsx` provides the shared fullscreen viewer. Keep horizontal, paged swiping instead of Anterior/Siguiente buttons. Open at the tapped photo, update the counter after swiping, and preserve the current photo when the viewport width or photo list changes where possible.
 - The viewer intentionally stays dark in either app theme, using `palette.dark`. Keep explicit light text/icon colors, the photo counter, the swipe hint for multiple photos, and the compact bottom Cerrar control with a 48px minimum touch target. Preserve Android Back dismissal and safe-area handling.
@@ -96,6 +112,17 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Preserve OpenStreetMap attribution and backend provider limits. Do not add continuous per-movement calls, background tracking or a direct public-geocoder fallback.
 - The backend contract and provider behavior are documented in its `docs/location-preview.md`. Test mapping, no coverage, stale responses, movement scheduling and retry recovery; native map/permission behavior still needs device validation.
 
+## Report location search
+
+- `src/features/reports/components/LocationSearch.tsx` above the map calls authenticated `GET /locations/search?query=...` through `src/services/search-locations.ts`. Search only on an explicit Buscar/keyboard submit action; public Nominatim forbids autocomplete. Do not request GPS permission for text search or persist search history.
+- Keep the search bar and Buscar button without the removed bold “Buscar dirección o lugar” label above them. Preserve the accessible input label, placeholder, keyboard submission, clear action and minimum touch targets.
+- Match backend query validation: at least three characters after whitespace normalization and at most 200 raw UTF-16 code units. Encode query text, validate response coordinates/fields, and preserve Spanish backend errors. Search requires the API version exposing `/locations/search`; do not silently substitute a public-geocoder call or report-feed search.
+- Show up to five named candidates with their address details. Preserve null address components and distinguish empty matches from request failures. Keep the shared ErrorBanner visible during retries with only its retry spinner for that request.
+- Selecting a result moves the adjustable center pin; the existing reverse lookup still runs after movement completes. Keep the pin authoritative, retain the current selection on search failure/no matches, and prevent late GPS responses from overriding a selected search result.
+- `createLocationSearch` in `src/services/location-search.ts` guards pending/stale queries and keeps previous results/errors during retries. Dispose/reset search state on navigation and session changes; ignore responses after editing/clearing the query. Keep the search endpoint's raw query/error payloads out of API diagnostics in `src/services/api.ts`.
+- The map is taller and responds to viewport height (320–440 logical pixels). Preserve the marker, live address preview, explicit GPS button, movement debounce, retries, attribution and keyboard/safe-area handling. Search coordinates use the same bounds as the API: latitude 18.92–22.75, longitude -105.68–-101.50.
+- Preserve `tests/location-search.test.cjs` coverage for explicit-only requests, validation, stale responses, lifecycle disposal, retry recovery, partial/malformed responses, exact bounds and diagnostic privacy. The real-client integration script also exercises search followed by reverse lookup; fake-provider integration does not establish native map/keyboard/GPS behavior.
+
 ## Report screens and recommendations
 
 - The visible Reportes tab is `src/app/(tabs)/mis-reportes.tsx`; `reports.tsx` is a hidden legacy route. Inspect navigation before choosing which screen to edit.
@@ -104,7 +131,8 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Keep the comment form above existing comments. The character counter belongs beside the input label, not between the input and publish button.
 - Empty or whitespace-only descriptions show plain `No hay descripción.` text. Do not add a bordered description section or extra heading unless requested.
 - Para ti consumes `/reports/recommended`; preserve server ranking and recommendation reasons. It is currently rule-based, not an AI feature.
-- Preserve Todos, Para ti, Reportado and Resuelto, along with type/location search. Search in Para ti must include remaining recommendation pages, not silently stop at the first page.
+- Preserve Todos, Para ti, Reportado and Resuelto, along with title/type/location/description search. The shared `matchesReportSearch` includes descriptions, ignores case/accents and matches query words across searchable fields. Search in Para ti must include remaining recommendation pages, not silently stop at the first page.
+- Feed description previews use two lines with a photo and three without, with a trailing ellipsis when truncated. Keep the full description in the detail screen; do not shorten stored text.
 - Deduplicate paginated reports by ID, guard against stale responses after navigation or identity changes, and clear personalized caches on session changes. Reuse existing session/cache infrastructure.
 - Location is optional and requested through an explicit action. Keep the centered explanation and full-width, noticeable `Activar ubicación` button. Do not restore the removed secondary “Puedes seguir…” messages.
 - Preserve location timeouts and guest/permission-denied fallback. Do not persist location or add background tracking as part of unrelated work.

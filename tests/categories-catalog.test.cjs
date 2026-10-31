@@ -102,3 +102,18 @@ test('category cards retain compact subtitles when the API supplies longer expla
   assert.deepEqual(merged.map(category => category.description), LOCAL_FALLBACK_CATEGORIES.map(category => category.description));
   assert.equal(mergeBackendCategories([{id: 'future', name: 'Nueva categoría', description: 'Descripción nueva'}])[0].description, 'Descripción nueva');
 });
+
+test('Semáforos is available offline and maps remote responses to its own label and visuals', () => {
+  const {LOCAL_FALLBACK_CATEGORIES, categoryDefFor, categoryFor, mergeBackendCategories} = createServiceClient().load('constants/report-categories');
+  assert.equal(LOCAL_FALLBACK_CATEGORIES.length, 8);
+  const category = categoryDefFor('semaforos');
+  assert.equal(category.id, 'semaforos');
+  assert.equal(category.label, 'Semáforos');
+  assert.equal(category.description, 'Apagados o dañados');
+  assert.equal(category.materialCommunityIcon, 'traffic-light-outline');
+  assert.equal(category.color, '#8B5CF6');
+  assert.equal(LOCAL_FALLBACK_CATEGORIES.filter(item => item.color === category.color).length, 1);
+  assert.equal(categoryFor('semaforos').label, 'Semáforos');
+  assert.equal(mergeBackendCategories([{id: 'semaforos', name: 'Semáforos', description: 'Explicación completa'}])[0].description, 'Apagados o dañados');
+  assert.equal(categoryDefFor('otro').id, 'otro');
+});

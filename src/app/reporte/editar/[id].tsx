@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams, usePreventRemove } from "expo-router";
@@ -134,7 +135,7 @@ function EditorContent({ initialReport }: { initialReport: Report }) {
         <Text style={[styles.subtitle, { color: colors.muted }]}>Cambia las fotos o el estado y guarda los cambios.</Text>
       </View>
       <View style={[styles.summary, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={[styles.summaryIcon, { backgroundColor: colors.accentSoft }]}><Ionicons name={category.ionicon} size={24} color={colors.accentText} /></View>
+        <View style={[styles.summaryIcon, { backgroundColor: colors.accentSoft }]}><CategoryIcon category={category} size={24} color={colors.accentText} /></View>
         <View style={{ flex: 1, gap: space.xs }}>
           <Text style={[styles.summaryTitle, { color: colors.text }]}>{category.label}</Text>
           <Text numberOfLines={2} style={[styles.caption, { color: colors.muted }]}>{baseline.ubication}</Text>

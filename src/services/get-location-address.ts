@@ -19,8 +19,8 @@ export const DEFAULT_JALISCO_COORDINATES = {
 export const JALISCO_BOUNDS = {
   minLatitude: 18.92,
   maxLatitude: 22.75,
-  minLongitude: -105.7,
-  maxLongitude: -101.47,
+  minLongitude: -105.68,
+  maxLongitude: -101.50,
 };
 
 export function isInJaliscoBounds(latitude: number, longitude: number): boolean {

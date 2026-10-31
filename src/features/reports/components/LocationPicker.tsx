@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -12,6 +13,10 @@ import { useFocusEffect } from "expo-router";
 import { createAddressLookup, type AddressLookupState } from "@/services/address-lookup";
 import { GetLocationAddress, DEFAULT_JALISCO_COORDINATES } from "@/services/get-location-address";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { LocationSearch } from "./LocationSearch";
+import type { LocationSearchResult } from "@/services/search-locations";
+import { useCacheValue } from "@/hooks/useReportState";
+import { sessionVersion } from "@/services/session";
 import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
@@ -46,6 +51,8 @@ export function LocationPicker({
   style,
 }: LocationPickerProps) {
   const { colors, dark } = useAppTheme();
+  const { height } = useWindowDimensions();
+  const identity = useCacheValue<number>("session:version") || 0;
 
   const map = useRef<MapView>(null);
   const position = useRef<Region>({
@@ -54,6 +61,7 @@ export function LocationPicker({
   });
   const lookup = useRef<ReturnType<typeof createAddressLookup> | null>(null);
   const active = useRef(false);
+  const focusVersion = useRef(0);
   const gpsPending = useRef(false);
   const movement = useRef(0);
   const [locating, setLocating] = useState(false);
@@ -69,6 +77,7 @@ export function LocationPicker({
     const controller = createAddressLookup({
       lookup: GetLocationAddress,
       onChange: (state) => {
+        if (identity !== sessionVersion()) return;
         setAddressState(state);
         onLocationChange({
           latitude: state.latitude, longitude: state.longitude,
@@ -80,38 +89,57 @@ export function LocationPicker({
     controller.select(position.current);
     return () => {
       active.current = false;
+      focusVersion.current++;
       controller.dispose();
       lookup.current = null;
     };
-  }, [onLocationChange]));
+  }, [onLocationChange, identity]));
 
   const handleAutoLocate = async () => {
     if (gpsPending.current) return;
     gpsPending.current = true;
     const startingMovement = movement.current;
+    const startingFocus = focusVersion.current;
     setLocating(true);
     setGpsError("");
     let timeout: ReturnType<typeof setTimeout> | undefined;
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
+      if (!active.current || startingFocus !== focusVersion.current || startingMovement !== movement.current) return;
       if (!permission.granted) throw new Error("Permite el acceso a tu ubicación para usar el GPS.");
       const current = await Promise.race([
         Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
         new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error("La ubicación está tardando demasiado. Intenta de nuevo.")), 15000); }),
       ]);
-      if (!active.current || startingMovement !== movement.current) return;
+      if (!active.current || startingFocus !== focusVersion.current || startingMovement !== movement.current) return;
       const next = { ...position.current, latitude: current.coords.latitude, longitude: current.coords.longitude };
       position.current = next;
       lookup.current?.move(next);
       if (map.current) map.current.animateToRegion(next);
       else lookup.current?.select(next);
     } catch (failure) {
-      if (active.current) setGpsError(failure instanceof Error ? failure.message : "No se pudo obtener tu ubicación.");
+      if (active.current && startingFocus === focusVersion.current && startingMovement === movement.current)
+        setGpsError(failure instanceof Error ? failure.message : "No se pudo obtener tu ubicación.");
     } finally {
       clearTimeout(timeout);
       gpsPending.current = false;
       if (active.current) setLocating(false);
     }
+  };
+
+  const handleSearchSelect = (location: LocationSearchResult) => {
+    if (!active.current) return;
+    movement.current++;
+    setGpsError("");
+    const next = {
+      latitude: location.latitude, longitude: location.longitude,
+      latitudeDelta: 0.005, longitudeDelta: 0.005,
+    };
+    position.current = next;
+    lookup.current?.move(next);
+    if (map.current) map.current.animateToRegion(next, 400);
+    else lookup.current?.select(next);
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleRegionChange = (region: Region) => {
@@ -129,8 +157,9 @@ export function LocationPicker({
 
   return (
     <View style={[styles.container, style]}>
+      <LocationSearch onSelect={handleSearchSelect} />
       {/* Map with Center Pin */}
-      <View style={[styles.mapWrap, { borderColor: colors.border }]}>
+      <View style={[styles.mapWrap, { borderColor: colors.border, height: Math.max(320, Math.min(440, Math.round(height * 0.46))) }]}>
         <MapView
           style={StyleSheet.absoluteFill}
           ref={map}
@@ -200,7 +229,6 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   mapWrap: {
-    height: 280,
     borderRadius: radius.group,
     overflow: "hidden",
     borderWidth: 1,

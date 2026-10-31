@@ -12,10 +12,22 @@ const reportId = Number(process.env.JALISCO_TEST_REPORT_ID);
   const login = await load('user-login').UserLogIn('mobile@example.invalid', 'mobile-test-password');
   storage.set('auth_token', login.token);
   load('session').setAuthSession(true);
+  const catalog = await load('get-categories').getOfficialCategories(true);
+  assert.equal(catalog.find(category => category.id === 'semaforos').name, 'Semáforos');
   const address = await load('get-location-address').GetLocationAddress({latitude: 20.6597, longitude: -103.3496});
   assert.equal(address.length, 1);
   assert.equal(address[0].name, 'Guadalajara, Jalisco');
   assert.equal(address[0].city, null);
+  const locations = await load('search-locations').SearchLocations('Escuela Morelos integración frontend');
+  assert.equal(locations.length, 2);
+  assert.equal(locations[0].name, 'Escuela Morelos');
+  assert.equal(locations[0].latitude, 20.67);
+  assert.equal(locations[0].longitude, -103.35);
+  assert.equal(locations[1].street, null);
+  assert.equal(locations[1].colonia, null);
+  const selectedAddress = await load('get-location-address').GetLocationAddress(locations[0]);
+  assert.equal(selectedAddress[0].name, 'Guadalajara, Jalisco');
+  assert.deepEqual(await load('search-locations').SearchLocations('sin coincidencias'), []);
   let report = await load('get-report-by-id').GetReportById(reportId, true);
   const initialLikes = report.like_count, initialComments = report.comment_count;
   assert.equal(report.liked_by_me, false);
@@ -60,14 +72,16 @@ const reportId = Number(process.env.JALISCO_TEST_REPORT_ID);
   const store = client.load('store/useReportsStore').useReportsStore;
   await store.getState().initialize();
   const submitted = await store.getState().submitReport({
-    title: 'Título enviado por el cliente', category: 'agua', description: 'Created by the current report form store',
+    title: 'Semáforo apagado en el cruce', category: 'semaforos', description: 'No enciende desde ayer.',
     latitude: 20.6597, longitude: -103.3496, photos: [],
   });
   const persisted = await load('get-report-by-id').GetReportById(submitted.id, true);
   assert.equal(persisted.user_id, login.user.id);
   assert.equal(persisted.username, login.user.username);
   assert.equal(persisted.folio, String(persisted.id));
-  assert.equal(persisted.title, 'Título enviado por el cliente');
+  assert.equal(persisted.title, 'Semáforo apagado en el cruce');
+  assert.equal(persisted.type, 'semaforos');
+  assert.equal(client.load('constants/report-categories').categoryDefFor(persisted.category).label, 'Semáforos');
   assert.equal(load('report-format').getReportDisplayTitle(persisted), persisted.title);
   assert.equal(store.getState().reports.find(item => item.id === persisted.id).can_manage, true);
   await store.getState().toggleUpvote(persisted.id);

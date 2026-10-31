@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React, { useState } from "react";
 import {
   Image,
@@ -93,8 +94,7 @@ export function ReportFeedItem({
               },
             ]}
           >
-            <Ionicons
-              name={categoryDef.ionicon}
+            <CategoryIcon category={categoryDef}
               size={14}
               color={categoryDef.color}
             />

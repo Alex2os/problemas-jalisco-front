@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React, { useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
@@ -80,8 +81,7 @@ export default function RevisarScreen() {
             />
           ) : (
             <View style={[styles.noImageHero, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
-              <Ionicons
-                name={categoryDef.ionicon}
+              <CategoryIcon category={categoryDef}
                 size={48}
                 color={categoryDef.color}
               />

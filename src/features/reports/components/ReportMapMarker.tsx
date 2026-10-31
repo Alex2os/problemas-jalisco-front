@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { Marker, type MapMarker, type MapMarkerProps } from "react-native-maps";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { CategoryIcon, CATEGORY_ICON_FONTS } from "./CategoryIcon";
 import { useFonts } from "expo-font";
 import { categoryDefFor } from "@/constants/report-categories";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -13,7 +13,7 @@ export const ReportMapMarker = memo(function ReportMapMarker({ report, onPress }
 }) {
   const { colors } = useAppTheme();
   const category = categoryDefFor(report.category || report.type);
-  const [fontLoaded] = useFonts(Ionicons.font);
+  const [fontLoaded] = useFonts(CATEGORY_ICON_FONTS);
   const marker = useRef<MapMarker>(null);
   const [snapshot, setSnapshot] = useState("");
   const [laidOut, setLaidOut] = useState(false);
@@ -46,7 +46,7 @@ export const ReportMapMarker = memo(function ReportMapMarker({ report, onPress }
       <View collapsable={false} pointerEvents="none" style={styles.marker}
         onLayout={() => setLaidOut(true)}>
         <View style={[styles.head, { backgroundColor: colors.surface, borderColor: category.color }]}>
-          {fontLoaded && <Ionicons name={category.ionicon} size={24} color={category.color}
+          {fontLoaded && <CategoryIcon category={category} size={24} color={category.color}
             allowFontScaling={false} style={styles.icon} />}
         </View>
         <View style={[styles.tip, { borderTopColor: category.color }]} />

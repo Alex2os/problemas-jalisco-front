@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React from "react";
 import {
   Image,
@@ -75,8 +76,7 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
                 { backgroundColor: dark ? colors.raised : categoryDef.bgLight },
               ]}
             >
-              <Ionicons
-                name={categoryDef.ionicon}
+              <CategoryIcon category={categoryDef}
                 size={30}
                 color={categoryDef.color}
               />

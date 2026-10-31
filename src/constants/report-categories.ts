@@ -1,12 +1,14 @@
 import type { ComponentProps } from "react";
 import type Feather from "@expo/vector-icons/Feather";
 import type Ionicons from "@expo/vector-icons/Ionicons";
+import type MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import type { BackendCategory } from "@/services/get-categories";
 
 export interface CategoryVisual {
   shortLabel: string;
   featherIcon: ComponentProps<typeof Feather>["name"];
   ionicon: ComponentProps<typeof Ionicons>["name"];
+  materialCommunityIcon?: ComponentProps<typeof MaterialCommunityIcons>["name"];
   color: string;
   bgLight: string;
   bgDark?: string;
@@ -71,6 +73,15 @@ export const CATEGORY_VISUALS: Record<string, CategoryVisual> = {
     bgLight: "#F0FDFA",
     bgDark: "#0A2825",
   },
+  semaforos: {
+    shortLabel: "Semáforos",
+    featherIcon: "stop-circle",
+    ionicon: "stop-circle-outline",
+    materialCommunityIcon: "traffic-light-outline",
+    color: "#8B5CF6",
+    bgLight: "#F5F3FF",
+    bgDark: "#281D3B",
+  },
   otro: {
     shortLabel: "Otro",
     featherIcon: "help-circle",
@@ -82,7 +93,7 @@ export const CATEGORY_VISUALS: Record<string, CategoryVisual> = {
 };
 
 /**
- * Catálogo local oficial de respaldo (exactamente los 7 identificadores del backend).
+ * Catálogo local oficial de respaldo (exactamente los 8 identificadores del backend).
  * Permite que la app funcione offline o si la consulta al backend falla.
  */
 export const LOCAL_FALLBACK_CATEGORIES: CategoryDefinition[] = [
@@ -123,9 +134,15 @@ export const LOCAL_FALLBACK_CATEGORIES: CategoryDefinition[] = [
     ...CATEGORY_VISUALS.arboles,
   },
   {
+    id: "semaforos",
+    label: "Semáforos",
+    description: "Apagados o dañados",
+    ...CATEGORY_VISUALS.semaforos,
+  },
+  {
     id: "otro",
     label: "Otro problema",
-    description: "Señales o semáforos",
+    description: "Otros incidentes",
     ...CATEGORY_VISUALS.otro,
   },
 ];
@@ -176,6 +193,7 @@ export const categories: Record<
   basura: { label: "Basura acumulada", icon: "trash-2", color: "#16A34A" },
   seguridad: { label: "Seguridad urbana", icon: "shield", color: "#DC2626" },
   arboles: { label: "Árboles y parques", icon: "feather", color: "#0D9488" },
+  semaforos: { label: "Semáforos", icon: "stop-circle", color: "#8B5CF6" },
   otro: { label: "Otro problema", icon: "help-circle", color: "#64748B" },
   accidente: { label: "Baches y vialidad", icon: "alert-triangle", color: "#EA580C" },
   bloqueo: { label: "Otro problema", icon: "slash", color: "#648392" },

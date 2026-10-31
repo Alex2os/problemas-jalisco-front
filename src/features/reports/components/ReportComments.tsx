@@ -4,6 +4,7 @@ import { router, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Button } from "@/components/Button";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { CharacterCount } from "@/components/CharacterCount";
 import { radius, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
@@ -117,7 +118,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
         <>
           <View style={styles.inputHeader}>
             <Text style={[styles.author, { color: colors.text, flex: 1 }]}>Escribe un comentario</Text>
-            <Text accessibilityLabel={`${text.length} de 100 caracteres`} style={[styles.date, { color: colors.muted }]}>{text.length}/100</Text>
+            <CharacterCount count={text.length} limit={100} />
           </View>
           <TextInput
             accessibilityLabel="Escribe un comentario"

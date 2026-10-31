@@ -5,6 +5,7 @@ import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { OptionalBadge } from "@/components/OptionalBadge";
+import { CharacterCount } from "@/components/CharacterCount";
 import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
 import { PhotoPicker } from "@/features/reports/components/PhotoPicker";
 import { radius, size, space } from "@/constants/design";
@@ -68,7 +69,7 @@ export default function EvidenciaScreen() {
                 Título del reporte <Text style={{ color: colors.danger }}>*</Text>
               </Text>
             </View>
-            <Text style={[styles.charCount, { color: colors.muted }]}>{title.length}/{REPORT_TITLE_LIMIT}</Text>
+            <CharacterCount count={title.length} limit={REPORT_TITLE_LIMIT} />
           </View>
           <TextInput
             ref={titleInput}
@@ -113,6 +114,7 @@ export default function EvidenciaScreen() {
                 <OptionalBadge />
               </View>
             </View>
+            <CharacterCount count={description.length} limit={DESCRIPTION_LIMIT} />
           </View>
 
           <TextInput
@@ -132,11 +134,6 @@ export default function EvidenciaScreen() {
               color: colors.text,
             }]}
           />
-          <View style={styles.descriptionFooter}>
-            <Text style={[styles.charCount, { color: description.length === DESCRIPTION_LIMIT ? colors.primaryText : colors.muted }]}>
-              {description.length}/{DESCRIPTION_LIMIT}
-            </Text>
-          </View>
         </View>
       </ScrollView>
 
@@ -163,8 +160,6 @@ const styles = StyleSheet.create({
   headingGroup: { flex: 1, gap: 3 },
   sectionTitle: { fontSize: 17, lineHeight: 23, fontWeight: "700" },
   textarea: { borderRadius: radius.md, borderWidth: 1, padding: 14, fontSize: 16, lineHeight: 24, minHeight: 152, textAlignVertical: "top" },
-  descriptionFooter: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: space.sm },
-  charCount: { fontSize: 12, lineHeight: 18, fontWeight: "600", textAlign: "right" },
   titleLabelRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
   titleInput: { minHeight: size.control, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: 16, lineHeight: 24 },
   validationMessage: { fontSize: 14, lineHeight: 20 },

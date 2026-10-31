@@ -22,6 +22,7 @@ const CATEGORY_TITLE_NOUNS: Record<string, string> = {
   basura: "basura",
   seguridad: "seguridad urbana",
   arboles: "árboles y parques",
+  semaforos: "semáforos",
 };
 
 function resolveCanonicalCategoryId(raw?: string | null): string | null {

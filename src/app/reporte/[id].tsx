@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React, { useRef, type ComponentRef } from "react";
 import {
   ActivityIndicator,
@@ -96,8 +97,7 @@ export default function ReporteDetailScreen() {
       >
         {!report.photos.length && (
           <View style={[styles.noPhotoBanner, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
-            <Ionicons
-              name={categoryDef.ionicon}
+            <CategoryIcon category={categoryDef}
               size={48}
               color={categoryDef.color}
               accessibilityLabel={categoryDef.label}

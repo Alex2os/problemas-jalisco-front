@@ -1,3 +1,4 @@
+import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React from "react";
 import {
   Pressable,
@@ -8,7 +9,6 @@ import {
   type ViewStyle,
 } from "react-native";
 import * as Haptics from "expo-haptics";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, space } from "@/constants/design";
 import type { CategoryDefinition } from "@/constants/report-categories";
@@ -62,8 +62,7 @@ export function CategoryCard({
           { backgroundColor: selected ? category.color : dark ? colors.raised : category.bgLight },
         ]}
       >
-        <Ionicons
-          name={category.ionicon}
+        <CategoryIcon category={category}
           size={32}
           allowFontScaling={false}
           style={styles.icon}

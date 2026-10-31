@@ -37,3 +37,9 @@ test('missing, empty and null descriptions preserve type and location matching',
     assert.equal(matchesReportSearch(legacy, 'banqueta'), false);
   }
 });
+
+test('Semáforos matches its accented display label without relying on title or description', () => {
+  const signal = {type: 'semaforos', description: '', ubication: 'Centro'};
+  assert.equal(matchesReportSearch(signal, 'SEMÁFOROS centro'), true);
+  assert.equal(matchesReportSearch(signal, 'arboles'), false);
+});

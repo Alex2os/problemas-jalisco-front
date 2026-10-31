@@ -151,3 +151,9 @@ test("reportShortDate formats valid ISO dates and returns empty string for inval
   assert.ok(reportShortDate("2026-05-15T12:00:00Z").length > 0);
 });
 
+
+test('Semáforos keeps the normal category fallback and respects stored report titles', () => {
+  assert.equal(getReportDisplayTitle({type: 'semaforos'}), 'Problema de semáforos');
+  assert.equal(getReportDisplayTitle({type: 'semaforos', colonia: 'Centro'}), 'Problema de semáforos en Centro');
+  assert.equal(getReportDisplayTitle({type: 'semaforos', title: 'Semáforo apagado en la esquina'}), 'Semáforo apagado en la esquina');
+});

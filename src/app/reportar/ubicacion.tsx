@@ -42,6 +42,8 @@ export default function UbicacionScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <Text style={[styles.heading, { color: colors.text }]}>
           {es.location.title}

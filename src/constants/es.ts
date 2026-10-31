@@ -85,7 +85,7 @@ export const es = {
 
   location: {
     title: "¿Dónde está el problema?",
-    hint: "Marca el lugar del problema en el mapa. Puedes usar tu ubicación.",
+    hint: "Busca una dirección o ajusta el mapa. También puedes usar tu ubicación.",
     confirm: "Confirmar ubicación",
     useGps: "Mi ubicación",
     addressLabel: "Dirección detectada",
