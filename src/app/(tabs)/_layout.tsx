@@ -91,26 +91,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
-      {/* Hidden legacy tab screens */}
-      <Tabs.Screen
-        name="reports"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="account"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="about"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }
