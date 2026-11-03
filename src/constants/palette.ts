@@ -19,16 +19,18 @@ export const brandColors = {
 export const palette = {
   light: {
     // Brand Colors (Light — Jalisco Claro)
-    primary: "#FE8B01", // Naranja principal
-    primaryDark: "#D97500",
-    primarySoft: "#FFF4E5", // Surface accent
-    primaryText: "#AA5800", // Naranja con contraste AA sobre superficies claras
-    onPrimary: "#FFFFFF", // Texto e iconos blancos sobre botón naranja en modo claro
+    primary: "#E00B50", // Rosa principal
+    primaryDark: "#B8083F", // Rosa oscuro para estados pressed
+    primarySoft: "#FDE8EF", // Surface accent rosa suave
+    primaryText: "#E00B50", // Rosa con contraste AA (4.8:1 sobre blanco, 4.56:1 sobre background)
+    onPrimary: "#FFFFFF", // Texto e iconos claros legibles sobre botón rosa (4.85:1)
 
     // Secondary & Accent
-    secondary: "#E00B50", // Rosa secundario
-    secondarySoft: "#FDE8EF",
-    onSecondary: "#FFFFFF",
+    secondary: "#FE8B01", // Naranja secundario
+    secondaryDark: "#D97500",
+    secondarySoft: "#FFF4E5", // Surface accent naranja suave
+    secondaryText: "#AA5800", // Naranja con contraste AA sobre superficies claras
+    onSecondary: "#202938", // Texto oscuro legible sobre naranja
     accent: "#58C3E3", // Azul cielo de acento
     accentDark: "#39A6C8",
     accentSoft: "#EAF8FC",
@@ -44,7 +46,7 @@ export const palette = {
     // Neutral Surfaces & Text
     background: "#F7F8FA",
     surface: "#FFFFFF",
-    surfaceAccent: "#FFF4E5",
+    surfaceAccent: "#FDE8EF",
     raised: "#F0F2F5",
     text: "#202938", // Text primary
     textSecondary: "#657083", // Text secondary
@@ -71,16 +73,18 @@ export const palette = {
 
   dark: {
     // Brand Colors (Dark — Jalisco Carbón)
-    primary: "#FE8B01", // Naranja principal
-    primaryDark: "#D97500",
-    primarySoft: "#2E2010", // Surface accent
-    primaryText: "#FE8B01",
-    onPrimary: "#0D0E10", // Texto oscuro legible sobre botón naranja
+    primary: "#FF4D83", // Rosa principal (variante visual dark)
+    primaryDark: "#E00B50", // Rosa para estados pressed
+    primarySoft: "#2D1520", // Surface accent rosa oscuro
+    primaryText: "#FF4D83", // Rosa legible sobre fondos oscuros (6.1:1 sobre background)
+    onPrimary: "#0D0E10", // Texto oscuro de alto contraste sobre rosa dark (6.1:1)
 
     // Secondary & Accent (variantes visuales dark)
-    secondary: "#FF4D83", // Rosa secundario (uso visual dark)
-    secondarySoft: "#2D1520",
-    onSecondary: "#0D0E10",
+    secondary: "#FE8B01", // Naranja secundario
+    secondaryDark: "#D97500",
+    secondarySoft: "#2E2010", // Surface accent naranja oscuro
+    secondaryText: "#FE8B01",
+    onSecondary: "#0D0E10", // Texto oscuro legible sobre naranja
     accent: "#7DDAF2", // Azul cielo de acento (uso visual dark)
     accentDark: "#58C3E3",
     accentSoft: "#162930",
@@ -96,7 +100,7 @@ export const palette = {
     // Neutral Surfaces & Text
     background: "#0D0E10",
     surface: "#1A1B1F",
-    surfaceAccent: "#2E2010",
+    surfaceAccent: "#2D1520",
     raised: "#292A2E",
     text: "#F6F5F3", // Text primary
     textSecondary: "#B0B0B4", // Text secondary

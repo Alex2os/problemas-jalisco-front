@@ -55,19 +55,36 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Preserve existing light/dark behavior where implemented.
 - Dark-mode styling uses the shared dark palette: subdued surfaces, softer borders/status fills and readable secondary text. Keep the Reportar flow's dark background as the visual reference; styling requests do not authorize removing cards, changing icon shapes or rearranging layouts. Keep light-mode styling unchanged unless explicitly requested.
 - The Reportes header uses `colors.background` in dark mode and `colors.surface` in light mode. Preserve its existing search/filter spacing; the attempted light-mode header adjustment was reverted.
+- Color hierarchy: Pink is the primary brand color (`#E00B50` in light, `#FF4D83` in dark), orange is the secondary brand color (`#FE8B01`), and sky blue is the informational accent (`#58C3E3` in light, `#7DDAF2` in dark). Jalisco Carbón preserves its original neutral dark palette (`#0D0E10`, `#1A1B1F`, `#292A2E`, `#F6F5F3`, `#B0B0B4`, `#35363B`).
 - NativeWind/Tailwind may be used where appropriate, but do not migrate working StyleSheet components solely for stylistic consistency.
 - Do not change visual identity, typography or component appearance during unrelated refactors.
 - Do not add shadows, glow, decorative elevation or simulated shadows. Use flat fills, borders and spacing for separation.
-- Support both light and dark themes using semantic colors, including contrasting foreground colors for filled buttons.
+- Support both light and dark themes using semantic colors, including contrasting foreground colors for filled buttons. Primary buttons use `colors.onPrimary` (`#FFFFFF` in light, `#0D0E10` in dark); secondary buttons use `colors.onSecondary` (`#202938` in light, `#0D0E10` in dark).
 - Keep touch targets at least `size.touch` (48 logical pixels). Allow labels to grow with accessibility text settings.
-- Reportes filters use one grouped control with equal-width rectangular tabs and a clear selected state. Preserve this design; do not turn them back into pills. Selection changes immediately; the sliding highlight animation was removed at the user's request.
+- Reportes filters use a grouped control with three equal-width rectangular tabs: Todos, Cerca de ti, and Resueltos. Selection changes immediately without sliding highlight animations.
 - Put padding inside pressed/highlighted containers so icons, labels and chevrons do not touch the background edges. Preserve this in both themes.
 - Shared buttons use direct style arrays with explicit press state. Preserve the existing rendering fix; verify native rendering before switching back to callback-only Pressable styles.
 - Full-width button content must center the icon and label together. Apply full-width inner content only to full-width buttons to avoid intrinsic sizing regressions.
 - Character counters use `src/components/CharacterCount.tsx`, on the right of the field-label row above the input. Keep title, description and comment counters consistent; do not put counters below inputs or between an input and its action button.
-- The floating bottom navigation uses `colors.secondary` (raspberry pink) for active icons and labels. Preserve its extra `space.md` bottom offset above the safe-area calculation and the map error overlay's matching clearance.
-- Orange primary buttons use white text/icons in light mode through `colors.onPrimary`; preserve the existing dark-mode foreground.
-- The Más page no longer contains the Sesión section or Cerrar sesión button. Do not restore them as part of unrelated work.
+- The floating bottom navigation uses 5 positions: Mapa, Reportes, central report action `+`, Perfil, and Más. It uses `colors.primaryText` (pink) for active icons and labels, and `colors.primary` (pink) for the central report button. Preserve its extra `space.md` bottom offset above the safe-area calculation and the map error overlay's matching clearance.
+- The Más page (`src/app/(tabs)/mas.tsx`) contains the Appearance selector (icon-only for system, light, dark), emergency contacts, and app version info. The Sesión section was moved to Perfil (`src/app/(tabs)/perfil.tsx`); do not restore it on Más.
+- Main tab screen headers (Reportes, Perfil, Más) share a unified typographic hierarchy (`fontSize: 26`, `lineHeight: 34`, `fontWeight: "800"`, `letterSpacing: -0.6`), safe-area top padding, and `maxWidth: 640` centered container.
+
+## Report feed and publication structure
+
+- The visible Reportes tab is `src/app/(tabs)/mis-reportes.tsx`; `reports.tsx` is a hidden legacy route.
+- The feed uses an open continuous publication layout via `ReportFeedItem.tsx`, separated by subtle hairline borders (`ItemSeparatorComponent`) without enclosing cards or card background fills.
+- Publication hierarchy inside `ReportFeedItem`:
+  1. Compact header with category icon/short label, structured location summary, and short date.
+  2. Status chip (`StatusChip`).
+  3. Main display title (`getReportDisplayTitle`) and citizen description snippet when distinct.
+  4. 16:9 evidence photo with rounded corners (`radius.md`), rendered only when photos exist; no empty image placeholders for text-only reports. Multi-photo counter badge (`1/N`) in the bottom right corner.
+  5. Bottom action bar with support count ("X apoyos") and "Ver ubicación" navigation link.
+- Entire publication acts as a single accessible touch target navigating to `/reporte/[id]`. Avoid nested interactive touch areas.
+- Presentation title generation: use centralized `getReportDisplayTitle` in `src/services/report-format.ts`. It respects stored `report.title` if valid; otherwise, constructs a clean descriptive fallback combining canonical category and structured location (colonia or municipality), falling back to category alone or "Problema reportado". Do not heuristically parse unstructured address strings into colonias.
+- Short location summaries: use `getReportLocationSummary` in `src/services/report-format.ts` (returns structured `colonia` or `municipality`, or `null`).
+- Filters: three tabs (Todos, Cerca de ti, Resueltos). "Cerca de ti" preserves exact backend 1 km proximity recommendations and GPS banner logic (`useRecommendedReports`).
+- ReportCard (`ReportCard.tsx`) is reserved for compact list rendering in Perfil (`src/app/(tabs)/perfil.tsx`); do not replace it with `ReportFeedItem` or alter Perfil's layout during feed changes.
 
 ## Report titles and category selection
 
@@ -130,9 +147,8 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Report sharing is currently removed, including the detail screen's share button and handler. The app-link experiment and its helper/tests/docs were reverted. Do not restore text-only sharing, custom-scheme report links or a share button unless requested; HTTPS app-link/domain configuration remains future work.
 - Keep the comment form above existing comments. The character counter belongs beside the input label, not between the input and publish button.
 - Empty or whitespace-only descriptions show plain `No hay descripción.` text. Do not add a bordered description section or extra heading unless requested.
-- Para ti consumes `/reports/recommended`; preserve server ranking and recommendation reasons. It is currently rule-based, not an AI feature.
-- Preserve Todos, Para ti, Reportado and Resuelto, along with title/type/location/description search. The shared `matchesReportSearch` includes descriptions, ignores case/accents and matches query words across searchable fields. Search in Para ti must include remaining recommendation pages, not silently stop at the first page.
-- Feed description previews use two lines with a photo and three without, with a trailing ellipsis when truncated. Keep the full description in the detail screen; do not shorten stored text.
+- Cerca de ti consumes `/reports/recommended`; preserve server ranking and recommendation reasons. It is currently rule-based, not an AI feature.
+- Active feed filters are Todos, Cerca de ti, and Resueltos, along with title/type/location/description search. The shared `matchesReportSearch` includes descriptions, generated presentation titles, ignores case/accents and matches query words across searchable fields. Search in Cerca de ti must include remaining recommendation pages, not silently stop at the first page.
 - Deduplicate paginated reports by ID, guard against stale responses after navigation or identity changes, and clear personalized caches on session changes. Reuse existing session/cache infrastructure.
 - Location is optional and requested through an explicit action. Keep the centered explanation and full-width, noticeable `Activar ubicación` button. Do not restore the removed secondary “Puedes seguir…” messages.
 - Preserve location timeouts and guest/permission-denied fallback. Do not persist location or add background tracking as part of unrelated work.
