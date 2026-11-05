@@ -24,7 +24,7 @@ import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
 import { SetReportLike, likePendingKey } from "@/services/report-interactions";
 import { ApiError } from "@/services/api";
 import { ReportComments } from "@/features/reports/components/ReportComments";
-import { reportDate } from "@/services/report-format";
+import { reportDate, getReportDisplayTitle } from "@/services/report-format";
 import { StatusChip } from "@/features/reports/components/StatusChip";
 import { categoryDefFor } from "@/constants/report-categories";
 import { radius, space } from "@/constants/design";
@@ -135,8 +135,16 @@ export default function ReporteDetailScreen() {
             </View>
           </View>
 
+          {/* Title */}
+          <Text
+            accessibilityRole="header"
+            style={[styles.reportTitle, { color: colors.text }]}
+          >
+            {getReportDisplayTitle(report)}
+          </Text>
+
           {/* Description */}
-          <Text style={[styles.description, { color: colors.text }]}>
+          <Text style={[styles.description, { color: colors.textSecondary }]}>
             {report.description?.trim() || "No hay descripción."}
           </Text>
 
@@ -266,10 +274,16 @@ const styles = StyleSheet.create({
   },
   authorLabel: { fontSize: 12 },
   authorName: { fontSize: 15, fontWeight: "700" },
+  reportTitle: {
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: "800",
+    letterSpacing: -0.4,
+  },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "500",
+    fontWeight: "400",
   },
   upvoteCard: {
     flexDirection: "row",

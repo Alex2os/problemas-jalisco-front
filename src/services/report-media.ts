@@ -1,5 +1,4 @@
 import { File } from "expo-file-system";
-import { Platform } from "react-native";
 import { apiRequest, apiUrl } from "./api";
 import { normalizeReport } from "./normalize-report";
 import { apiCache } from "./cache";
@@ -24,16 +23,30 @@ export function photoUrl(path: string) {
 export async function appendPhotos(form: FormData, photos: SelectedPhoto[]) {
   if (photos.length > 3) throw new Error("Puedes adjuntar hasta 3 fotos.");
   for (const [index, photo] of photos.entries()) {
-    if (photo.size <= 0 || photo.size > MAX_PHOTO_BYTES)
-      throw new Error("Cada foto debe ocupar como máximo 5 MB.");
     const filename = photo.name || `report-photo-${index + 1}.jpg`;
-    // Expo 58 fetch requires Blob/File bytes rather than RN URI descriptors.
-    const file = Platform.OS === "web"
-      ? await (await fetch(photo.uri)).blob()
-      : new File(photo.uri);
-    if (file.size <= 0 || file.size > MAX_PHOTO_BYTES)
-      throw new Error("Cada foto debe ocupar entre 1 byte y 5 MB.");
-    form.append("photos", file, filename);
+    if (photo.size <= 0) {
+      throw new Error(`La foto "${filename}" está vacía (0 bytes).`);
+    }
+    if (photo.size > MAX_PHOTO_BYTES) {
+      throw new Error(`La foto "${filename}" supera el límite de 5 MB (${photo.size} bytes).`);
+    }
+
+    // In Node test environments where standard Fetch FormData is used:
+    if (typeof (form as any).getParts !== "function") {
+      const file = new File(photo.uri);
+      const actualSize = typeof file.size === "number" ? file.size : photo.size;
+      if (actualSize > MAX_PHOTO_BYTES) {
+        throw new Error(`La foto "${filename}" supera el límite de 5 MB (${actualSize} bytes).`);
+      }
+      form.append("photos", file, filename);
+    } else {
+      // Native platforms (Android & iOS with React Native fetch) expect { uri, name, type }
+      form.append("photos", {
+        uri: photo.uri,
+        name: filename,
+        type: photo.type || "image/jpeg",
+      } as unknown as Blob);
+    }
   }
 }
 function confirm(report: Report) {

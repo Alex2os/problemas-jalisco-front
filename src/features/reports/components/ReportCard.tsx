@@ -15,6 +15,7 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, space } from "@/constants/design";
 import { categoryDefFor } from "@/constants/report-categories";
 import { StatusChip } from "./StatusChip";
+import { getReportDisplayTitle } from "@/services/report-format";
 import type { Report } from "@/services/types";
 
 export interface ReportCardProps {
@@ -108,6 +109,14 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
               {formatDate(report.created_at)}
             </Text>
           </View>
+
+          {/* Title */}
+          <Text
+            style={[styles.reportTitle, { color: colors.text }]}
+            numberOfLines={2}
+          >
+            {getReportDisplayTitle(report)}
+          </Text>
 
           {/* Location line with address & municipality */}
           <View style={styles.locationRow}>
@@ -222,6 +231,12 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
     fontWeight: "600",
+  },
+  reportTitle: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: "700",
+    marginVertical: 2,
   },
   locationRow: {
     flexDirection: "row",
