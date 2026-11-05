@@ -3,24 +3,41 @@ import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-na
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, space } from "@/constants/design";
+import { palette } from "@/constants/palette";
 import { normalizeReportStatus, reportStatusLabels } from "@/services/report-status";
 import type { ReportStatus } from "@/services/types";
 
 export interface StatusChipProps {
   status: ReportStatus;
   size?: "sm" | "md";
+  /** Neutral gray chip for non-resolved statuses (resolved keeps its semantic green). */
+  neutral?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-export function StatusChip({ status, size = "md", style }: StatusChipProps) {
-  const { colors } = useAppTheme();
+export function StatusChip({ status, size = "md", neutral = false, style }: StatusChipProps) {
+  const { colors, dark } = useAppTheme();
 
   const normalizedKey = normalizeReportStatus(status);
   const label = reportStatusLabels[normalizedKey];
   const iconName: React.ComponentProps<typeof Ionicons>["name"] =
     normalizedKey === "resuelto" ? "checkmark-circle-outline" : "document-text-outline";
 
-  const themeStatus = colors.status[normalizedKey];
+  const semantic = colors.status[normalizedKey];
+  const themeStatus =
+    neutral && normalizedKey !== "resuelto"
+      ? dark
+        ? {
+            bg: palette.dark.textSecondary,
+            border: palette.dark.textSecondary,
+            text: palette.dark.background,
+          }
+        : {
+            bg: palette.dark.raised,
+            border: palette.dark.raised,
+            text: palette.dark.text,
+          }
+      : semantic;
   const isSm = size === "sm";
 
   return (

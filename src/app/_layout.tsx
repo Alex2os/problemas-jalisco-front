@@ -78,6 +78,16 @@ function Navigation() {
           }}
         />
 
+        {/* Perfil → historial completo: horizontal push, 220 ms where the platform honors it */}
+        <Stack.Screen
+          name="perfil/reportes"
+          options={{
+            headerShown: false,
+            animation: reducedMotion ? "none" : "slide_from_right",
+            animationDuration: 220,
+          }}
+        />
+
         <Stack.Screen name="reporte/editar/[id]" options={{ headerShown: false }} />
 
         {/* Legacy routes preserved */}

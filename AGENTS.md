@@ -70,6 +70,18 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - The Más page (`src/app/(tabs)/mas.tsx`) contains the Appearance selector (icon-only for system, light, dark), emergency contacts, and app version info. The Sesión section was moved to Perfil (`src/app/(tabs)/perfil.tsx`); do not restore it on Más.
 - Main tab screen headers (Reportes, Perfil, Más) share a unified typographic hierarchy (`fontSize: 26`, `lineHeight: 34`, `fontWeight: "800"`, `letterSpacing: -0.6`), safe-area top padding, and `maxWidth: 640` centered container.
 
+## Navigation and visual fluidity
+
+- Keep screen transitions consistent with the existing navigation system. Horizontal transitions target about 220 ms where technically supported (tabs use `shift` at 220 ms; the Perfil → `/perfil/reportes` push sets `animationDuration: 220`, which the native stack honors on iOS only).
+- Entry and exit direction must match the navigation direction (forward enters from the right, back reverses).
+- Always respect reduced-motion preferences (`useReducedMotion`).
+- Avoid unnecessary animations, exaggerated bounce and duplicated or overlapping transitions.
+- Do not show refresh indicators when a screen regains focus and valid content already exists; refresh silently (`refreshReports(true)`) and keep current content visible during background updates.
+- Reserve visible refresh indicators (`RefreshControl`) for user-initiated refreshes.
+- Never sacrifice data correctness, error states or accessibility just to hide loading indicators.
+- Prefer navigation and animation tools already installed; add dependencies only with a clear technical justification.
+- Perfil shows the three most recent own reports (`ProfileReportItem`) and links to `/perfil/reportes` (full history, root stack, not a tab). Both use `useMyReports`, which sorts reports with `can_manage` by `created_at` descending from the unpaginated `/reports` data.
+
 ## Report feed and publication structure
 
 - The visible Reportes tab is `src/app/(tabs)/mis-reportes.tsx`; `reports.tsx` is a hidden legacy route.
