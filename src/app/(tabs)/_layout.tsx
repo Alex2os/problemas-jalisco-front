@@ -1,5 +1,5 @@
 import React, { useEffect, useState, type ComponentProps } from "react";
-import { Keyboard, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Easing, Keyboard, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { router, Tabs } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -16,6 +16,11 @@ type TabConfig = {
   activeIcon: ComponentProps<typeof Ionicons>["name"];
   inactiveIcon: ComponentProps<typeof Ionicons>["name"];
 };
+
+const TAB_TRANSITION_SPEC = {
+  animation: "timing",
+  config: { duration: 220, easing: Easing.inOut(Easing.ease) },
+} as const;
 
 const LEFT_TABS: TabConfig[] = [
   {
@@ -95,7 +100,7 @@ function FloatingTabBar({
 
     const isFocused = state.routes[state.index]?.key === route.key;
     const options = descriptors[route.key]?.options;
-    const color = isFocused ? colors.primaryText : colors.textSecondary;
+    const color = isFocused ? colors.text : colors.textSecondary;
 
     const onPress = () => {
       const event = emitter.emit({
@@ -217,7 +222,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        animation: reducedMotion ? "none" : "fade",
+        animation: reducedMotion ? "none" : "shift",
+        transitionSpec: TAB_TRANSITION_SPEC,
       }}
     >
       <Tabs.Screen name="index" options={{ href: null }} />

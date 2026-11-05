@@ -52,6 +52,7 @@ export default function MisReportesScreen() {
     canAskAgain: boolean;
   } | null>(null);
   const locating = useRef(false);
+  const [pulling, setPulling] = useState(false);
   const forYou = activeFilter === "para-ti";
   const recommended = useRecommendedReports(forYou, !!searchQuery.trim(), location);
   const listLoading = forYou ? recommended.loading : isLoading;
@@ -126,8 +127,13 @@ export default function MisReportesScreen() {
         keyboardDismissMode="on-drag"
         refreshControl={
           <RefreshControl
-            refreshing={listLoading && !listError}
-            onRefresh={() => { if (forYou) recommended.refresh(); else void refreshReports(); }}
+            refreshing={pulling && listLoading && !listError}
+            onRefresh={() => {
+              setPulling(true);
+              void (forYou ? recommended.refresh() : refreshReports()).finally(() =>
+                setPulling(false),
+              );
+            }}
             tintColor={colors.primary}
           />
         }

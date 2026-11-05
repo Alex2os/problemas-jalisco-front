@@ -15,7 +15,7 @@ export function useBackendReports() {
     const reload = () => {
       if (active && AppState.currentState === "active" && identity === sessionVersion()) void refresh(true);
     };
-    void loadSession().then(() => { if (active) void refresh(); }).catch(() => {
+    void loadSession().then(() => { if (active) void refresh(useReportsStore.getState().reports.length > 0); }).catch(() => {
       if (active) useReportsStore.setState({ error: "No se pudo leer la sesión.", isLoading: false });
     });
     const timer = setInterval(reload, 15000);

@@ -67,6 +67,6 @@ export function useRecommendedReports(enabled: boolean, searching: boolean, loca
     ...state,
     reports: state.identity === identity ? state.reports : [],
     recommendations: state.identity === identity ? state.recommendations : [],
-    refresh: () => { void load(); }, loadMore,
+    refresh: () => load(), loadMore,
   };
 }
