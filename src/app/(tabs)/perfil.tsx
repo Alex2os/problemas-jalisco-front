@@ -32,6 +32,7 @@ export default function PerfilScreen() {
   const isLoading = useReportsStore((state) => state.isLoading);
   const resolvedCount = userReports.filter((report) => report.status === "resuelto" || report.status === "resolved").length;
   const upvotedCount = reports.filter((report) => report.liked_by_me).length;
+  const cardColors = { backgroundColor: colors.surface, borderColor: colors.border };
 
   async function logOut() {
     if (logoutPending.current) return;
@@ -57,7 +58,7 @@ export default function PerfilScreen() {
       showsVerticalScrollIndicator={false}>
       <Text accessibilityRole="header" style={[styles.pageTitle, { color: colors.text }]}>{es.profile.title}</Text>
 
-      <View style={styles.userRow}>
+      <View style={[styles.card, cardColors, styles.userRow]}>
         <View style={[styles.avatar, { backgroundColor: colors.accentSoft }]}>
           <Ionicons name="person-outline" size={26} color={colors.accentText} />
         </View>
@@ -69,14 +70,14 @@ export default function PerfilScreen() {
         </View>
       </View>
 
-      <View style={styles.activity}>
+      <View style={[styles.card, cardColors, styles.activity]}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>{es.profile.statsTitle}</Text>
         {!!error && <ErrorBanner message={error} />}
         <View style={styles.statsRow}>
           {[{ value: userReports.length, label: es.profile.statsReported },
             { value: resolvedCount, label: es.profile.statsResolved },
             { value: upvotedCount, label: es.profile.statsSupported }].map((stat) => (
-            <View key={stat.label} style={[styles.stat, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            <View key={stat.label} style={[styles.stat, { backgroundColor: colors.raised }]}
               accessible accessibilityLabel={`${stat.value} ${stat.label}`}>
               <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
               <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
@@ -86,7 +87,7 @@ export default function PerfilScreen() {
       </View>
 
       {authenticated && (
-        <View style={styles.reportsSection}>
+        <View style={[styles.card, cardColors, styles.reportsSection]}>
           <View style={styles.sectionHeader}>
             <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
               Mis reportes
@@ -180,8 +181,9 @@ function AccountAction({ title, icon, tone, loading = false, onPress }: {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { width: "100%", maxWidth: 640, alignSelf: "center", paddingHorizontal: space.lg, gap: space.xl },
+  content: { width: "100%", maxWidth: 640, alignSelf: "center", paddingHorizontal: space.lg, gap: space.md },
   pageTitle: { fontSize: 26, lineHeight: 34, fontWeight: "800", letterSpacing: -0.6 },
+  card: { borderRadius: radius.xl, borderWidth: 1, padding: space.lg },
   sectionTitle: { fontSize: 17, lineHeight: 24, fontWeight: "700" },
   interactiveLabel: { fontSize: 16, lineHeight: 22, fontWeight: "600" },
   caption: { fontSize: 13, lineHeight: 19 },
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
   userName: { fontSize: 18, lineHeight: 25, fontWeight: "700" },
   activity: { gap: space.md },
   statsRow: { flexDirection: "row", gap: space.sm, alignItems: "stretch" },
-  stat: { flex: 1, minWidth: 0, minHeight: 72, paddingHorizontal: space.xs, paddingVertical: space.sm, borderRadius: radius.md, borderWidth: 1, alignItems: "center", justifyContent: "center", gap: space.xs },
+  stat: { flex: 1, minWidth: 0, minHeight: 68, paddingHorizontal: space.xs, paddingVertical: space.sm, borderRadius: radius.md, alignItems: "center", justifyContent: "center", gap: space.xs },
   statValue: { fontSize: 22, lineHeight: 28, fontWeight: "700", alignSelf: "center", textAlign: "center" },
   statLabel: { fontSize: 12, lineHeight: 18, fontWeight: "500", textAlign: "center", alignSelf: "center" },
   accountActions: { gap: space.md },

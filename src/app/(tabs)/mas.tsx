@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: "center",
     paddingHorizontal: space.lg,
-    gap: space.xl,
+    gap: space.md,
   },
   pageTitle: {
     fontSize: 26,
