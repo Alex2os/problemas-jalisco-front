@@ -65,7 +65,8 @@ export function ReportFeedItem({
       style={[
         styles.post,
         {
-          backgroundColor: pressed ? colors.raised : "transparent",
+          backgroundColor: pressed ? colors.raised : colors.surface,
+          borderColor: colors.border,
         },
         style,
       ]}
@@ -235,7 +236,9 @@ export function ReportFeedItem({
 
 const styles = StyleSheet.create({
   post: {
-    paddingVertical: space.md,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    padding: space.lg,
     gap: space.xs + 2,
     minHeight: size.touch,
   },

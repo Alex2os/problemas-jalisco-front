@@ -150,16 +150,9 @@ export default function MisReportesScreen() {
             />
           );
         }}
-        ItemSeparatorComponent={() => (
-          <View
-            style={[
-              styles.separator,
-              { backgroundColor: colors.border },
-            ]}
-          />
-        )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
-          <View>
+          <View style={styles.listHeader}>
       <View
         style={[
           styles.header,
@@ -209,6 +202,7 @@ export default function MisReportesScreen() {
             ) : null}
           </View>
         }
+        ListFooterComponentStyle={styles.listFooter}
         ListFooterComponent={forYou && !listError && recommended.nextOffset !== null ? (
           <Button title={searchQuery.trim() ? "Buscar en más reportes" : "Ver más reportes"}
             variant="outline" loading={recommended.loadingMore}
@@ -261,8 +255,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingTop: 0,
   },
+  listHeader: {
+    marginBottom: space.md,
+  },
+  listFooter: {
+    marginTop: space.md,
+  },
   separator: {
-    height: StyleSheet.hairlineWidth,
-    marginVertical: space.xs,
+    height: space.md,
   },
 });

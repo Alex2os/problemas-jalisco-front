@@ -5,7 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { ProfileReportItem } from "@/features/reports/components/ProfileReportItem";
-import { size, space } from "@/constants/design";
+import { radius, size, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useBackendReports } from "@/hooks/useBackendReports";
 import { useMyReports } from "@/hooks/useMyReports";
@@ -55,7 +55,14 @@ export default function MisReportesHistorialScreen() {
         ]}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: colors.border }]} />
+          <View
+            style={[
+              styles.separatorRow,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <View style={[styles.separator, { backgroundColor: colors.border }]} />
+          </View>
         )}
         ListHeaderComponent={
           error ? (
@@ -68,22 +75,44 @@ export default function MisReportesHistorialScreen() {
           ) : undefined
         }
         ListEmptyComponent={
-          error ? undefined : isLoading ? (
-            <ActivityIndicator color={colors.primary} />
-          ) : (
-            <Text style={[styles.empty, { color: colors.textSecondary }]}>
-              {authenticated
-                ? "Aún no has publicado reportes."
-                : "Inicia sesión para ver tus reportes."}
-            </Text>
+          error ? undefined : (
+            <View
+              style={[
+                styles.emptyCard,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Text style={[styles.empty, { color: colors.textSecondary }]}>
+                  {authenticated
+                    ? "Aún no has publicado reportes."
+                    : "Inicia sesión para ver tus reportes."}
+                </Text>
+              )}
+            </View>
           )
         }
-        renderItem={({ item }) => (
-          <ProfileReportItem
-            report={item}
-            onPress={(report) => router.push(`/reporte/${report.id}`)}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const isFirst = index === 0;
+          const isLast = index === myReports.length - 1;
+          return (
+            <View
+              style={[
+                styles.itemRow,
+                isFirst && styles.itemRowFirst,
+                isLast && styles.itemRowLast,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+            >
+              <ProfileReportItem
+                report={item}
+                onPress={(report) => router.push(`/reporte/${report.id}`)}
+              />
+            </View>
+          );
+        }}
       />
     </View>
   );
@@ -111,9 +140,38 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: "center",
     paddingHorizontal: space.lg,
+    paddingTop: space.lg,
+  },
+  itemRow: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    paddingHorizontal: space.lg,
+  },
+  itemRowFirst: {
+    borderTopWidth: 1,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
     paddingTop: space.sm,
   },
+  itemRowLast: {
+    borderBottomWidth: 1,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+    paddingBottom: space.sm,
+  },
+  separatorRow: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    paddingHorizontal: space.lg,
+  },
   separator: { height: StyleSheet.hairlineWidth },
-  banner: { marginBottom: space.sm },
-  empty: { fontSize: 14, lineHeight: 20, textAlign: "center", paddingTop: space.lg },
+  banner: { marginBottom: space.md },
+  emptyCard: {
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    padding: space.lg,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  empty: { fontSize: 14, lineHeight: 20, textAlign: "center" },
 });
