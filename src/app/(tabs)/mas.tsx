@@ -29,7 +29,6 @@ export default function MasScreen() {
   const insets = useSafeAreaInsets();
   const { colors, preference, setPreference } = useAppTheme();
   const appVersion = Constants.default?.expoConfig?.version || "1.0.0";
-  const cardColors = { backgroundColor: colors.surface, borderColor: colors.border };
 
   function handleCall(phone: string) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -58,7 +57,7 @@ export default function MasScreen() {
       </Text>
 
       {/* Apariencia y selección de tema */}
-      <View style={[styles.card, cardColors]}>
+      <View style={styles.section}>
         <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
           {es.more.themeTitle}
         </Text>
@@ -93,8 +92,10 @@ export default function MasScreen() {
         </View>
       </View>
 
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
       {/* Teléfonos de atención de Jalisco */}
-      <View style={[styles.card, cardColors]}>
+      <View style={styles.section}>
         <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
           {es.more.emergencyTitle}
         </Text>
@@ -114,8 +115,10 @@ export default function MasScreen() {
         </View>
       </View>
 
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
       {/* Información acerca de la aplicación y versión */}
-      <View style={[styles.card, cardColors]}>
+      <View style={styles.section}>
         <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.text }]}>
           {es.more.aboutTitle}
         </Text>
@@ -197,7 +200,7 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: "center",
     paddingHorizontal: space.lg,
-    gap: space.xl,
+    gap: space.lg,
   },
   pageTitle: {
     fontSize: 26,
@@ -205,11 +208,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: -0.6,
   },
-  card: {
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    padding: space.lg,
-    gap: space.lg,
+  section: {
+    gap: space.md,
   },
   sectionTitle: {
     fontSize: 17,
@@ -249,11 +249,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   settingRow: {
-    minHeight: 64,
+    minHeight: size.touch,
     flexDirection: "row",
     alignItems: "center",
     gap: space.md,
-    padding: space.md,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.sm,
   },
   settingIcon: {
     width: 40,
@@ -265,22 +266,23 @@ const styles = StyleSheet.create({
   settingInfo: {
     flex: 1,
     minWidth: 0,
-    gap: space.xs,
+    gap: 2,
   },
   rowDivider: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: 40 + space.md * 2,
-    marginRight: space.md,
   },
   aboutRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: space.md,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
   },
   versionRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: space.sm,
   },
   versionValue: {
     fontSize: 14,
