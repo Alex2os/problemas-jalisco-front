@@ -2,7 +2,7 @@ export * from "./CategoryCard";
 export * from "./EvidencePhotos";
 export * from "./LocationPicker";
 export * from "./PhotoPicker";
-export * from "./RecommendationLocationBanner";
+export * from "./RecommendationLocationNotice";
 export * from "./ReportCard";
 export * from "./ReportFeedItem";
 export * from "./ReportComments";

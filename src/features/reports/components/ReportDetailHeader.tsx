@@ -1,11 +1,11 @@
 import React from "react";
-import { Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
-import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { shareReport } from "@/services/share-report";
 import type { Report } from "@/services/types";
 
 export interface ReportDetailHeaderProps {
@@ -20,17 +20,7 @@ export function ReportDetailHeader({
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
 
-  const handleShare = async () => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      await Share.share({
-        title: `Reporte #${report.folio}`,
-        message: `${categoryLabel} en ${report.ubication}. Reporte #${report.id} en ProblemasJalisco.`,
-      });
-    } catch {
-      // Ignored
-    }
-  };
+  const handleShare = () => shareReport(report, categoryLabel);
 
   return (
     <View

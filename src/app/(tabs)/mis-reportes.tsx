@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
   RefreshControl,
   StyleSheet,
   Text,
@@ -16,7 +17,11 @@ import { useBackendReports } from "@/hooks/useBackendReports";
 import { useRecommendedReports } from "@/hooks/useRecommendedReports";
 import type { RecommendationLocation } from "@/services/get-recommended-reports";
 import { EmptyState } from "@/components/EmptyState";
-import { RecommendationLocationBanner } from "@/features/reports/components/RecommendationLocationBanner";
+import { RecommendationLocationNotice } from "@/features/reports/components/RecommendationLocationNotice";
+import {
+  getCachedRecommendationLocation,
+  resolveRecommendationLocation,
+} from "@/services/recommendation-location";
 import { ReportFeedItem } from "@/features/reports/components/ReportFeedItem";
 import { ReportSearchFilterBar } from "@/features/reports/components/ReportSearchFilterBar";
 import { size, space } from "@/constants/design";
@@ -39,7 +44,14 @@ export default function MisReportesScreen() {
 
   const [activeFilter, setActiveFilter] = useState<string>("todos");
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState<RecommendationLocation>();
+  const [location, setLocation] = useState<RecommendationLocation | undefined>(
+    getCachedRecommendationLocation,
+  );
+  const [locationNotice, setLocationNotice] = useState<{
+    message: string;
+    canAskAgain: boolean;
+  } | null>(null);
+  const locating = useRef(false);
   const forYou = activeFilter === "para-ti";
   const recommended = useRecommendedReports(forYou, !!searchQuery.trim(), location);
   const listLoading = forYou ? recommended.loading : isLoading;
@@ -50,6 +62,42 @@ export default function MisReportesScreen() {
     if (activeFilter === "todos" || forYou) return true;
     return normalizeReportStatus(r.status) === activeFilter;
   });
+
+  const requestLocation = async () => {
+    if (locating.current) return;
+    locating.current = true;
+    try {
+      const result = await resolveRecommendationLocation();
+      if (result.status === "ok") {
+        setLocation(result.location);
+        setLocationNotice(null);
+      } else if (result.status === "denied") {
+        setLocationNotice({
+          message: "Sin acceso a tu ubicación, mostramos recomendaciones generales.",
+          canAskAgain: result.canAskAgain,
+        });
+      } else {
+        setLocationNotice({
+          message: "No pudimos obtener tu ubicación, mostramos recomendaciones generales.",
+          canAskAgain: true,
+        });
+      }
+    } finally {
+      locating.current = false;
+    }
+  };
+
+  const handleFilterChange = (filterId: string) => {
+    setActiveFilter(filterId);
+    if (filterId !== "para-ti") return;
+    const cached = getCachedRecommendationLocation();
+    if (cached) {
+      setLocation(cached);
+      setLocationNotice(null);
+    } else {
+      void requestLocation();
+    }
+  };
 
   const handlePress = (report: Report) => {
     router.push(`/reporte/${report.id}`);
@@ -65,36 +113,6 @@ export default function MisReportesScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: dark ? colors.background : colors.surface,
-            borderBottomColor: colors.border,
-            paddingTop: insets.top + space.lg,
-          },
-        ]}
-      >
-        <View style={styles.headerInner}>
-          <Text
-            accessibilityRole="header"
-            style={[styles.pageTitle, { color: colors.text }]}
-          >
-            {es.myReports.title}
-          </Text>
-
-          <View>
-            <ReportSearchFilterBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-            />
-          </View>
-        </View>
-      </View>
-
       {/* List of Reports */}
       <FlatList
         data={filteredReports}
@@ -134,20 +152,57 @@ export default function MisReportesScreen() {
             ]}
           />
         )}
-        ListHeaderComponent={forYou || listError ? (
-          <View style={{ gap: space.sm }}>
-            {forYou && (
-              <RecommendationLocationBanner
-                location={location}
-                onLocationChange={setLocation}
-              />
-            )}
-            {!!listError && <>
-              <ErrorBanner message={listError} retrying={listLoading || (forYou && recommended.loadingMore)}
-                onRetry={() => { if (forYou) recommended.refresh(); else void refreshReports(); }} />
-            </>}
+        ListHeaderComponent={
+          <View>
+      <View
+        style={[
+          styles.header,
+          styles.headerBleed,
+          {
+            backgroundColor: dark ? colors.background : colors.surface,
+            borderBottomColor: colors.border,
+            paddingTop: insets.top + space.lg,
+          },
+        ]}
+      >
+        <View style={styles.headerInner}>
+          <Text
+            accessibilityRole="header"
+            style={[styles.pageTitle, { color: colors.text }]}
+          >
+            {es.myReports.title}
+          </Text>
+
+          <View>
+            <ReportSearchFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
+            />
           </View>
-        ) : undefined}
+        </View>
+      </View>
+            {(forYou || listError) ? (
+              <View style={{ gap: space.sm, paddingTop: space.md }}>
+                {forYou && !location && !!locationNotice && (
+                  <RecommendationLocationNotice
+                    message={locationNotice.message}
+                    actionLabel={locationNotice.canAskAgain ? "Reintentar" : "Abrir ajustes"}
+                    onAction={() => {
+                      if (locationNotice.canAskAgain) void requestLocation();
+                      else void Linking.openSettings();
+                    }}
+                  />
+                )}
+                {!!listError && (
+                  <ErrorBanner message={listError} retrying={listLoading || (forYou && recommended.loadingMore)}
+                    onRetry={() => { if (forYou) recommended.refresh(); else void refreshReports(); }} />
+                )}
+              </View>
+            ) : null}
+          </View>
+        }
         ListFooterComponent={forYou && !listError && recommended.nextOffset !== null ? (
           <Button title={searchQuery.trim() ? "Buscar en más reportes" : "Ver más reportes"}
             variant="outline" loading={recommended.loadingMore}
@@ -178,6 +233,9 @@ const styles = StyleSheet.create({
     paddingBottom: space.md,
     borderBottomWidth: 1,
   },
+  headerBleed: {
+    marginHorizontal: -space.lg,
+  },
   headerInner: {
     width: "100%",
     maxWidth: 640,
@@ -195,7 +253,7 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: "center",
     paddingHorizontal: space.lg,
-    paddingTop: space.xs,
+    paddingTop: 0,
   },
   separator: {
     height: StyleSheet.hairlineWidth,

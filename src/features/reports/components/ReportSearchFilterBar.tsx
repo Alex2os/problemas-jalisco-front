@@ -27,9 +27,17 @@ export function ReportSearchFilterBar({
   const { colors } = useAppTheme();
   const [searchFocused, setSearchFocused] = useState(false);
   const [clearPressed, setClearPressed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const activeSummary =
+    activeFilter === "para-ti"
+      ? "Cerca de ti"
+      : activeFilter === "resuelto"
+        ? "Resueltos"
+        : "Todos los reportes";
 
   return (
     <>
+      <View style={styles.searchRow}>
       <View
         style={[
           styles.searchField,
@@ -89,8 +97,18 @@ export function ReportSearchFilterBar({
           <View style={styles.searchClear} />
         )}
       </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Filtros"
+        accessibilityState={{ expanded: menuOpen }}
+        onPress={() => setMenuOpen((open) => !open)}
+        style={[styles.filterButton, { backgroundColor: colors.primary }]}
+      >
+        <Ionicons name="options-outline" size={22} color={colors.onPrimary} />
+      </Pressable>
+      </View>
 
-      {/* Status Filter Tabs */}
+      {menuOpen && (
       <View
         style={[
           styles.filterRow,
@@ -105,6 +123,7 @@ export function ReportSearchFilterBar({
               onPress={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 onFilterChange(tab.id);
+                setMenuOpen(false);
               }}
               accessibilityRole="button"
               accessibilityLabel={`Filtrar por ${tab.label}`}
@@ -112,7 +131,8 @@ export function ReportSearchFilterBar({
               style={[
                 styles.filterTab,
                 {
-                  backgroundColor: isSelected ? colors.primary : "transparent",
+                  backgroundColor: isSelected ? colors.surface : "transparent",
+                  borderColor: isSelected ? colors.textSecondary : "transparent",
                 },
               ]}
             >
@@ -120,7 +140,7 @@ export function ReportSearchFilterBar({
                 style={[
                   styles.filterTabText,
                   {
-                    color: isSelected ? colors.onPrimary : colors.textSecondary,
+                    color: isSelected ? colors.text : colors.textSecondary,
                   },
                 ]}
               >
@@ -130,12 +150,36 @@ export function ReportSearchFilterBar({
           );
         })}
       </View>
+      )}
+
+      <Text style={[styles.activeFilterText, { color: colors.textSecondary }]}>
+        Mostrando: {activeSummary}
+      </Text>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: space.sm,
+    marginBottom: space.sm,
+  },
+  filterButton: {
+    width: size.control,
+    height: size.control,
+    borderRadius: radius.control,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  activeFilterText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "500",
+  },
   searchField: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     minHeight: size.control,
@@ -143,7 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.control,
     paddingLeft: space.md,
     paddingRight: space.sm,
-    marginBottom: space.sm,
     gap: space.xs,
   },
   searchInput: {
@@ -183,16 +226,18 @@ const styles = StyleSheet.create({
     padding: space.xs,
     borderWidth: 1,
     borderRadius: radius.control,
+    marginBottom: space.sm,
   },
   filterTab: {
     flex: 1,
-    minHeight: size.touch,
+    minHeight: 40,
     minWidth: 0,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: space.xs,
     paddingVertical: space.sm,
     borderRadius: radius.sm,
+    borderWidth: 1,
   },
   filterTabText: {
     fontSize: 13,

@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { palette } from "@/constants/palette";
+import { shareReport } from "@/services/share-report";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { radius, size, space } from "@/constants/design";
 import { categoryDefFor } from "@/constants/report-categories";
@@ -19,7 +21,6 @@ import {
   getReportLocationSummary,
   reportShortDate,
 } from "@/services/report-format";
-import { StatusChip } from "./StatusChip";
 import type { Report } from "@/services/types";
 
 export interface ReportFeedItemProps {
@@ -44,6 +45,10 @@ export function ReportFeedItem({
   const dateLabel = reportShortDate(report.created_at);
   const photoUrl = report.photos?.[0]?.url ?? null;
   const photoCount = report.photos?.length ?? 0;
+
+  const supportedBg = dark ? palette.dark.text : palette.dark.background;
+  const supportedFg = dark ? palette.dark.background : palette.dark.text;
+  const liked = !!report.liked_by_me;
 
   const handlePress = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -112,7 +117,13 @@ export function ReportFeedItem({
           </Text>
         </View>
 
-        <StatusChip status={report.status} size="sm" />
+        <Ionicons
+          name="ellipsis-horizontal"
+          size={20}
+          color={colors.textSecondary}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+        />
       </View>
 
       {/* 3. Main Title */}
@@ -157,31 +168,26 @@ export function ReportFeedItem({
         </View>
       )}
 
-      {/* 5. Footer: Upvotes + Location/Detail Access */}
+      {/* 5. Footer: Support + Comments */}
       <View style={styles.footerRow}>
         <View
           style={[
             styles.supportBadge,
             {
-              backgroundColor: report.liked_by_me
-                ? colors.secondarySoft
-                : colors.raised,
+              backgroundColor: liked ? supportedBg : colors.raised,
+              borderColor: "transparent",
             },
           ]}
         >
           <Ionicons
             name={report.liked_by_me ? "hand-right" : "hand-right-outline"}
             size={14}
-            color={report.liked_by_me ? colors.secondary : colors.textSecondary}
+            color={liked ? supportedFg : colors.textSecondary}
           />
           <Text
             style={[
               styles.supportText,
-              {
-                color: report.liked_by_me
-                  ? colors.secondary
-                  : colors.textSecondary,
-              },
+              { color: liked ? supportedFg : colors.textSecondary },
             ]}
           >
             {report.like_count === 1
@@ -190,24 +196,38 @@ export function ReportFeedItem({
           </Text>
         </View>
 
-        <View style={styles.detailAction}>
+        <View
+          style={[
+            styles.supportBadge,
+            { backgroundColor: colors.raised, borderColor: "transparent" },
+          ]}
+          accessibilityLabel={
+            typeof report.comment_count === "number"
+              ? `${report.comment_count} comentarios`
+              : "Comentarios"
+          }
+        >
           <Ionicons
-            name="location-outline"
-            size={15}
-            color={colors.accentText}
-          />
-          <Text
-            style={[styles.detailActionText, { color: colors.accentText }]}
-            numberOfLines={1}
-          >
-            Ver ubicación
-          </Text>
-          <Ionicons
-            name="chevron-forward"
+            name="chatbubble-outline"
             size={14}
-            color={colors.accentText}
+            color={colors.textSecondary}
           />
+          {typeof report.comment_count === "number" && (
+            <Text style={[styles.supportText, { color: colors.textSecondary }]}>
+              {report.comment_count}
+            </Text>
+          )}
         </View>
+
+        <Pressable
+          onPress={() => void shareReport(report, categoryDef.label)}
+          accessibilityRole="button"
+          accessibilityLabel="Compartir reporte"
+          hitSlop={8}
+          style={[styles.shareButton, { backgroundColor: colors.raised }]}
+        >
+          <Ionicons name="share-social-outline" size={16} color={colors.textSecondary} />
+        </Pressable>
       </View>
     </Pressable>
   );
@@ -305,10 +325,18 @@ const styles = StyleSheet.create({
   footerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     gap: space.sm,
     marginTop: space.xs,
     paddingTop: space.xs,
+  },
+  shareButton: {
+    marginLeft: "auto",
+    width: 32,
+    height: 32,
+    borderRadius: radius.full,
+    alignItems: "center",
+    justifyContent: "center",
   },
   supportBadge: {
     flexDirection: "row",
@@ -317,24 +345,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.sm,
     paddingVertical: 6,
     borderRadius: radius.full,
+    borderWidth: 1,
   },
   supportText: {
     fontSize: 13,
     lineHeight: 18,
     fontWeight: "700",
-  },
-  detailAction: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    flexShrink: 1,
-    paddingVertical: 4,
-    paddingHorizontal: space.xs,
-  },
-  detailActionText: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    flexShrink: 1,
   },
 });
