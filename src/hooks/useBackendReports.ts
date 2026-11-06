@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useAuthSession, useCacheValue, useLiveReport } from "./useReportState";
@@ -31,6 +31,8 @@ export function useBackendReport(id: string) {
   const report = useLiveReport(fetched?.id === Number(id) ? fetched : undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const retryRequest = useRef<(() => Promise<void>) | null>(null);
+  const retry = useCallback(() => { void retryRequest.current?.(); }, []);
   useFocusEffect(useCallback(() => {
     let active = true;
     let pending = false;
@@ -49,11 +51,12 @@ export function useBackendReport(id: string) {
         if (active) setLoading(false);
       }
     };
+    retryRequest.current = () => load();
     void load();
     const refresh = () => { if (AppState.currentState === "active") void load(true); };
     const timer = setInterval(refresh, 15000);
     const subscription = AppState.addEventListener("change", refresh);
-    return () => { active = false; clearInterval(timer); subscription.remove(); };
+    return () => { active = false; retryRequest.current = null; clearInterval(timer); subscription.remove(); };
   }, [id, identity]));
-  return { report, loading, error };
+  return { report, loading, error, retry };
 }

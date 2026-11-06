@@ -33,7 +33,7 @@ test('photo payload validation rejects oversized batches and files before reques
   await assert.rejects(() => appendPhotos(new FormData(), [{...file, size: MAX_PHOTO_BYTES + 1}]), /5 MB/);
 });
 
-test('appendPhotos sends actual JPEG bytes and filenames compatible with Expo fetch', async () => {
+test('appendPhotos sends actual JPEG bytes even when FormData exposes native getParts', async () => {
   const fs = require('node:fs');
   const os = require('node:os');
   const path = require('node:path');
@@ -44,6 +44,8 @@ test('appendPhotos sends actual JPEG bytes and filenames compatible with Expo fe
     fs.writeFileSync(uri, bytes);
     const {appendPhotos} = createServiceClient().load('services/report-media');
     const form = new FormData();
+    // Native FormData exposes getParts too; this must never select legacy URI descriptors.
+    form.getParts = () => { throw new Error('Upload must use File/Blob parts'); };
     await appendPhotos(form, [{uri, name: 'evidence.jpg', type: 'image/jpeg', size: bytes.length}]);
     const file = form.get('photos');
     assert.ok(file instanceof Blob);

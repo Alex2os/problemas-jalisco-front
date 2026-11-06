@@ -1,8 +1,14 @@
 import React, { useRef, useState } from "react";
-import { Keyboard, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { OptionalBadge } from "@/components/OptionalBadge";
 import { CharacterCount } from "@/components/CharacterCount";
@@ -12,7 +18,10 @@ import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
-import { getReportTitleError, REPORT_TITLE_LIMIT } from "@/services/create-report";
+import {
+  getReportTitleError,
+  REPORT_TITLE_LIMIT,
+} from "@/services/create-report";
 
 const DESCRIPTION_LIMIT = 255;
 
@@ -58,15 +67,26 @@ export default function EvidenciaScreen() {
         keyboardDismissMode="on-drag"
       >
         <View style={styles.intro}>
-          <Text accessibilityRole="header" style={[styles.heading, { color: colors.text }]}>{es.evidence.title}</Text>
-          <Text style={[styles.hint, { color: colors.muted }]}>{es.evidence.hint}</Text>
+          <Text
+            accessibilityRole="header"
+            style={[styles.heading, { color: colors.text }]}
+          >
+            {es.evidence.title}
+          </Text>
+          <Text style={[styles.hint, { color: colors.muted }]}>
+            {es.evidence.hint}
+          </Text>
         </View>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={styles.section}>
           <View style={styles.titleLabelRow}>
             <View style={styles.headingGroup}>
-              <Text nativeID="report-title-label" style={[styles.sectionTitle, { color: colors.text }]}>
-                Título del reporte <Text style={{ color: colors.danger }}>*</Text>
+              <Text
+                nativeID="report-title-label"
+                style={[styles.sectionTitle, { color: colors.text }]}
+              >
+                Título del reporte{" "}
+                <Text style={{ color: colors.danger }}>*</Text>
               </Text>
             </View>
             <CharacterCount count={title.length} limit={REPORT_TITLE_LIMIT} />
@@ -79,48 +99,71 @@ export default function EvidenciaScreen() {
             value={title}
             onChangeText={setTitle}
             onFocus={() => setTitleFocused(true)}
-            onBlur={() => { setTitleFocused(false); setTitleTouched(true); }}
+            onBlur={() => {
+              setTitleFocused(false);
+              setTitleTouched(true);
+            }}
             placeholder="Ej. Bache profundo frente a la escuela"
             placeholderTextColor={colors.muted}
             maxLength={REPORT_TITLE_LIMIT}
             autoCapitalize="sentences"
             returnKeyType="done"
             onSubmitEditing={handleNext}
-            style={[styles.titleInput, {
-              backgroundColor: colors.background,
-              borderColor: titleError ? colors.danger : titleFocused ? colors.primary : colors.border,
-              color: colors.text,
-            }]}
+            style={[
+              styles.titleInput,
+              {
+                backgroundColor: colors.surface,
+                borderColor: titleError
+                  ? colors.danger
+                  : titleFocused
+                    ? colors.primary
+                    : colors.border,
+                color: colors.text,
+              },
+            ]}
           />
           {!!titleError && (
-            <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={[styles.validationMessage, { color: colors.danger }]}>
+            <Text
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              style={[styles.validationMessage, { color: colors.danger }]}
+            >
               {titleError}
             </Text>
           )}
         </View>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <PhotoPicker variant="evidence" photos={photos} onChange={setPhotos} onBusyChange={setPicking} />
+        <View style={styles.section}>
+          <PhotoPicker
+            variant="evidence"
+            photos={photos}
+            onChange={setPhotos}
+            onBusyChange={setPicking}
+          />
         </View>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <View style={[styles.sectionIcon, { backgroundColor: colors.accentSoft }]}>
-              <Ionicons name="create-outline" size={20} color={colors.accentText} />
-            </View>
             <View style={styles.headingGroup}>
               <View style={styles.titleRow}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Descripción</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Descripción
+                </Text>
                 <OptionalBadge />
               </View>
             </View>
-            <CharacterCount count={description.length} limit={DESCRIPTION_LIMIT} />
+            <CharacterCount
+              count={description.length}
+              limit={DESCRIPTION_LIMIT}
+            />
           </View>
 
           <TextInput
             accessibilityLabel={es.evidence.descriptionLabel}
             value={description}
-            onChangeText={(text) => setDescription(text.slice(0, DESCRIPTION_LIMIT))}
+            onChangeText={(text) =>
+              setDescription(text.slice(0, DESCRIPTION_LIMIT))
+            }
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             placeholder="Escribe aquí los detalles del problema…"
@@ -128,11 +171,14 @@ export default function EvidenciaScreen() {
             multiline
             maxLength={DESCRIPTION_LIMIT}
             scrollEnabled={false}
-            style={[styles.textarea, {
-              backgroundColor: colors.background,
-              borderColor: focused ? colors.primary : colors.border,
-              color: colors.text,
-            }]}
+            style={[
+              styles.textarea,
+              {
+                backgroundColor: colors.surface,
+                borderColor: focused ? colors.primary : colors.border,
+                color: colors.text,
+              },
+            ]}
           />
         </View>
       </ScrollView>
@@ -149,18 +195,50 @@ export default function EvidenciaScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   scroll: { flex: 1 },
-  content: { width: "100%", maxWidth: 640, alignSelf: "center", padding: space.lg, paddingBottom: space.xxl, gap: space.lg },
+  content: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
+    padding: space.lg,
+    paddingBottom: space.xxl,
+    gap: space.xl,
+  },
   intro: { gap: space.xs, paddingBottom: space.xs },
-  heading: { fontSize: 26, lineHeight: 33, fontWeight: "800", letterSpacing: -0.6 },
+  heading: {
+    fontSize: 26,
+    lineHeight: 33,
+    fontWeight: "800",
+    letterSpacing: -0.6,
+  },
   hint: { fontSize: 15, lineHeight: 22 },
-  card: { borderWidth: 1, borderRadius: radius.xl, padding: space.lg, gap: space.lg },
+  section: { gap: space.sm },
   sectionHeader: { flexDirection: "row", alignItems: "center", gap: space.md },
-  sectionIcon: { width: 40, height: 40, borderRadius: radius.md, alignItems: "center", justifyContent: "center" },
-  titleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.sm },
+  titleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: space.sm,
+  },
   headingGroup: { flex: 1, gap: 3 },
   sectionTitle: { fontSize: 17, lineHeight: 23, fontWeight: "700" },
-  textarea: { borderRadius: radius.md, borderWidth: 1, padding: 14, fontSize: 16, lineHeight: 24, minHeight: 152, textAlignVertical: "top" },
+  textarea: {
+    borderRadius: radius.md,
+    borderWidth: 1,
+    padding: space.md,
+    fontSize: 16,
+    lineHeight: 24,
+    minHeight: 152,
+    textAlignVertical: "top",
+  },
   titleLabelRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  titleInput: { minHeight: size.control, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: space.md, paddingVertical: space.sm, fontSize: 16, lineHeight: 24 },
+  titleInput: {
+    minHeight: size.control,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+    fontSize: 16,
+    lineHeight: 24,
+  },
   validationMessage: { fontSize: 14, lineHeight: 20 },
 });

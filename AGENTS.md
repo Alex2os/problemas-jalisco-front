@@ -53,7 +53,7 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - Prefer semantic colors and shared spacing, typography and radius scales over hardcoded values.
 - Do not introduce competing palettes or theme systems.
 - Preserve existing light/dark behavior where implemented.
-- Dark-mode styling uses the shared dark palette: subdued surfaces, softer borders/status fills and readable secondary text. Keep the Reportar flow's dark background as the visual reference; styling requests do not authorize removing cards, changing icon shapes or rearranging layouts. Keep light-mode styling unchanged unless explicitly requested.
+- Dark-mode styling uses the shared dark palette: subdued surfaces, softer borders/status fills and readable secondary text. Keep the Reportar flow's dark background as the visual reference. Theme-only styling tasks do not authorize removing cards, changing icon shapes or rearranging layouts; explicitly requested layout redesigns may apply the continuous interface principles below. Keep light-mode styling unchanged unless explicitly requested.
 - The Reportes header uses `colors.background` in dark mode and `colors.surface` in light mode. Preserve its existing search/filter spacing; the attempted light-mode header adjustment was reverted.
 - Color hierarchy: Pink is the primary brand color (`#E00B50` in light, `#FF4D83` in dark), orange is the secondary brand color (`#FE8B01`), and sky blue is the informational accent (`#58C3E3` in light, `#7DDAF2` in dark). Jalisco Carbón preserves its original neutral dark palette (`#0D0E10`, `#1A1B1F`, `#292A2E`, `#F6F5F3`, `#B0B0B4`, `#35363B`).
 - NativeWind/Tailwind may be used where appropriate, but do not migrate working StyleSheet components solely for stylistic consistency.
@@ -69,6 +69,19 @@ Preserve Expo Router filename conventions, dynamic segments, route groups and Re
 - The floating bottom navigation uses 5 positions: Mapa, Reportes, central report action `+`, Perfil, and Más. It uses `colors.primaryText` (pink) for active icons and labels, and `colors.primary` (pink) for the central report button. Preserve its extra `space.md` bottom offset above the safe-area calculation and the map error overlay's matching clearance.
 - The Más page (`src/app/(tabs)/mas.tsx`) contains the Appearance selector (icon-only for system, light, dark), emergency contacts, and app version info. The Sesión section was moved to Perfil (`src/app/(tabs)/perfil.tsx`); do not restore it on Más.
 - Main tab screen headers (Reportes, Perfil, Más) share a unified typographic hierarchy (`fontSize: 26`, `lineHeight: 34`, `fontWeight: "800"`, `letterSpacing: -0.6`), safe-area top padding, and `maxWidth: 640` centered container.
+
+### Continuous and clean interface design
+
+- Prefer continuous, open layouts over multiple independent cards or containers.
+- Use consistent spacing, typography, alignment and subtle separators as the primary tools for visual hierarchy.
+- Avoid alternating section backgrounds, perimeter borders, shadows and decorative containers when they serve no functional purpose. The existing prohibition on shadows, glow and decorative elevation still applies.
+- Reserve contained surfaces for meaningful functional grouping, interaction or important differentiation, such as error banners and dialogs.
+- Buttons, inputs, selectors, photographs and other interactive controls may retain their appropriate backgrounds, borders and radii. Preserve touch targets and accessible text scaling.
+- Keep the visual language coherent across report feeds, detail, editing and other app sections, while preserving each screen's purpose and existing behavior.
+- Favor compact but comfortable compositions with consistent spacing and a clear typographic hierarchy. Do not use cards as the default solution for organizing content.
+- Apply these principles in both light and dark mode using existing semantic tokens and the Jalisco Claro / Jalisco Carbón palettes; do not introduce competing palettes or alternating dark cards.
+- Do not automatically redesign existing screens when updating these rules. Apply them to future design tasks and screens explicitly authorized for redesign. Preserve screen-specific exceptions, including Perfil's compact report rendering, until a separate task authorizes changing them.
+- Editar reporte uses a continuous surface with an open report summary, equal-width status controls, optional photo thumbnails and a fixed save action. Presentation options on shared photo/footer components must be opt-in so the Reportar flow and other callers retain their existing appearance. Preserve selection, permissions, photo limits, pending removals/undo, save/reload logic and unsaved-change protection.
 
 ## Navigation and visual fluidity
 

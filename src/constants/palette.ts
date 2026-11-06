@@ -66,8 +66,8 @@ export const palette = {
 
     // Status Colors (Never convey status by color alone)
     status: {
-      reportado: { text: "#B45309", bg: "#FEF3C7", border: "#FCD34D" },
-      resuelto: { text: "#1E5F12", bg: "#EAF5E7", border: "#A7D79C" },
+      reportado: {text: "#B45309", bg: "#FEF3C7", border: "#FCD34D"},
+      resuelto: {text: "#1E5F12", bg: "#EAF5E7", border: "#A7D79C"},
     },
   },
 
@@ -120,8 +120,8 @@ export const palette = {
 
     // Status Colors
     status: {
-      reportado: { text: "#E9B66A", bg: "#30271A", border: "#67502C" },
-      resuelto: { text: "#9DBA78", bg: "#1E2C1B", border: "#3E5C36" },
+      reportado: {text: "#E9B66A", bg: "#30271A", border: "#67502C"},
+      resuelto: {text: "#9DBA78", bg: "#1E2C1B", border: "#3E5C36"},
     },
   },
 };

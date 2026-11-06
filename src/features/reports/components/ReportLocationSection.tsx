@@ -16,8 +16,7 @@ export function ReportLocationSection({ report }: { report: Report }) {
   return (
     <View
       style={[
-        styles.sectionCard,
-        { backgroundColor: colors.surface, borderColor: colors.border },
+        styles.section,
       ]}
     >
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -54,10 +53,8 @@ export function ReportLocationSection({ report }: { report: Report }) {
 }
 
 const styles = StyleSheet.create({
-  sectionCard: {
-    borderRadius: radius.group,
-    borderWidth: 1,
-    padding: space.md,
+  section: {
+    paddingVertical: space.md,
     gap: space.sm,
   },
   sectionTitle: {

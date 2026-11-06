@@ -1,4 +1,5 @@
 import { File } from "expo-file-system";
+import { Platform } from "react-native";
 import { apiRequest, apiUrl } from "./api";
 import { normalizeReport } from "./normalize-report";
 import { apiCache } from "./cache";
@@ -31,22 +32,25 @@ export async function appendPhotos(form: FormData, photos: SelectedPhoto[]) {
       throw new Error(`La foto "${filename}" supera el límite de 5 MB (${photo.size} bytes).`);
     }
 
-    // In Node test environments where standard Fetch FormData is used:
-    if (typeof (form as any).getParts !== "function") {
-      const file = new File(photo.uri);
-      const actualSize = typeof file.size === "number" ? file.size : photo.size;
-      if (actualSize > MAX_PHOTO_BYTES) {
-        throw new Error(`La foto "${filename}" supera el límite de 5 MB (${actualSize} bytes).`);
+    let file: Blob;
+    if (Platform.OS === "web") {
+      const response = await fetch(photo.uri);
+      if (!response.ok) {
+        throw new Error(`No se pudo leer la foto "${filename}". Selecciónala de nuevo.`);
       }
-      form.append("photos", file, filename);
+      file = await response.blob();
     } else {
-      // Native platforms (Android & iOS with React Native fetch) expect { uri, name, type }
-      form.append("photos", {
-        uri: photo.uri,
-        name: filename,
-        type: photo.type || "image/jpeg",
-      } as unknown as Blob);
+      // Expo 58 fetch reads File.bytes(); legacy { uri, name, type } parts are unsupported.
+      file = new File(photo.uri);
     }
+    const actualSize = file.size;
+    if (!Number.isFinite(actualSize) || actualSize <= 0) {
+      throw new Error(`No se pudo leer la foto "${filename}" o está vacía. Selecciónala de nuevo.`);
+    }
+    if (actualSize > MAX_PHOTO_BYTES) {
+      throw new Error(`La foto "${filename}" supera el límite de 5 MB (${actualSize} bytes).`);
+    }
+    form.append("photos", file, filename);
   }
 }
 function confirm(report: Report) {

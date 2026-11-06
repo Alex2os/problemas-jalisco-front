@@ -1,85 +1,71 @@
-import React from "react";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { space } from "@/constants/design";
+import { radius, size, space, type } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { shareReport } from "@/services/share-report";
 import type { Report } from "@/services/types";
 
 export interface ReportDetailHeaderProps {
-  report: Pick<Report, "id" | "folio" | "ubication">;
-  categoryLabel: string;
+  report?: Pick<Report, "id">;
 }
 
-export function ReportDetailHeader({
-  report,
-  categoryLabel,
-}: ReportDetailHeaderProps) {
+export function ReportDetailHeader({ report }: ReportDetailHeaderProps) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-
-  const handleShare = () => shareReport(report, categoryLabel);
+  const [pressed, setPressed] = useState(false);
 
   return (
     <View
-      style={[
-        styles.header,
-        {
-          paddingTop: Math.max(insets.top, 12),
-          backgroundColor: colors.surface,
-          borderBottomColor: colors.border,
-        },
-      ]}
+      style={{ paddingTop: insets.top, backgroundColor: colors.background }}
     >
-      <Pressable
-        onPress={() => router.back()}
-        accessibilityRole="button"
-        accessibilityLabel="Atrás"
-        hitSlop={12}
-        style={styles.navBtn}
-      >
-        <Ionicons name="arrow-back" size={24} color={colors.text} />
-      </Pressable>
-
-      <Text style={[styles.folioTitle, { color: colors.text }]}>
-        #{report.folio}
-      </Text>
-
-      <Pressable
-        onPress={() => {
-          void handleShare();
-        }}
-        accessibilityRole="button"
-        accessibilityLabel="Compartir reporte"
-        hitSlop={12}
-        style={styles.navBtn}
-      >
-        <Ionicons name="share-social-outline" size={22} color={colors.text} />
-      </Pressable>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Pressable
+          onPress={() => router.back()}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Atrás"
+          style={[
+            styles.navBtn,
+            { backgroundColor: pressed ? colors.raised : colors.background },
+          ]}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </Pressable>
+        <Text style={[styles.title, { color: colors.textSecondary }]}>
+          {report ? `Reporte #${report.id}` : "Detalle del reporte"}
+        </Text>
+        <View style={styles.navBtn} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: space.sm,
     paddingBottom: space.xs,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   navBtn: {
-    width: 44,
-    height: 44,
+    width: size.touch,
+    minHeight: size.touch,
+    borderRadius: radius.full,
     alignItems: "center",
     justifyContent: "center",
   },
-  folioTitle: {
-    fontSize: 16,
-    fontWeight: "800",
+  title: {
+    ...type.label,
+    flex: 1,
+    textAlign: "center",
+    paddingHorizontal: space.sm,
   },
 });
-

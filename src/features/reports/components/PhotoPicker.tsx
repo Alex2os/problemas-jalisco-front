@@ -28,7 +28,7 @@ export function PhotoPicker({
   disabled?: boolean;
   capacity?: number;
   onBusyChange?: (busy: boolean) => void;
-  variant?: "default" | "evidence";
+  variant?: "default" | "evidence" | "editor";
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -133,9 +133,9 @@ export function PhotoPicker({
       }
     }
   }
-  if (variant === "evidence") return (
+  if (variant === "evidence" || variant === "editor") return (
     <View style={{ gap: space.md }}>
-      <EvidencePhotos photos={photos} capacity={capacity} busy={busy} disabled={disabled}
+      <EvidencePhotos continuous={variant === "editor"} photos={photos} capacity={capacity} busy={busy} disabled={disabled}
         existingPhotos={existingPhotos} onRemoveExisting={onRemoveExisting}
         onChoose={(camera) => { void choose(camera); }}
         onRemove={(index) => onChange(photos.filter((_, i) => i !== index))} />
