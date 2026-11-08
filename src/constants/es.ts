@@ -118,6 +118,7 @@ export const es = {
     title: "Reporte enviado",
     subtitle: "Tu reporte ya está publicado. Puedes ver los detalles o volver al mapa.",
     viewReport: "Ver reporte",
+    exploreReports: "Explorar reportes",
     homeCta: "Volver al mapa",
   },
 

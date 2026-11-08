@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   View,
-  useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -51,7 +50,6 @@ export function LocationPicker({
   style,
 }: LocationPickerProps) {
   const { colors, dark } = useAppTheme();
-  const { height } = useWindowDimensions();
   const identity = useCacheValue<number>("session:version") || 0;
 
   const map = useRef<MapView>(null);
@@ -159,7 +157,7 @@ export function LocationPicker({
     <View style={[styles.container, style]}>
       <LocationSearch onSelect={handleSearchSelect} />
       {/* Map with Center Pin */}
-      <View style={[styles.mapWrap, { borderColor: colors.border, height: Math.max(320, Math.min(440, Math.round(height * 0.46))) }]}>
+      <View style={[styles.mapWrap, { borderColor: colors.border }]}>
         <MapView
           style={StyleSheet.absoluteFill}
           ref={map}
@@ -203,22 +201,36 @@ export function LocationPicker({
         ]}
       >
         <View style={styles.addressHeader}>
-          {findingAddress && !locating ? <ActivityIndicator color={colors.accentText} accessibilityLabel="Buscando calle" /> : <Ionicons name="location-sharp" size={20} color={colors.accentText} />}
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.addressText, { color: colors.text }]}>
+          {findingAddress && !locating ? (
+            <ActivityIndicator size="small" color={colors.accentText} accessibilityLabel="Buscando calle" />
+          ) : (
+            <Ionicons name="location-sharp" size={18} color={colors.accentText} />
+          )}
+          <View style={styles.addressInfo}>
+            <Text style={[styles.addressText, { color: colors.text }]} numberOfLines={1}>
               {addressTitle}
             </Text>
-            <Text style={[styles.addressSub, { color: colors.muted }]}>
+            <Text style={[styles.addressSub, { color: colors.textSecondary }]} numberOfLines={1}>
               {addressSubtitle}
             </Text>
           </View>
         </View>
-        {!!addressState.error && <ErrorBanner message={addressState.error}
-          variant={addressState.status === "unavailable" ? "warning" : "danger"}
-          retrying={addressState.status === "loading"}
-          onRetry={() => lookup.current?.select(position.current, true)} />}
-        {!!gpsError && <Text accessibilityRole="alert" style={{ color: colors.danger, marginTop: space.sm }}>{gpsError}</Text>}
-        <Text style={[styles.attribution, { color: colors.muted }]}>Direcciones © OpenStreetMap contributors</Text>
+        {!!addressState.error && (
+          <ErrorBanner
+            message={addressState.error}
+            variant={addressState.status === "unavailable" ? "warning" : "danger"}
+            retrying={addressState.status === "loading"}
+            onRetry={() => lookup.current?.select(position.current, true)}
+          />
+        )}
+        {!!gpsError && (
+          <Text accessibilityRole="alert" style={{ color: colors.danger, marginTop: space.xs }}>
+            {gpsError}
+          </Text>
+        )}
+        <Text style={[styles.attribution, { color: colors.muted }]}>
+          Direcciones © OpenStreetMap contributors
+        </Text>
       </View>
     </View>
   );
@@ -226,9 +238,12 @@ export function LocationPicker({
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     gap: space.sm,
   },
   mapWrap: {
+    flex: 1,
+    minHeight: 180,
     borderRadius: radius.group,
     overflow: "hidden",
     borderWidth: 1,
@@ -255,20 +270,31 @@ const styles = StyleSheet.create({
   addressCard: {
     borderRadius: radius.group,
     borderWidth: 1,
-    padding: space.md,
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
   },
   addressHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: space.sm,
   },
+  addressInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
   addressText: {
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: "700",
   },
   addressSub: {
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 16,
     marginTop: 1,
   },
-  attribution: { fontSize: 11, marginTop: space.sm },
+  attribution: {
+    fontSize: 10,
+    lineHeight: 14,
+    marginTop: 4,
+  },
 });

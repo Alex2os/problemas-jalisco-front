@@ -317,10 +317,12 @@ export const ui = StyleSheet.create({
   input: {
     flex: 1,
     minWidth: 0,
-    minHeight: size.control,
+    height: size.control,
     paddingHorizontal: space.md,
-    paddingVertical: space.md,
+    paddingVertical: 0,
     fontSize: 16,
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
   row: { flexDirection: "row", alignItems: "center", gap: space.md },
 });

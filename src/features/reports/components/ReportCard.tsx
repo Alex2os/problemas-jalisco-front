@@ -20,17 +20,19 @@ import type { Report } from "@/services/types";
 
 export interface ReportCardProps {
   report: Report;
-  onPress: (report: Report) => void;
+  onPress?: (report: Report) => void;
+  readOnly?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-export function ReportCard({ report, onPress, style }: ReportCardProps) {
+export function ReportCard({ report, onPress, readOnly = false, style }: ReportCardProps) {
   const { colors, dark } = useAppTheme();
   const categoryDef = categoryDefFor(report.category || report.type);
 
   const photoUrl = report.photos?.[0]?.url ?? null;
 
   const handlePress = () => {
+    if (readOnly || !onPress) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress(report);
   };
@@ -47,16 +49,17 @@ export function ReportCard({ report, onPress, style }: ReportCardProps) {
 
   return (
     <Pressable
-      onPress={handlePress}
-      accessibilityRole="button"
+      onPress={readOnly ? undefined : handlePress}
+      disabled={readOnly}
+      accessibilityRole={readOnly ? "none" : "button"}
       accessibilityLabel={`${categoryDef.label}. ${report.ubication}. ${report.status}`}
       style={({ pressed }) => [
         styles.card,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          opacity: pressed ? 0.92 : 1,
-          transform: [{ scale: pressed ? 0.985 : 1 }],
+          opacity: (!readOnly && pressed) ? 0.92 : 1,
+          transform: [{ scale: (!readOnly && pressed) ? 0.985 : 1 }],
         },
         style,
       ]}

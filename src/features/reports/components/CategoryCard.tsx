@@ -1,5 +1,5 @@
 import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
-import React from "react";
+import React, { useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, space } from "@/constants/design";
+import { border, radius, size, space } from "@/constants/design";
 import type { CategoryDefinition } from "@/constants/report-categories";
 
 export interface CategoryCardProps {
@@ -27,30 +27,38 @@ export function CategoryCard({
   style,
 }: CategoryCardProps) {
   const { colors, dark } = useAppTheme();
+  const [pressed, setPressed] = useState(false);
 
   const handlePress = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSelect(category.id);
   };
 
+  const backgroundColor = selected
+    ? dark
+      ? category.bgDark || colors.raised
+      : category.bgLight
+    : pressed
+      ? colors.raised
+      : colors.surface;
+
+  const borderColor = selected ? category.color : colors.border;
+
   return (
     <Pressable
       onPress={handlePress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="button"
-      accessibilityLabel={`${category.label}. ${category.description}`}
+      accessibilityLabel={`${category.label}. ${category.description || ""}`}
+      accessibilityHint="Toca para seleccionar esta categoría y continuar a la ubicación"
       accessibilityState={{ selected }}
-      style={({ pressed }) => [
+      style={[
         styles.card,
         {
-          backgroundColor: selected
-            ? dark
-              ? category.bgDark || colors.raised
-              : category.bgLight
-            : colors.surface,
-          borderColor: selected ? category.color : colors.border,
-          borderWidth: 2,
-          opacity: pressed ? 0.9 : 1,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
+          backgroundColor,
+          borderColor,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
         },
         style,
       ]}
@@ -59,32 +67,37 @@ export function CategoryCard({
       <View
         style={[
           styles.iconWrap,
-          { backgroundColor: selected ? category.color : dark ? colors.raised : category.bgLight },
+          {
+            backgroundColor: dark
+              ? category.bgDark || colors.raised
+              : category.bgLight,
+          },
         ]}
       >
-        <CategoryIcon category={category}
-          size={32}
+        <CategoryIcon
+          category={category}
+          size={28}
           allowFontScaling={false}
           style={styles.icon}
-          color={selected ? "#FFFFFF" : category.color}
+          color={category.color}
         />
       </View>
 
-      {/* Label and 1-line description */}
+      {/* Label and description */}
       <Text
         style={[
           styles.label,
           { color: colors.text },
         ]}
-        numberOfLines={1}
+        numberOfLines={2}
       >
         {category.label}
       </Text>
 
       {category.description ? (
         <Text
-          style={[styles.description, { color: colors.muted }]}
-          numberOfLines={1}
+          style={[styles.description, { color: colors.textSecondary }]}
+          numberOfLines={2}
         >
           {category.description}
         </Text>
@@ -96,38 +109,41 @@ export function CategoryCard({
 const styles = StyleSheet.create({
   card: {
     borderRadius: radius.group,
-    padding: space.md,
+    borderWidth: border.normal,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.md,
     alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    minHeight: 124,
+    justifyContent: "flex-start",
+    minHeight: size.minTouch * 2.2, // ~106px para asegurar área táctil amplia y estabilidad
+    width: "100%",
   },
   iconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignSelf: "center",
+    width: 48,
+    height: 48,
+    borderRadius: radius.full,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: space.xs,
+    marginBottom: space.sm,
   },
   icon: {
-    width: 32,
-    height: 32,
-    lineHeight: 32,
+    width: 28,
+    height: 28,
+    lineHeight: 28,
     textAlign: "center",
     textAlignVertical: "center",
     includeFontPadding: false,
   },
   label: {
     fontSize: 15,
-    fontWeight: "800",
+    lineHeight: 20,
+    fontWeight: "700",
     letterSpacing: -0.2,
     textAlign: "center",
   },
   description: {
     fontSize: 12,
+    lineHeight: 16,
     textAlign: "center",
-    marginTop: 2,
+    marginTop: space.xs,
   },
 });

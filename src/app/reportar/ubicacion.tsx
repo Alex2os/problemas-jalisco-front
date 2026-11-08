@@ -39,11 +39,12 @@ export default function UbicacionScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <ScrollView
-        style={{ flex: 1 }}
+        style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        bounces={false}
       >
         <Text style={[styles.heading, { color: colors.text }]}>
           {es.location.title}
@@ -59,6 +60,7 @@ export default function UbicacionScreen() {
           colonia={colonia}
           municipality={municipality}
           onLocationChange={setLocation}
+          style={styles.picker}
         />
       </ScrollView>
 
@@ -75,18 +77,28 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  scroll: {
+    flex: 1,
+  },
   content: {
-    padding: space.lg,
+    flexGrow: 1,
+    paddingHorizontal: space.lg,
+    paddingTop: space.sm,
+    paddingBottom: space.sm,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: "800",
     letterSpacing: -0.4,
   },
   hint: {
-    fontSize: 14,
-    marginTop: 4,
-    marginBottom: space.md,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 2,
+    marginBottom: space.sm,
+  },
+  picker: {
+    flex: 1,
   },
 });

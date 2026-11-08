@@ -56,7 +56,15 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationSear
             <Ionicons name="close" size={19} color={colors.textSecondary} />
           </Pressable>}
         </View>
-        <Button title="Buscar" size="sm" onPress={submit} disabled={loading} loading={loading && !state.error} />
+        <Button
+          title="Buscar"
+          variant="secondary"
+          size="sm"
+          onPress={submit}
+          disabled={loading}
+          loading={loading && !state.error}
+          style={styles.searchButton}
+        />
       </View>
       {!!state.validation && <Text accessibilityRole="alert" style={[styles.message, { color: colors.danger }]}>{state.validation}</Text>}
       {!!state.error && <ErrorBanner message={state.error} retrying={loading} onRetry={submit} />}
@@ -95,8 +103,32 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationSear
 const styles = StyleSheet.create({
   section: { gap: space.sm },
   searchRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  inputWrap: { flex: 1, minWidth: 0, minHeight: size.control, flexDirection: "row", alignItems: "center", borderWidth: 1, borderRadius: radius.control, paddingLeft: space.md },
-  input: { flex: 1, minWidth: 0, minHeight: size.control, paddingHorizontal: space.sm, paddingVertical: space.sm, fontSize: 15, lineHeight: 22 },
+  inputWrap: {
+    flex: 1,
+    minWidth: 0,
+    height: size.control,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: radius.control,
+    paddingLeft: space.md,
+  },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    height: "100%",
+    paddingHorizontal: space.sm,
+    paddingVertical: 0,
+    fontSize: 15,
+    lineHeight: 20,
+    includeFontPadding: false,
+    textAlignVertical: "center",
+  },
+  searchButton: {
+    borderWidth: 0,
+    height: size.control,
+    paddingHorizontal: space.lg,
+  },
   clear: { width: size.touch, minHeight: size.touch, alignItems: "center", justifyContent: "center", padding: space.sm },
   message: { fontSize: 13, lineHeight: 19 },
   results: { borderWidth: 1, borderRadius: radius.group, overflow: "hidden" },

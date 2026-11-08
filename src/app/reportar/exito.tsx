@@ -18,7 +18,7 @@ export default function ExitoScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const reportId = Number(id);
   const hasReport = Number.isSafeInteger(reportId) && reportId > 0;
-  const [pressed, setPressed] = useState<"report" | "map" | null>(null);
+  const [pressed, setPressed] = useState<"report" | "explore" | "map" | null>(null);
 
   useEffect(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -28,6 +28,10 @@ export default function ExitoScreen() {
     if (!hasReport) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.replace({ pathname: "/reporte/[id]", params: { id: String(reportId) } });
+  };
+  const handleExploreReports = () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.dismissTo("/mis-reportes");
   };
   const handleDone = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -47,6 +51,7 @@ export default function ExitoScreen() {
             <Text style={[styles.subtitle, { color: colors.muted }]}>{es.success.subtitle}</Text>
           </Animated.View>
           <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(320).duration(360)} style={styles.actions}>
+            {/* Acción primaria — Ver reporte */}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={es.success.viewReport}
@@ -66,21 +71,39 @@ export default function ExitoScreen() {
                 <Ionicons name="arrow-forward" size={22} color={colors.onPrimary} />
               </View>
             </Pressable>
+
+            {/* Acción secundaria — Explorar reportes */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={es.success.exploreReports}
+              onPress={handleExploreReports}
+              onPressIn={() => setPressed("explore")}
+              onPressOut={() => setPressed(null)}
+              style={[styles.button, styles.secondaryButton, {
+                backgroundColor: pressed === "explore" ? colors.surface : colors.raised,
+                transform: [{ scale: pressed === "explore" ? 0.99 : 1 }],
+              }]}
+            >
+              <View style={styles.buttonInnerRow}>
+                <Ionicons name="document-text-outline" size={20} color={colors.text} />
+                <Text style={[styles.buttonText, { color: colors.text }]}>{es.success.exploreReports}</Text>
+              </View>
+            </Pressable>
+
+            {/* Acción terciaria — Volver al mapa */}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={es.success.homeCta}
               onPress={handleDone}
               onPressIn={() => setPressed("map")}
               onPressOut={() => setPressed(null)}
-              style={[styles.button, styles.mapButton, {
-                backgroundColor: pressed === "map" ? colors.raised : colors.surface,
-                borderColor: colors.border,
-                transform: [{ scale: pressed === "map" ? 0.99 : 1 }],
+              style={[styles.tertiaryButton, {
+                backgroundColor: pressed === "map" ? colors.raised : "transparent",
               }]}
             >
-              <View style={styles.mapLabel}>
-                <Ionicons name="map-outline" size={20} color={colors.textSecondary} />
-                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>{es.success.homeCta}</Text>
+              <View style={styles.buttonInnerRow}>
+                <Ionicons name="map-outline" size={19} color={colors.textSecondary} />
+                <Text style={[styles.tertiaryButtonText, { color: colors.textSecondary }]}>{es.success.homeCta}</Text>
               </View>
             </Pressable>
           </Animated.View>
@@ -101,6 +124,8 @@ const styles = StyleSheet.create({
   button: { width: "100%", minHeight: 56, borderRadius: radius.group, paddingHorizontal: 48, paddingVertical: space.lg, alignItems: "center", justifyContent: "center" },
   buttonText: { fontSize: 16, lineHeight: 22, fontWeight: "700", textAlign: "center", alignSelf: "center", includeFontPadding: false },
   trailingIcon: { position: "absolute", right: space.lg, top: 0, bottom: 0, width: 24, alignItems: "center", justifyContent: "center" },
-  mapButton: { borderWidth: 1, minHeight: 52, paddingHorizontal: space.lg },
-  mapLabel: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: space.sm },
+  secondaryButton: { borderWidth: 0, minHeight: 52, paddingHorizontal: space.lg },
+  buttonInnerRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: space.sm },
+  tertiaryButton: { width: "100%", minHeight: 48, borderRadius: radius.group, paddingHorizontal: space.lg, paddingVertical: space.sm, alignItems: "center", justifyContent: "center" },
+  tertiaryButtonText: { fontSize: 15, lineHeight: 20, fontWeight: "600", textAlign: "center", alignSelf: "center", includeFontPadding: false },
 });

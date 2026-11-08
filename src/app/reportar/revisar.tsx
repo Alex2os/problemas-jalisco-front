@@ -1,22 +1,21 @@
-import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
-import React, { useRef, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { useAuthSession } from "@/hooks/useReportState";
 import { ReportStepFooter } from "@/features/reports/components/ReportStepFooter";
-import { categoryDefFor } from "@/constants/report-categories";
-import { radius, space } from "@/constants/design";
+import { ReportFeedItem } from "@/features/reports/components/ReportFeedItem";
+import { space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
 import { useReportsStore } from "@/store/useReportsStore";
+import type { Report } from "@/services/types";
 
 export default function RevisarScreen() {
-  const { colors, dark } = useAppTheme();
+  const { colors } = useAppTheme();
 
   const draft = useDraftStore();
   const resetDraft = useDraftStore((s) => s.resetDraft);
@@ -27,10 +26,62 @@ export default function RevisarScreen() {
   const [error, setError] = useState("");
   const pending = useRef(false);
   const authenticated = useAuthSession();
-  const categoryDef = categoryDefFor(draft.category || "otro");
+
+  const previewReport = useMemo<Report>(() => {
+    const canonicalCategory = draft.category || "otro";
+    const formattedAddress =
+      draft.address ||
+      (draft.colonia ? `Col. ${draft.colonia}` : "Ubicación en Jalisco");
+
+    return {
+      id: 0,
+      folio: "PREVIEW",
+      category: canonicalCategory,
+      type: canonicalCategory,
+      title: draft.title.trim(),
+      description: draft.description.trim(),
+      latitude: draft.latitude ?? 20.6766,
+      longitude: draft.longitude ?? -103.347,
+      ubication: formattedAddress,
+      address: draft.address,
+      colonia: draft.colonia,
+      municipality: draft.municipality,
+      reference: draft.reference,
+      photos: (draft.photos || []).map((photo, index) => ({
+        id: index + 1,
+        url: photo.uri,
+      })),
+      status: "reportado",
+      status_version: 1,
+      can_manage: true,
+      created_at: new Date().toISOString(),
+      user_id: 0,
+      username: "Tú",
+      like_count: 0,
+      comment_count: 0,
+      liked_by_me: false,
+    };
+  }, [
+    draft.category,
+    draft.title,
+    draft.description,
+    draft.latitude,
+    draft.longitude,
+    draft.address,
+    draft.colonia,
+    draft.municipality,
+    draft.reference,
+    draft.photos,
+  ]);
 
   const handleSubmit = async () => {
-    if (!authenticated) { router.push({ pathname: "/auth/login", params: { returnTo: "/reportar/revisar" } }); return; }
+    if (!authenticated) {
+      router.push({
+        pathname: "/auth/login",
+        params: { returnTo: "/reportar/revisar" },
+      });
+      return;
+    }
     if (pending.current) return;
     pending.current = true;
     setError("");
@@ -44,7 +95,11 @@ export default function RevisarScreen() {
         params: { id: String(created.id) },
       });
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : "No se pudo enviar el reporte.");
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : "No se pudo enviar el reporte.",
+      );
       setSubmitting(false);
     } finally {
       pending.current = false;
@@ -65,68 +120,25 @@ export default function RevisarScreen() {
           {es.review.hint}
         </Text>
 
-        {/* Airbnb / SeeClickFix style Review Summary Card */}
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-        >
-          {/* Photo */}
-          {draft.photos?.[0] ? (
-            <Image
-              source={{ uri: draft.photos[0].uri }}
-              style={styles.heroImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={[styles.noImageHero, { backgroundColor: dark ? colors.raised : categoryDef.bgLight }]}>
-              <CategoryIcon category={categoryDef}
-                size={48}
-                color={categoryDef.color}
-              />
-            </View>
-          )}
+        {/* Vista previa fiel con el componente de publicación real de Reportes */}
+        <ReportFeedItem report={previewReport} readOnly />
 
-          <View style={styles.cardDetails}>
-            <Text accessibilityRole="header" style={[styles.reportTitle, { color: colors.text }]}>
-              {draft.title.trim()}
-            </Text>
-            {/* Category */}
-            <View style={styles.catRow}>
-              <View
-                style={[styles.colorDot, { backgroundColor: categoryDef.color }]}
-              />
-              <Text style={[styles.catName, { color: colors.text }]}>
-                {categoryDef.label}
-              </Text>
-            </View>
-
-            {/* Location */}
-            <View style={styles.locationRow}>
-              <Ionicons name="location-sharp" size={16} color={colors.accentText} />
-              <Text style={[styles.locationText, { color: colors.text }]}>
-                {draft.address || "Ubicación en Jalisco"}
-                {draft.colonia ? `, Col. ${draft.colonia}` : ""}
-              </Text>
-            </View>
-
-            {/* Restored Short Description */}
-            {draft.description.trim() ? (
-              <Text style={[styles.descText, { color: colors.textSecondary }]}>
-                {draft.description.trim()}
-              </Text>
-            ) : null}
-          </View>
-        </View>
         {!!error && <ErrorBanner message={error} />}
       </ScrollView>
 
       <ReportStepFooter
-        title={submitting ? "Enviando reporte…" : authenticated ? es.review.send : "Inicia sesión para enviar"}
+        title={
+          submitting
+            ? "Enviando reporte…"
+            : authenticated
+              ? es.review.send
+              : "Inicia sesión para enviar"
+        }
         icon={authenticated ? "paper-plane-outline" : "log-in-outline"}
         loading={submitting}
-        onPress={() => { void handleSubmit(); }}
+        onPress={() => {
+          void handleSubmit();
+        }}
       />
     </View>
   );
@@ -137,7 +149,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
     padding: space.lg,
+    paddingBottom: space.xxl,
+    gap: space.sm,
   },
   heading: {
     fontSize: 22,
@@ -147,57 +164,7 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 14,
     marginTop: 4,
-    marginBottom: space.lg,
+    marginBottom: space.md,
     lineHeight: 20,
-  },
-  card: {
-    borderRadius: radius.group,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  heroImage: {
-    width: "100%",
-    height: 180,
-  },
-  noImageHero: {
-    width: "100%",
-    height: 140,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardDetails: {
-    padding: space.md,
-    gap: space.sm,
-  },
-  catRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  reportTitle: { fontSize: 20, lineHeight: 28, fontWeight: "700" },
-  colorDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  catName: {
-    fontSize: 17,
-    fontWeight: "800",
-  },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  locationText: {
-    fontSize: 14,
-    fontWeight: "600",
-    flex: 1,
-  },
-  descText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontStyle: "italic",
-    marginTop: 2,
   },
 });

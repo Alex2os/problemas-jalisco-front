@@ -204,7 +204,7 @@ export function EvidencePhotos({
         </Text>
       </View>
 
-      {previews.length ? (
+      {!!previews.length && (
         <View style={styles.continuousPhotos}>
           {previews.map((photo, index) => (
             <View
@@ -227,86 +227,75 @@ export function EvidencePhotos({
                   accessibilityState={{ disabled: inactive }}
                   disabled={inactive}
                   onPress={photo.remove}
-                  style={styles.removeButton}
+                  style={styles.continuousRemoveButton}
                 >
-                  <View style={styles.removeCircle}>
-                    <Ionicons name="close" size={16} color="#FFFFFF" />
+                  <View
+                    style={[
+                      styles.removeCircle,
+                      { backgroundColor: palette.dark.background },
+                    ]}
+                  >
+                    <Ionicons
+                      name="close"
+                      size={16}
+                      color={palette.dark.text}
+                    />
                   </View>
                 </Pressable>
               )}
             </View>
           ))}
         </View>
-      ) : (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Agregar fotos desde la galería"
-          disabled={inactive}
-          accessibilityState={{ disabled: inactive, busy }}
-          onPress={() => onChoose(false)}
-          style={[
-            styles.emptyArea,
-            {
-              borderColor: colors.borderStrong,
-              backgroundColor: colors.background,
-            },
-          ]}
-        >
-          <View
-            style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}
-          >
-            {busy ? (
-              <ActivityIndicator color={colors.accentText} />
-            ) : (
-              <Ionicons
-                name="camera-outline"
-                size={28}
-                color={colors.accentText}
-              />
-            )}
-          </View>
-          <Text style={[styles.emptyTitle, { color: colors.muted }]}>
-            {busy ? "Preparando fotos…" : "Toca para agregar imágenes"}
-          </Text>
-        </Pressable>
       )}
 
       {photos.length < capacity && (
         <View style={styles.actions}>
-          {(
-            [
-              { camera: true, label: "Tomar foto", icon: "camera-outline" },
-              { camera: false, label: "Galería", icon: "images-outline" },
-            ] as const
-          ).map((action) => (
-            <Pressable
-              key={action.label}
-              accessibilityRole="button"
-              accessibilityLabel={action.label}
-              accessibilityState={{ disabled: inactive, busy }}
-              disabled={inactive}
-              onPress={() => onChoose(action.camera)}
-              style={[
-                styles.action,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  opacity: inactive ? 0.5 : 1,
-                },
-              ]}
-            >
-              <Ionicons name={action.icon} size={20} color={colors.text} />
-              <Text style={[styles.actionText, { color: colors.text }]}>
-                {action.label}
-              </Text>
-            </Pressable>
-          ))}
+          <Button
+            title="Tomar foto"
+            variant="outline"
+            size="sm"
+            haptic={false}
+            icon={
+              <Ionicons
+                name="camera-outline"
+                size={20}
+                color={inactive ? colors.muted : colors.text}
+              />
+            }
+            style={styles.actionButton}
+            textStyle={styles.actionButtonText}
+            disabled={inactive}
+            onPress={() => onChoose(true)}
+          />
+          <Button
+            title="Galería"
+            variant="outline"
+            size="sm"
+            haptic={false}
+            icon={
+              <Ionicons
+                name="images-outline"
+                size={20}
+                color={inactive ? colors.muted : colors.text}
+              />
+            }
+            style={styles.actionButton}
+            textStyle={styles.actionButtonText}
+            disabled={inactive}
+            onPress={() => onChoose(false)}
+          />
         </View>
       )}
-      {!!(busy && photos.length) && (
-        <Text style={[styles.caption, { color: colors.textSecondary }]}>
-          Preparando fotos…
-        </Text>
+
+      {busy && (
+        <View style={styles.preparing}>
+          <ActivityIndicator color={colors.primary} size="small" />
+          <Text
+            style={[styles.caption, { color: colors.textSecondary }]}
+          >
+            Preparando fotos…
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -360,68 +349,20 @@ const styles = StyleSheet.create({
   title: { fontSize: 17, lineHeight: 23, fontWeight: "700" },
   caption: { fontSize: 12, lineHeight: 18 },
   counterText: { fontSize: 12, fontWeight: "700", lineHeight: 18 },
-  emptyArea: {
-    minHeight: 168,
-    padding: space.lg,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderRadius: radius.group,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.sm,
-  },
-  emptyIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.full,
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: space.xs,
-  },
-  emptyTitle: {
-    fontSize: 15,
-    lineHeight: 21,
-    fontWeight: "600",
-    textAlign: "center",
-    alignSelf: "center",
-  },
-  removeButton: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: size.touch,
-    height: size.touch,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   removeCircle: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "rgba(15,23,42,0.8)",
     alignItems: "center",
     justifyContent: "center",
   },
   actions: { flexDirection: "row", gap: space.sm },
-  action: {
+  actionButton: {
     flex: 1,
     minWidth: 0,
-    minHeight: 50,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: space.md,
+    height: "auto",
+    minHeight: size.touch,
     paddingVertical: space.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.sm,
   },
-  actionText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "600",
-    flexShrink: 1,
-    textAlign: "center",
-  },
+  actionButtonText: { fontSize: 14, flexShrink: 1 },
 });

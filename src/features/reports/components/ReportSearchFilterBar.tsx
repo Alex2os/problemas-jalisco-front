@@ -162,7 +162,7 @@ export function ReportSearchFilterBar({
 const styles = StyleSheet.create({
   searchRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: space.sm,
     marginBottom: space.sm,
   },
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    minHeight: size.control,
+    height: size.control,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingLeft: space.md,
@@ -192,9 +192,11 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     minWidth: 0,
-    fontSize: 16,
+    height: "100%",
+    fontSize: 15,
+    lineHeight: 20,
     paddingHorizontal: 0,
-    paddingVertical: space.md,
+    paddingVertical: 0,
     includeFontPadding: false,
     textAlignVertical: "center",
   },

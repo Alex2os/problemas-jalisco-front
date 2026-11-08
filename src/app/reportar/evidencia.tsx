@@ -56,6 +56,8 @@ export default function EvidenciaScreen() {
     router.push("/reportar/revisar");
   };
 
+  const cardColors = { backgroundColor: colors.surface, borderColor: colors.border };
+
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -78,7 +80,8 @@ export default function EvidenciaScreen() {
           </Text>
         </View>
 
-        <View style={styles.section}>
+        {/* Contenedor 1: Título del reporte */}
+        <View style={[styles.card, cardColors]}>
           <View style={styles.titleLabelRow}>
             <View style={styles.headingGroup}>
               <Text
@@ -112,7 +115,7 @@ export default function EvidenciaScreen() {
             style={[
               styles.titleInput,
               {
-                backgroundColor: colors.surface,
+                backgroundColor: colors.raised,
                 borderColor: titleError
                   ? colors.danger
                   : titleFocused
@@ -133,7 +136,8 @@ export default function EvidenciaScreen() {
           )}
         </View>
 
-        <View style={styles.section}>
+        {/* Contenedor 2: Fotografías de evidencia */}
+        <View style={[styles.card, cardColors]}>
           <PhotoPicker
             variant="evidence"
             photos={photos}
@@ -142,7 +146,8 @@ export default function EvidenciaScreen() {
           />
         </View>
 
-        <View style={styles.section}>
+        {/* Contenedor 3: Descripción detallada */}
+        <View style={[styles.card, cardColors]}>
           <View style={styles.sectionHeader}>
             <View style={styles.headingGroup}>
               <View style={styles.titleRow}>
@@ -174,7 +179,7 @@ export default function EvidenciaScreen() {
             style={[
               styles.textarea,
               {
-                backgroundColor: colors.surface,
+                backgroundColor: colors.raised,
                 borderColor: focused ? colors.primary : colors.border,
                 color: colors.text,
               },
@@ -199,11 +204,18 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 640,
     alignSelf: "center",
-    padding: space.lg,
+    paddingHorizontal: space.lg,
+    paddingTop: space.sm,
     paddingBottom: space.xxl,
-    gap: space.xl,
+    gap: space.md,
   },
   intro: { gap: space.xs, paddingBottom: space.xs },
+  card: {
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    padding: space.lg,
+    gap: space.md,
+  },
   heading: {
     fontSize: 26,
     lineHeight: 33,
@@ -211,7 +223,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.6,
   },
   hint: { fontSize: 15, lineHeight: 22 },
-  section: { gap: space.sm },
   sectionHeader: { flexDirection: "row", alignItems: "center", gap: space.md },
   titleRow: {
     flexDirection: "row",
@@ -222,23 +233,24 @@ const styles = StyleSheet.create({
   headingGroup: { flex: 1, gap: 3 },
   sectionTitle: { fontSize: 17, lineHeight: 23, fontWeight: "700" },
   textarea: {
-    borderRadius: radius.md,
+    borderRadius: radius.control,
     borderWidth: 1,
     padding: space.md,
     fontSize: 16,
     lineHeight: 24,
-    minHeight: 152,
+    minHeight: 112,
     textAlignVertical: "top",
   },
   titleLabelRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
   titleInput: {
-    minHeight: size.control,
-    borderRadius: radius.md,
+    height: size.control,
+    borderRadius: radius.control,
     borderWidth: 1,
     paddingHorizontal: space.md,
-    paddingVertical: space.sm,
+    paddingVertical: 0,
     fontSize: 16,
-    lineHeight: 24,
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
   validationMessage: { fontSize: 14, lineHeight: 20 },
 });

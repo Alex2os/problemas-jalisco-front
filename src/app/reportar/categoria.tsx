@@ -68,23 +68,24 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 22,
+    lineHeight: 28,
     fontWeight: "800",
     letterSpacing: -0.4,
   },
   hint: {
     fontSize: 14,
-    marginTop: 4,
-    marginBottom: space.lg,
     lineHeight: 20,
+    marginTop: space.xs,
+    marginBottom: space.lg,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     rowGap: space.md,
-    marginHorizontal: -space.sm,
+    columnGap: space.md,
   },
   gridItem: {
-    width: "50%",
-    paddingHorizontal: space.sm,
+    flexBasis: "47%",
+    flexGrow: 1,
   },
 });

@@ -25,8 +25,9 @@ import type { Report } from "@/services/types";
 
 export interface ReportFeedItemProps {
   report: Report;
-  onPress: (report: Report) => void;
+  onPress?: (report: Report) => void;
   recommendationNote?: string;
+  readOnly?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -34,6 +35,7 @@ export function ReportFeedItem({
   report,
   onPress,
   recommendationNote,
+  readOnly = false,
   style,
 }: ReportFeedItemProps) {
   const { colors, dark } = useAppTheme();
@@ -51,21 +53,28 @@ export function ReportFeedItem({
   const liked = !!report.liked_by_me;
 
   const handlePress = () => {
+    if (readOnly || !onPress) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress(report);
   };
 
+  const handleShare = () => {
+    if (readOnly) return;
+    void shareReport(report, categoryDef.label);
+  };
+
   return (
     <Pressable
-      onPress={handlePress}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      accessibilityRole="button"
+      onPress={readOnly ? undefined : handlePress}
+      onPressIn={readOnly ? undefined : () => setPressed(true)}
+      onPressOut={readOnly ? undefined : () => setPressed(false)}
+      disabled={readOnly}
+      accessibilityRole={readOnly ? "none" : "button"}
       accessibilityLabel={`${displayTitle}. ${categoryDef.label}. ${locationSummary || "Ubicación disponible en el detalle"}. ${report.status}. ${report.like_count} apoyos`}
       style={[
         styles.post,
         {
-          backgroundColor: pressed ? colors.raised : colors.surface,
+          backgroundColor: (!readOnly && pressed) ? colors.raised : colors.surface,
           borderColor: colors.border,
         },
         style,
@@ -221,11 +230,12 @@ export function ReportFeedItem({
         </View>
 
         <Pressable
-          onPress={() => void shareReport(report, categoryDef.label)}
-          accessibilityRole="button"
+          onPress={readOnly ? undefined : handleShare}
+          disabled={readOnly}
+          accessibilityRole={readOnly ? "none" : "button"}
           accessibilityLabel="Compartir reporte"
           hitSlop={8}
-          style={[styles.shareButton, { backgroundColor: colors.raised }]}
+          style={[styles.shareButton, { backgroundColor: colors.raised, opacity: readOnly ? 0.8 : 1 }]}
         >
           <Ionicons name="share-social-outline" size={16} color={colors.textSecondary} />
         </Pressable>
