@@ -17,7 +17,16 @@ import type { Report } from "@/services/types";
 export default function RevisarScreen() {
   const { colors } = useAppTheme();
 
-  const draft = useDraftStore();
+  const category = useDraftStore((s) => s.category);
+  const title = useDraftStore((s) => s.title);
+  const description = useDraftStore((s) => s.description);
+  const latitude = useDraftStore((s) => s.latitude);
+  const longitude = useDraftStore((s) => s.longitude);
+  const address = useDraftStore((s) => s.address);
+  const colonia = useDraftStore((s) => s.colonia);
+  const municipality = useDraftStore((s) => s.municipality);
+  const reference = useDraftStore((s) => s.reference);
+  const photos = useDraftStore((s) => s.photos);
   const resetDraft = useDraftStore((s) => s.resetDraft);
   const submitReport = useReportsStore((s) => s.submitReport);
 
@@ -28,26 +37,26 @@ export default function RevisarScreen() {
   const authenticated = useAuthSession();
 
   const previewReport = useMemo<Report>(() => {
-    const canonicalCategory = draft.category || "otro";
+    const canonicalCategory = category || "otro";
     const formattedAddress =
-      draft.address ||
-      (draft.colonia ? `Col. ${draft.colonia}` : "Ubicación en Jalisco");
+      address ||
+      (colonia ? `Col. ${colonia}` : "Ubicación en Jalisco");
 
     return {
       id: 0,
       folio: "PREVIEW",
       category: canonicalCategory,
       type: canonicalCategory,
-      title: draft.title.trim(),
-      description: draft.description.trim(),
-      latitude: draft.latitude ?? 20.6766,
-      longitude: draft.longitude ?? -103.347,
+      title: title.trim(),
+      description: description.trim(),
+      latitude: latitude ?? 20.6766,
+      longitude: longitude ?? -103.347,
       ubication: formattedAddress,
-      address: draft.address,
-      colonia: draft.colonia,
-      municipality: draft.municipality,
-      reference: draft.reference,
-      photos: (draft.photos || []).map((photo, index) => ({
+      address,
+      colonia,
+      municipality,
+      reference,
+      photos: (photos || []).map((photo, index) => ({
         id: index + 1,
         url: photo.uri,
       })),
@@ -62,16 +71,16 @@ export default function RevisarScreen() {
       liked_by_me: false,
     };
   }, [
-    draft.category,
-    draft.title,
-    draft.description,
-    draft.latitude,
-    draft.longitude,
-    draft.address,
-    draft.colonia,
-    draft.municipality,
-    draft.reference,
-    draft.photos,
+    category,
+    title,
+    description,
+    latitude,
+    longitude,
+    address,
+    colonia,
+    municipality,
+    reference,
+    photos,
   ]);
 
   const handleSubmit = async () => {
@@ -88,7 +97,7 @@ export default function RevisarScreen() {
     setSubmitting(true);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
-      const created = await submitReport(draft);
+      const created = await submitReport(useDraftStore.getState());
       await resetDraft();
       router.replace({
         pathname: "/reportar/exito",

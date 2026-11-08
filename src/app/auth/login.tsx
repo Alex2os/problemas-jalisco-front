@@ -78,7 +78,9 @@ export default function Login() {
       alternatePrompt="¿No tienes una cuenta?"
       alternateLabel="Crear una cuenta"
       onBack={() => {
-        if (!submission.current) router.replace("/(tabs)/perfil");
+        if (submission.current) return;
+        if (router.canGoBack()) router.back();
+        else router.replace("/(tabs)/perfil");
       }}
       onSubmit={ManageUserLogIn}
       onAlternate={() =>

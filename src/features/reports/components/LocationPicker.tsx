@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -50,6 +51,8 @@ export function LocationPicker({
   style,
 }: LocationPickerProps) {
   const { colors, dark } = useAppTheme();
+  const { height: windowHeight } = useWindowDimensions();
+  const mapHeight = Math.min(440, Math.max(320, Math.round(windowHeight * 0.44)));
   const identity = useCacheValue<number>("session:version") || 0;
 
   const map = useRef<MapView>(null);
@@ -157,7 +160,7 @@ export function LocationPicker({
     <View style={[styles.container, style]}>
       <LocationSearch onSelect={handleSearchSelect} />
       {/* Map with Center Pin */}
-      <View style={[styles.mapWrap, { borderColor: colors.border }]}>
+      <View style={[styles.mapWrap, { height: mapHeight, borderColor: colors.border }]}>
         <MapView
           style={StyleSheet.absoluteFill}
           ref={map}
@@ -242,8 +245,8 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   mapWrap: {
-    flex: 1,
-    minHeight: 180,
+    minHeight: 320,
+    maxHeight: 440,
     borderRadius: radius.group,
     overflow: "hidden",
     borderWidth: 1,

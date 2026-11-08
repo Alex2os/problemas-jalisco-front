@@ -10,6 +10,7 @@ import { useReducedMotion } from "react-native-reanimated";
 
 import { AppThemeProvider, useAppTheme } from "@/hooks/useAppTheme";
 import { useAppFonts } from "@/hooks/useAppFonts";
+import { motion } from "@/constants/design";
 import { clearLegacyStorage } from "@/services/clear-legacy-storage";
 import { useReportsStore } from "@/store/useReportsStore";
 import "../../global.css";
@@ -84,7 +85,7 @@ function Navigation() {
           options={{
             headerShown: false,
             animation: reducedMotion ? "none" : "slide_from_right",
-            animationDuration: 220,
+            animationDuration: motion.tabShift,
           }}
         />
 

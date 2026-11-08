@@ -10,7 +10,7 @@ import {
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { space } from "@/constants/design";
+import { motion, space } from "@/constants/design";
 
 export interface StepProgressProps {
   currentStep: number;
@@ -35,11 +35,13 @@ export function StepProgress({
   const progress = useSharedValue(progressRatio);
   useEffect(() => {
     progress.value = withTiming(progressRatio, {
-      duration: reducedMotion ? 0 : 320,
+      duration: reducedMotion ? 0 : motion.progress,
       easing: Easing.out(Easing.cubic),
     });
   }, [progress, progressRatio, reducedMotion]);
-  const fillStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%` }));
+  const fillStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleX: progress.value }],
+  }));
 
   const handleBack = () => {
     if (backDisabled) return;
@@ -68,7 +70,7 @@ export function StepProgress({
 
         <Animated.Text
           key={stepTitle}
-          entering={reducedMotion ? undefined : FadeIn.duration(160)}
+          entering={reducedMotion ? undefined : FadeIn.duration(motion.micro)}
           accessibilityRole="header"
           style={[styles.title, { color: colors.text }]}
         >
@@ -127,6 +129,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   fill: {
+    width: "100%",
     height: "100%",
+    transformOrigin: "left",
   },
 });

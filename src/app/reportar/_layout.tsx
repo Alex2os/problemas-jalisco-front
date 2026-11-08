@@ -1,10 +1,11 @@
 import { router, usePathname } from "expo-router";
 import { Stack, CardStyleInterpolators } from "expo-router/js-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Easing, KeyboardAvoidingView, Platform, View } from "react-native";
+import { Easing, Keyboard, KeyboardAvoidingView, Platform, View } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StepProgress } from "@/components/StepProgress";
+import { motion } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useDraftStore } from "@/store/useDraftStore";
 
@@ -36,6 +37,7 @@ export default function ReportarLayout() {
             backDisabled={submitting}
             onBack={() => {
               if (submitting) return;
+              Keyboard.dismiss();
               if (index === 0) router.dismissTo("/mapa");
               else if (router.canGoBack()) router.back();
               else router.replace("/mapa");
@@ -51,8 +53,8 @@ export default function ReportarLayout() {
             animation: reducedMotion ? "none" : "slide_from_right",
             cardStyleInterpolator: reducedMotion ? CardStyleInterpolators.forNoAnimation : CardStyleInterpolators.forHorizontalIOS,
             transitionSpec: {
-              open: { animation: "timing", config: { duration: 320, easing: Easing.out(Easing.cubic) } },
-              close: { animation: "timing", config: { duration: 320, easing: Easing.out(Easing.cubic) } },
+              open: { animation: "timing", config: { duration: motion.stackOpen, easing: Easing.out(Easing.cubic) } },
+              close: { animation: "timing", config: { duration: motion.stackClose, easing: Easing.out(Easing.cubic) } },
             },
             gestureDirection: "horizontal",
             gestureResponseDistance: 24,

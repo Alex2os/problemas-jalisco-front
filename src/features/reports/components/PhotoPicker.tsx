@@ -3,11 +3,12 @@ import { ErrorBanner } from "@/components/ErrorBanner";
 import type { ReportPhoto } from "@/services/types";
 import { space } from "@/constants/design";
 import { MAX_PHOTO_BYTES, type SelectedPhoto } from "@/services/report-media";
+import { File } from "expo-file-system";
 import { Image } from "expo-image";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
-import { Linking, Pressable, View } from "react-native";
+import { Linking, Platform, Pressable, View } from "react-native";
 import { Button } from "@/components/Button";
 import { AppText, Notice } from "@/components/ui/AppUi";
 
@@ -103,10 +104,18 @@ export function PhotoPicker({
         const image = await manipulateAsync(asset.uri, actions, {
           compress: 0.8,
           format: SaveFormat.JPEG,
-          base64: true,
         });
-        const size = Math.floor(((image.base64?.length || 0) * 3) / 4);
-        if (!size || size > MAX_PHOTO_BYTES)
+        let size = 0;
+        if (Platform.OS === "web") {
+          const response = await fetch(image.uri);
+          if (response.ok) {
+            const blob = await response.blob();
+            size = blob.size;
+          }
+        } else {
+          size = new File(image.uri).size;
+        }
+        if (!Number.isFinite(size) || size <= 0 || size > MAX_PHOTO_BYTES)
           throw new Error(
             "La foto procesada supera 5 MB. Elige una más pequeña.",
           );

@@ -69,7 +69,9 @@ export default function Register() {
       alternatePrompt="¿Ya tienes una cuenta?"
       alternateLabel="Iniciar sesión"
       onBack={() => {
-        if (!submission.current) router.replace("/(tabs)/perfil");
+        if (submission.current) return;
+        if (router.canGoBack()) router.back();
+        else router.replace("/(tabs)/perfil");
       }}
       onSubmit={ManageRegisterUser}
       onAlternate={() =>

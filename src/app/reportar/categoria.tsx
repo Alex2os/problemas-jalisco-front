@@ -22,7 +22,7 @@ export default function CategoriaScreen() {
   const handleSelect = (id: string) => {
     setCategory(id);
     setStep(2);
-    router.navigate("/reportar/ubicacion");
+    router.push("/reportar/ubicacion");
   };
 
   return (

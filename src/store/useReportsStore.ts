@@ -5,7 +5,7 @@ import { GetAllReports } from "@/services/get-all-reports";
 import { GetReportById } from "@/services/get-report-by-id";
 import { normalizeReport } from "@/services/normalize-report";
 import { SetReportLike } from "@/services/report-interactions";
-import { reportKey } from "@/services/report-state";
+import { isBulkReadingReports, isSameReportSnapshot, reportKey } from "@/services/report-state";
 import { loadSession, sessionVersion } from "@/services/session";
 import type { Report, ReportDraft } from "@/services/types";
 
@@ -31,10 +31,14 @@ function watchReports(reports: Report[]) {
   for (const id of ids) {
     if (subscriptions.has(id)) continue;
     subscriptions.set(id, apiCache.subscribe(reportKey(id), () => {
+      if (isBulkReadingReports()) return;
       const updated = apiCache.peek<Report>(reportKey(id));
       if (!updated) return;
       useReportsStore.setState((state) => {
-        const reports = state.reports.map((report) => report.id === id ? updated : report);
+        const index = state.reports.findIndex((report) => report.id === id);
+        if (index === -1 || isSameReportSnapshot(state.reports[index], updated)) return state;
+        const reports = state.reports.slice();
+        reports[index] = updated;
         return { reports };
       });
     }));
@@ -68,7 +72,13 @@ export const useReportsStore = create<ReportsState>((set, get) => ({
         if (version !== sessionVersion() || request !== readEpoch) return;
         const reports = fetched.map((report) => apiCache.peek<Report>(reportKey(report.id)) || report);
         watchReports(reports);
-        set({ reports, error: "" });
+        set((state) => {
+          const unchanged =
+            state.error === "" &&
+            state.reports.length === reports.length &&
+            state.reports.every((item, i) => isSameReportSnapshot(item, reports[i]));
+          return unchanged ? state : { reports, error: "" };
+        });
       } catch (error) {
         if (version === sessionVersion() && request === readEpoch)
           set({ error: error instanceof Error ? error.message : "No se pudieron cargar los reportes." });

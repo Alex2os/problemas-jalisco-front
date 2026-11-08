@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
@@ -40,7 +41,14 @@ export function ProfileReportItem({ report, onPress }: ProfileReportItemProps) {
       <View style={styles.row}>
       <View style={[styles.thumb, { backgroundColor: colors.raised }]}>
         {photoUrl ? (
-          <Image source={{ uri: photoUrl }} style={styles.image} resizeMode="cover" />
+          <Image
+            source={{ uri: photoUrl }}
+            style={styles.image}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={150}
+            recyclingKey={photoUrl}
+          />
         ) : (
           <View
             style={[

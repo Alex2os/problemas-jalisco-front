@@ -132,3 +132,42 @@ test('a confirmed create remains successful if its follow-up detail request fail
   assert.equal(result.folio, '42');
   assert.equal(store.getState().reports.length, 0);
 });
+
+test('background refreshes batch report updates without intermediate per-item store emissions', async () => {
+  let feedVersion = 0;
+  const c = client(async path => {
+    if (path === '/reports') {
+      feedVersion++;
+      return {
+        reports: [
+          { ...report, id: 1, like_count: feedVersion },
+          { ...report, id: 2, like_count: feedVersion },
+          { ...report, id: 3, like_count: feedVersion },
+        ],
+      };
+    }
+    throw new Error(`Unexpected path: ${path}`);
+  });
+  const store = c.load('store/useReportsStore').useReportsStore;
+  await store.getState().initialize();
+  assert.deepEqual(store.getState().reports.map(item => item.like_count), [1, 1, 1]);
+
+  let reportsEmissions = 0;
+  let prevReports = store.getState().reports;
+  const unsubscribe = store.subscribe(state => {
+    if (state.reports !== prevReports) {
+      reportsEmissions++;
+      prevReports = state.reports;
+    }
+  });
+
+  await store.getState().refreshReports(true);
+  assert.equal(reportsEmissions, 1);
+  assert.deepEqual(store.getState().reports.map(item => item.like_count), [2, 2, 2]);
+
+  // Repeat identical data in background: should not replace reports reference
+  feedVersion--;
+  await store.getState().refreshReports(true);
+  assert.equal(reportsEmissions, 1);
+  unsubscribe();
+});

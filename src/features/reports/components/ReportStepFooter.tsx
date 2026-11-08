@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -29,7 +31,24 @@ export function ReportStepFooter({
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
   const [pressed, setPressed] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   const inactive = disabled || loading;
+  const bottomPadding = keyboardVisible
+    ? space.md
+    : insets.bottom + (continuous ? space.md : space.xxl);
+
   return (
     <View
       style={[
@@ -37,7 +56,8 @@ export function ReportStepFooter({
         {
           backgroundColor: continuous ? colors.background : colors.surface,
           borderTopColor: colors.border,
-          paddingBottom: insets.bottom + (continuous ? space.md : space.xxl),
+          paddingTop: keyboardVisible ? space.md : space.lg,
+          paddingBottom: bottomPadding,
         },
       ]}
     >

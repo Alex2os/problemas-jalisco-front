@@ -46,6 +46,16 @@ export const border = {
   thick: 2,
 };
 
+export const motion = {
+  micro: 160,
+  tabShift: 220,
+  stackClose: 220,
+  progress: 240,
+  stackOpen: 260,
+  enter: 360,
+  pulse: 900,
+} as const;
+
 // Accessible typography: body font 16px+, high contrast line heights
 export const type = StyleSheet.create({
   hero: {

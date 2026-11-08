@@ -1,6 +1,7 @@
 import * as Font from "expo-font";
 import { useEffect, useState } from "react";
 import { FontFamily } from "@/constants/theme";
+import { CATEGORY_ICON_FONTS } from "@/features/reports/components/CategoryIcon";
 
 /**
  * Mapeo de archivos reales de fuentes en assets/fonts/ a nombres de familia Expo/React Native.
@@ -8,6 +9,7 @@ import { FontFamily } from "@/constants/theme";
  * - Inter: Textos principales, etiquetas, subtítulos y controles.
  */
 export const customFonts: Record<string, Font.FontSource> = {
+  ...CATEGORY_ICON_FONTS,
   // Nunito
   [FontFamily.nunito.semiBold]: require("../../assets/fonts/Nunito-SemiBold.ttf"),
   [FontFamily.nunito.bold]: require("../../assets/fonts/Nunito-Bold.ttf"),

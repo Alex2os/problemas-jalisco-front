@@ -4,7 +4,7 @@ import { router, Tabs } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useReducedMotion } from "react-native-reanimated";
-import { radius, size, space } from "@/constants/design";
+import { motion, radius, size, space } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useAuthSession } from "@/hooks/useReportState";
 
@@ -19,7 +19,7 @@ type TabConfig = {
 
 const TAB_TRANSITION_SPEC = {
   animation: "timing",
-  config: { duration: 220, easing: Easing.inOut(Easing.ease) },
+  config: { duration: motion.tabShift, easing: Easing.out(Easing.cubic) },
 } as const;
 
 const LEFT_TABS: TabConfig[] = [
@@ -213,8 +213,20 @@ function FloatingTabBar({
   );
 }
 
+export const unstable_settings = {
+  initialRouteName: "mapa",
+};
+
 export default function TabLayout() {
   const reducedMotion = useReducedMotion();
+  const [tabsPreloaded, setTabsPreloaded] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setTabsPreloaded(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <Tabs
@@ -222,11 +234,12 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
+        lazy: !tabsPreloaded,
         animation: reducedMotion ? "none" : "shift",
         transitionSpec: TAB_TRANSITION_SPEC,
       }}
     >
-      <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen name="index" options={{ href: null, lazy: true }} />
       <Tabs.Screen name="mapa" options={{ title: "Mapa" }} />
       <Tabs.Screen name="mis-reportes" options={{ title: "Reportes" }} />
       <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />

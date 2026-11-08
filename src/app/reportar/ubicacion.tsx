@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Keyboard, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 
@@ -31,6 +31,7 @@ export default function UbicacionScreen() {
     if (!isLocationValid) {
       return;
     }
+    Keyboard.dismiss();
     setStep(3);
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/reportar/evidencia");

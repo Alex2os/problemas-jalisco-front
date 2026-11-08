@@ -53,12 +53,6 @@ export default function MapaScreen() {
   };
 
   const handleSelectReport = (r: Report) => {
-    mapRef.current?.animateToRegion({
-      latitude: r.latitude,
-      longitude: r.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
     router.push(`/reporte/${r.id}`);
   };
 

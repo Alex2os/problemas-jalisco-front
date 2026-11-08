@@ -7,7 +7,7 @@ import Animated, { FadeInDown, useReducedMotion } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ReportSuccessAnimation } from "@/features/reports/components/ReportSuccessAnimation";
-import { radius, space } from "@/constants/design";
+import { motion, radius, space } from "@/constants/design";
 import { es } from "@/constants/es";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
@@ -46,11 +46,11 @@ export default function ExitoScreen() {
       }]} showsVerticalScrollIndicator={false}>
         <View style={styles.panel}>
           <ReportSuccessAnimation />
-          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(180).duration(360)} style={styles.message}>
+          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(180).duration(motion.enter)} style={styles.message}>
             <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{es.success.title}</Text>
             <Text style={[styles.subtitle, { color: colors.muted }]}>{es.success.subtitle}</Text>
           </Animated.View>
-          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(320).duration(360)} style={styles.actions}>
+          <Animated.View entering={reducedMotion ? undefined : FadeInDown.delay(320).duration(motion.enter)} style={styles.actions}>
             {/* Acción primaria — Ver reporte */}
             <Pressable
               accessibilityRole="button"

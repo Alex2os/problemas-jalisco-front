@@ -1,7 +1,6 @@
 import { CategoryIcon } from "@/features/reports/components/CategoryIcon";
 import React from "react";
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -71,7 +71,10 @@ export function ReportCard({ report, onPress, readOnly = false, style }: ReportC
             <Image
               source={{ uri: photoUrl }}
               style={styles.thumbnail}
-              resizeMode="cover"
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={150}
+              recyclingKey={photoUrl}
             />
           ) : (
             <View

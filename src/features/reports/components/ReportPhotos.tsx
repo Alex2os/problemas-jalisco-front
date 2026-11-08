@@ -17,6 +17,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useReducedMotion } from "react-native-reanimated";
 import { AppText, Notice } from "@/components/ui/AppUi";
 
 export function ReportImage({
@@ -103,6 +104,7 @@ function ReportPhotosContent({
   report: Report;
   hero: boolean;
 }) {
+  const reducedMotion = useReducedMotion();
   const photos = report.photos || [];
   const [viewing, setViewing] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -167,7 +169,7 @@ function ReportPhotosContent({
       <Notice message={error} />
       <Modal
         visible={viewing !== null && index >= 0}
-        animationType="none"
+        animationType={reducedMotion ? "none" : "fade"}
         onRequestClose={() => setViewing(null)}
       >
         <SafeAreaProvider>

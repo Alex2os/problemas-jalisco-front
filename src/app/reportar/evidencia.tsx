@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
+import { useReducedMotion } from "react-native-reanimated";
 
 import { OptionalBadge } from "@/components/OptionalBadge";
 import { CharacterCount } from "@/components/CharacterCount";
@@ -27,6 +28,7 @@ const DESCRIPTION_LIMIT = 255;
 
 export default function EvidenciaScreen() {
   const { colors } = useAppTheme();
+  const reducedMotion = useReducedMotion();
   const photos = useDraftStore((state) => state.photos);
   const title = useDraftStore((state) => state.title);
   const setTitle = useDraftStore((state) => state.setTitle);
@@ -46,7 +48,7 @@ export default function EvidenciaScreen() {
     if (picking) return;
     setTitleTouched(true);
     if (getReportTitleError(title)) {
-      scroll.current?.scrollTo({ y: 0, animated: true });
+      scroll.current?.scrollTo({ y: 0, animated: !reducedMotion });
       titleInput.current?.focus();
       return;
     }

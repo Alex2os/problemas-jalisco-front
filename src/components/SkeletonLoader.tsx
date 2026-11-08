@@ -2,13 +2,14 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
   Easing,
 } from "react-native-reanimated";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { radius, space } from "@/constants/design";
+import { motion, radius, space } from "@/constants/design";
 
 export interface SkeletonProps {
   width?: number | `${number}%` | "100%";
@@ -24,15 +25,21 @@ export function SkeletonItem({
   style,
 }: SkeletonProps) {
   const { colors } = useAppTheme();
-  const opacity = useSharedValue(0.4);
+  const reducedMotion = useReducedMotion();
+  const opacity = useSharedValue(0.6);
 
   useEffect(() => {
+    if (reducedMotion) {
+      opacity.value = 0.6;
+      return;
+    }
+    opacity.value = 0.4;
     opacity.value = withRepeat(
-      withTiming(0.85, { duration: 900, easing: Easing.inOut(Easing.ease) }),
+      withTiming(0.85, { duration: motion.pulse, easing: Easing.inOut(Easing.ease) }),
       -1,
       true
     );
-  }, [opacity]);
+  }, [opacity, reducedMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
