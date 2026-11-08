@@ -6,6 +6,8 @@ export * from "./RecommendationLocationNotice";
 export * from "./ReportCard";
 export * from "./ReportFeedItem";
 export * from "./ReportComments";
+export * from "./ReportCommentsPreview";
+export * from "./ReportCommentsSheet";
 export * from "./ReportDetailHeader";
 export * from "./ReportEditButton";
 export * from "./ReportLocationSection";

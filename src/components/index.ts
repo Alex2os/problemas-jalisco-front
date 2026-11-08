@@ -5,4 +5,5 @@ export * from "./ErrorBanner";
 export * from "./OptionalBadge";
 export * from "./SkeletonLoader";
 export * from "./StepProgress";
+export * from "./UserAvatar";
 export * from "./ui/IconSymbol";

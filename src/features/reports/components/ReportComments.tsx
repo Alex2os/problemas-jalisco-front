@@ -14,6 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Button } from "@/components/Button";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { CharacterCount } from "@/components/CharacterCount";
+import { UserAvatar } from "@/components/UserAvatar";
 import { radius, size, space, type } from "@/constants/design";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useAuthSession, useCacheValue } from "@/hooks/useReportState";
@@ -172,7 +173,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
   }
 
   return (
-    <View style={[styles.section, { borderTopColor: colors.border }]}>
+    <View style={styles.section}>
       {authenticated ? (
         <View style={styles.composer}>
           <View style={styles.inputHeader}>
@@ -195,7 +196,6 @@ export function ReportComments({ reportId }: { reportId: number }) {
             editable={!busy}
             style={[
               styles.input,
-              (composerFocused || !!text) && styles.inputExpanded,
               {
                 color: colors.text,
                 backgroundColor: colors.background,
@@ -278,11 +278,7 @@ export function ReportComments({ reportId }: { reportId: number }) {
             style={[styles.comment, { borderBottomColor: colors.border }]}
           >
             <View style={styles.commentHeader}>
-              <View style={[styles.avatar, { backgroundColor: colors.raised }]}>
-                <Text style={[styles.initial, { color: colors.textSecondary }]}>
-                  {(comment.username || "Usuario").slice(0, 1).toUpperCase()}
-                </Text>
-              </View>
+              <UserAvatar size={28} tone="soft" />
               <View style={styles.commentMeta}>
                 <Text style={[styles.author, { color: colors.text }]}>
                   {comment.username || "Usuario"}
@@ -391,9 +387,6 @@ export function ReportComments({ reportId }: { reportId: number }) {
 
 const styles = StyleSheet.create({
   section: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: space.lg,
-    paddingTop: space.lg,
     gap: space.md,
   },
   composer: { gap: space.sm },
@@ -418,14 +411,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   commentHeader: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.full,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  initial: { ...type.caption, fontWeight: "700" },
   commentMeta: {
     flex: 1,
     flexDirection: "row",
@@ -453,10 +438,9 @@ const styles = StyleSheet.create({
   inputHeader: { flexDirection: "row", alignItems: "center", gap: space.sm },
   date: { ...type.caption },
   body: { ...type.body, paddingVertical: space.xs },
-  inputExpanded: { minHeight: 96 },
   input: {
     ...type.body,
-    minHeight: size.touch,
+    minHeight: 72,
     borderWidth: 1,
     borderRadius: radius.control,
     padding: space.md,

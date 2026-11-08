@@ -6,6 +6,7 @@ import * as Haptics from "expo-haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { UserAvatar } from "@/components/UserAvatar";
 import { ProfileReportItem } from "@/features/reports/components/ProfileReportItem";
 import { radius, size, space } from "@/constants/design";
 import { es } from "@/constants/es";
@@ -59,9 +60,7 @@ export default function PerfilScreen() {
       <Text accessibilityRole="header" style={[styles.pageTitle, { color: colors.text }]}>{es.profile.title}</Text>
 
       <View style={[styles.card, cardColors, styles.userRow]}>
-        <View style={[styles.avatar, { backgroundColor: colors.accentSoft }]}>
-          <Ionicons name="person-outline" size={26} color={colors.accentText} />
-        </View>
+        <UserAvatar size={56} iconSize={26} tone="accent" />
         <View style={styles.userInfo}>
           <Text style={[styles.userName, { color: colors.text }]}>{authenticated ? user?.username || "Mi cuenta" : "Invitado"}</Text>
           <Text style={[styles.caption, { color: colors.muted }]}>
@@ -188,7 +187,6 @@ const styles = StyleSheet.create({
   interactiveLabel: { fontSize: 16, lineHeight: 22, fontWeight: "600" },
   caption: { fontSize: 13, lineHeight: 19 },
   userRow: { flexDirection: "row", alignItems: "center", gap: space.md },
-  avatar: { width: 56, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center" },
   userInfo: { flex: 1, minWidth: 0, gap: space.xs },
   userName: { fontSize: 18, lineHeight: 25, fontWeight: "700" },
   activity: { gap: space.md },

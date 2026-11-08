@@ -1,9 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import MapView from "react-native-maps";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { radius, space } from "@/constants/design";
-import { es } from "@/constants/es";
 import { darkMapStyle } from "@/constants/map-theme";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import type { Report } from "@/services/types";
@@ -11,25 +9,10 @@ import { GoogleMapsButton } from "./GoogleMapsButton";
 import { ReportMapMarker } from "./ReportMapMarker";
 
 export function ReportLocationSection({ report }: { report: Report }) {
-  const { colors, dark } = useAppTheme();
+  const { dark } = useAppTheme();
 
   return (
-    <View
-      style={[
-        styles.section,
-      ]}
-    >
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>
-        {es.detail.locationTitle}
-      </Text>
-
-      <View style={styles.locationTextRow}>
-        <Ionicons name="location-sharp" size={16} color={colors.accentText} />
-        <Text style={[styles.locationText, { color: colors.text }]}>
-          {report.ubication}
-        </Text>
-      </View>
-
+    <View style={styles.section}>
       <View style={styles.miniMapWrapper}>
         <MapView
           style={StyleSheet.absoluteFill}
@@ -54,28 +37,13 @@ export function ReportLocationSection({ report }: { report: Report }) {
 
 const styles = StyleSheet.create({
   section: {
-    paddingVertical: space.md,
+    paddingTop: space.xs,
     gap: space.sm,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  locationTextRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  locationText: {
-    fontSize: 14,
-    fontWeight: "600",
-    flex: 1,
   },
   miniMapWrapper: {
     height: 160,
     borderRadius: radius.md,
     overflow: "hidden",
-    marginTop: space.xs,
   },
 });
 
